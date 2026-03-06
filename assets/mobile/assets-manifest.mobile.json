@@ -29,56 +29,74 @@
     ],
     "frames": [
       {
-        "prefix": "torch_blur_",
-        "atlas": "symbols-1.json"
+        "prefix": "book_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal"
       },
       {
-        "prefix": "mini_blur_",
-        "atlas": "symbols-0.json"
-      },
-      {
-        "prefix": "mega_blur_",
-        "atlas": "symbols-0.json"
-      },
-      {
-        "prefix": "major_blur_",
-        "atlas": "symbols-0.json"
-      },
-      {
-        "prefix": "A_blur_",
-        "atlas": "symbols-0.json"
-      },
-      {
-        "prefix": "K_blur_",
-        "atlas": "symbols-0.json"
-      },
-      {
-        "prefix": "Q_blur_",
-        "atlas": "symbols-0.json"
+        "prefix": "10_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal"
       },
       {
         "prefix": "J_blur_",
-        "atlas": "symbols-0.json"
+        "atlas": "symbols-0.json",
+        "winProfile": "normal"
       },
       {
-        "prefix": "book_blur_",
-        "atlas": "symbols-0.json"
+        "prefix": "Q_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal"
+      },
+      {
+        "prefix": "K_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal"
+      },
+      {
+        "prefix": "A_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal"
+      },
+      {
+        "prefix": "torch_blur_",
+        "atlas": "symbols-1.json",
+        "winProfile": "high"
       },
       {
         "prefix": "axe_blur_",
-        "atlas": "symbols-0.json"
+        "atlas": "symbols-0.json",
+        "winProfile": "high"
       },
       {
         "prefix": "chalice_blur_",
-        "atlas": "symbols-0.json"
-      },
-      {
-        "prefix": "shield_blur_",
-        "atlas": "symbols-0.json"
+        "atlas": "symbols-0.json",
+        "winProfile": "high"
       },
       {
         "prefix": "knight_blur_",
-        "atlas": "symbols-0.json"
+        "atlas": "symbols-0.json",
+        "winProfile": "high"
+      },
+      {
+        "prefix": "shield_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high"
+      },
+      {
+        "prefix": "mini_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high"
+      },
+      {
+        "prefix": "major_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high"
+      },
+      {
+        "prefix": "mega_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high"
       }
     ]
   },

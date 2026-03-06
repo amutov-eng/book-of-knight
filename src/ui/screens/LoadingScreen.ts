@@ -11,7 +11,9 @@ import {
     getBackgroundKeys,
     getReelLayerKeys,
     getSymbolAtlases,
-    getSymbolFrameDefsByIndex
+    getSymbolFrameDefsByIndex,
+    getAnimationAtlases,
+    getSymbolWinAnimationProfiles
 } from '../../config/assetsConfig';
 import { getRuntimeVariant } from '../../config/runtimeConfig';
 import AssetManager from '../../core/assets/AssetManager';
@@ -58,8 +60,10 @@ export default class LoadingScreen extends BaseScreen {
 
     cacheAtlasTextures(resources, textureCache) {
         const symbolAtlases = getSymbolAtlases(this.assetsManifest);
-        for (let i = 0; i < symbolAtlases.length; i++) {
-            const atlasPath = symbolAtlases[i];
+        const animationAtlases = getAnimationAtlases(this.assetsManifest);
+        const atlasPaths = [...symbolAtlases, ...animationAtlases];
+        for (let i = 0; i < atlasPaths.length; i++) {
+            const atlasPath = atlasPaths[i];
             if (resources[atlasPath] && resources[atlasPath].textures) {
                 Object.assign(textureCache, resources[atlasPath].textures);
             }
@@ -90,13 +94,17 @@ export default class LoadingScreen extends BaseScreen {
         }
         this.game.textures.regions = [];
         this.game.textures.symbolOffsets = [];
+        this.game.textures.symbolWinProfiles = [];
+        this.game.textures.symbolWinAnimations = getSymbolWinAnimationProfiles(this.assetsManifest);
         for (let i = 0; i < symbolDefs.length; i++) {
             this.game.textures.regions.push(this.game.textures.findFrames(symbolDefs[i].prefix, symbolDefs[i].atlas));
             this.game.textures.symbolOffsets.push({
                 x: Number.isFinite(symbolDefs[i].offsetX) ? symbolDefs[i].offsetX : 0,
                 y: Number.isFinite(symbolDefs[i].offsetY) ? symbolDefs[i].offsetY : 0
             });
+            this.game.textures.symbolWinProfiles.push(symbolDefs[i].winProfile || 'normal');
         }
+        this.game.textures.winFrames = this.game.textures.findFrames('frame_', 'assets/animations/win-0.json');
         const maxStripIndex = getMaxStripSymbolIndex();
         if (maxStripIndex >= this.game.textures.regions.length) {
             log(`LoadingScreen::symbol index map too short for strips (max strip index: ${maxStripIndex}, loaded: ${this.game.textures.regions.length})`, 'warn');

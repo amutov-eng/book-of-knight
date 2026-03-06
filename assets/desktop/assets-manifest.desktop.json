@@ -22,6 +22,11 @@
                                   "assets/lines/lines-1.json"
                               ]
               },
+    "animations":  {
+                        "atlases":  [
+                                        "assets/animations/win-0.json"
+                                    ]
+                    },
     "layout":  {
                    "shared":  {
                                   "baseReel":  {
@@ -69,78 +74,98 @@
                                    {
                                        "prefix":  "book_blur_",
                                        "atlas":  "symbols-0.json",
+                                       "winProfile":  "normal",
                                        "offsetX":  5,
+                                       "offsetY":  0
+                                   },
+                                   {
+                                       "prefix":  "10_blur_",
+                                       "atlas":  "symbols-0.json",
+                                       "winProfile":  "normal",
+                                       "offsetX":  0,
                                        "offsetY":  0
                                    },
                                    {
                                        "prefix":  "J_blur_",
                                        "atlas":  "symbols-0.json",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "torch_blur_",
-                                       "atlas":  "symbols-1.json",
+                                       "winProfile":  "normal",
                                        "offsetX":  0,
                                        "offsetY":  0
                                    },
                                    {
                                        "prefix":  "Q_blur_",
                                        "atlas":  "symbols-0.json",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "mini_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "mega_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "major_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "A_blur_",
-                                       "atlas":  "symbols-0.json",
+                                       "winProfile":  "normal",
                                        "offsetX":  0,
                                        "offsetY":  0
                                    },
                                    {
                                        "prefix":  "K_blur_",
                                        "atlas":  "symbols-0.json",
+                                       "winProfile":  "normal",
+                                       "offsetX":  0,
+                                       "offsetY":  0
+                                   },
+                                   {
+                                       "prefix":  "A_blur_",
+                                       "atlas":  "symbols-0.json",
+                                       "winProfile":  "normal",
+                                       "offsetX":  0,
+                                       "offsetY":  0
+                                   },
+                                   {
+                                       "prefix":  "torch_blur_",
+                                       "atlas":  "symbols-1.json",
+                                       "winProfile":  "high",
                                        "offsetX":  0,
                                        "offsetY":  0
                                    },
                                    {
                                        "prefix":  "axe_blur_",
                                        "atlas":  "symbols-0.json",
+                                       "winProfile":  "high",
                                        "offsetX":  0,
                                        "offsetY":  0
                                    },
                                    {
                                        "prefix":  "chalice_blur_",
                                        "atlas":  "symbols-0.json",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "shield_blur_",
-                                       "atlas":  "symbols-0.json",
+                                       "winProfile":  "high",
                                        "offsetX":  0,
                                        "offsetY":  0
                                    },
                                    {
                                        "prefix":  "knight_blur_",
                                        "atlas":  "symbols-0.json",
+                                       "winProfile":  "high",
+                                       "offsetX":  0,
+                                       "offsetY":  0
+                                   },
+                                   {
+                                       "prefix":  "shield_blur_",
+                                       "atlas":  "symbols-0.json",
+                                       "winProfile":  "high",
+                                       "offsetX":  0,
+                                       "offsetY":  0
+                                   },
+                                   {
+                                       "prefix":  "mini_blur_",
+                                       "atlas":  "symbols-0.json",
+                                       "winProfile":  "high",
+                                       "offsetX":  0,
+                                       "offsetY":  0
+                                   },
+                                   {
+                                       "prefix":  "major_blur_",
+                                       "atlas":  "symbols-0.json",
+                                       "winProfile":  "high",
+                                       "offsetX":  0,
+                                       "offsetY":  0
+                                   },
+                                   {
+                                       "prefix":  "mega_blur_",
+                                       "atlas":  "symbols-0.json",
+                                       "winProfile":  "high",
                                        "offsetX":  0,
                                        "offsetY":  0
                                    }

@@ -154,6 +154,17 @@ function isNumericArray(value) {
     return Array.isArray(value) && value.length > 0 && value.every((item) => Number.isFinite(item));
 }
 
+const DEFAULT_SYMBOL_WIN_PROFILES = {
+    normal: {
+        scale: [100, 94.4, 88.8, 83.2, 77.6, 72, 82.8, 93.5, 104, 115, 110, 105, 100, 95, 90, 91.4, 92.9, 94, 95.7, 97, 98.6, 100, 100, 100, 100],
+        rotate: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    high: {
+        scale: [100, 94.4, 88.8, 83.2, 77.6, 72, 82.8, 93.5, 104.2, 115, 110.8, 106.6, 102.4, 98.2, 94, 96.8, 99.5, 102.2, 105, 103.8, 102.5, 101.2, 100, 100, 100],
+        rotate: [0, -2.3, -4.5, -6.8, -9, -6.5, -4, -1.5, 1, 3.5, 6, 5.1, 4.3, 3.4, 2.6, 1.7, 0.8, 0, 0, 0, 0, 0, 0, 0, 0]
+    }
+};
+
 /**
  * Loads the merged runtime manifest.
  *
@@ -235,6 +246,9 @@ export function validateAssetsManifest(manifest, variant = getRuntimeVariant()) 
                 for (let i = 0; i < manifest.symbols.frames.length; i++) {
                     const entry = manifest.symbols.frames[i];
                     if (!entry || typeof entry !== 'object') continue;
+                    if (entry.winProfile != null && typeof entry.winProfile !== 'string') {
+                        errors.push(`manifest.symbols.frames[${i}].winProfile must be a string when provided.`);
+                    }
                     if (entry.offsetX != null && !Number.isFinite(entry.offsetX)) {
                         errors.push(`manifest.symbols.frames[${i}].offsetX must be a number when provided.`);
                     }
@@ -261,6 +275,32 @@ export function validateAssetsManifest(manifest, variant = getRuntimeVariant()) 
             errors.push('manifest.lines must be an object.');
         } else if (manifest.lines.atlases != null && !Array.isArray(manifest.lines.atlases)) {
             errors.push('manifest.lines.atlases must be an array.');
+        }
+    }
+
+    if (manifest.animations != null) {
+        if (!isObject(manifest.animations)) {
+            errors.push('manifest.animations must be an object.');
+        } else if (manifest.animations.atlases != null && !Array.isArray(manifest.animations.atlases)) {
+            errors.push('manifest.animations.atlases must be an array.');
+        } else if (manifest.animations.symbolProfiles != null && !isObject(manifest.animations.symbolProfiles)) {
+            errors.push('manifest.animations.symbolProfiles must be an object when provided.');
+        } else if (isObject(manifest.animations.symbolProfiles)) {
+            const profileNames = Object.keys(manifest.animations.symbolProfiles);
+            for (let i = 0; i < profileNames.length; i++) {
+                const profileName = profileNames[i];
+                const profile = manifest.animations.symbolProfiles[profileName];
+                if (!isObject(profile)) {
+                    errors.push(`manifest.animations.symbolProfiles.${profileName} must be an object.`);
+                    continue;
+                }
+                if (profile.scale != null && !isNumericArray(profile.scale)) {
+                    errors.push(`manifest.animations.symbolProfiles.${profileName}.scale must be a numeric array when provided.`);
+                }
+                if (profile.rotate != null && !isNumericArray(profile.rotate)) {
+                    errors.push(`manifest.animations.symbolProfiles.${profileName}.rotate must be a numeric array when provided.`);
+                }
+            }
         }
     }
 
@@ -307,6 +347,7 @@ export function getLoadingManifest(manifest) {
     entries.push(...atlases);
     entries.push(...getUiAtlases(manifest));
     entries.push(...getLineAtlases(manifest));
+    entries.push(...getAnimationAtlases(manifest));
 
     return [...new Set(entries)];
 }
@@ -317,6 +358,34 @@ export function getLineAtlases(manifest) {
     }
 
     return manifest.lines.atlases.filter((value) => typeof value === 'string');
+}
+
+export function getAnimationAtlases(manifest) {
+    if (!manifest || !manifest.animations || !Array.isArray(manifest.animations.atlases)) {
+        return [];
+    }
+
+    return manifest.animations.atlases.filter((value) => typeof value === 'string');
+}
+
+export function getSymbolWinAnimationProfiles(manifest) {
+    const configured = manifest && manifest.animations && isObject(manifest.animations.symbolProfiles)
+        ? manifest.animations.symbolProfiles
+        : {};
+
+    const profiles = {};
+    const profileNames = [...new Set([...Object.keys(DEFAULT_SYMBOL_WIN_PROFILES), ...Object.keys(configured)])];
+    for (let i = 0; i < profileNames.length; i++) {
+        const profileName = profileNames[i];
+        const fallback = DEFAULT_SYMBOL_WIN_PROFILES[profileName] || DEFAULT_SYMBOL_WIN_PROFILES.normal;
+        const source = isObject(configured[profileName]) ? configured[profileName] : {};
+        profiles[profileName] = {
+            scale: isNumericArray(source.scale) ? source.scale.slice() : fallback.scale.slice(),
+            rotate: isNumericArray(source.rotate) ? source.rotate.slice() : fallback.rotate.slice()
+        };
+    }
+
+    return profiles;
 }
 
 /**
@@ -603,6 +672,7 @@ export function getSymbolFrameDefs(manifest) {
         .map((entry) => ({
             prefix: entry.prefix,
             atlas: entry.atlas,
+            winProfile: typeof entry.winProfile === 'string' && entry.winProfile.length > 0 ? entry.winProfile : 'normal',
             offsetX: Number.isFinite(entry.offsetX) ? entry.offsetX : 0,
             offsetY: Number.isFinite(entry.offsetY) ? entry.offsetY : 0
         }));
@@ -624,7 +694,7 @@ export function getSymbolFrameDefsByIndex(manifest) {
         const key = normalizePrefix(prefix);
         const found = defsByPrefix.get(key);
         if (found) return found;
-        return { prefix, atlas: '', offsetX: 0, offsetY: 0 };
+        return { prefix, atlas: '', winProfile: 'normal', offsetX: 0, offsetY: 0 };
     });
 }
 

@@ -557,8 +557,7 @@ export default class Reel extends PIXI.Container {
 
     removeHighlight() {
         for( let i = 0; i < this.TOTAL_SYMBOLS; i++ ) {
-            //this.visibleSymbols[i].highlight(false);
-            this.visibleSymbols[i].loop = false;
+            this.visibleSymbols[i].animate(false, false, false);
             this.visibleSymbols[i].alpha = 1.0;
             this.visibleSymbols[i].isWinning = false;
         }

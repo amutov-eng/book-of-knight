@@ -8,6 +8,9 @@ export default class Textures {
     constructor() {
         this.regions = [];
         this.symbolOffsets = [];
+        this.symbolWinProfiles = [];
+        this.symbolWinAnimations = {};
+        this.winFrames = [];
     }
 
     findFrames(id, atlas) { // alternative to libgdx findAtlasRegions

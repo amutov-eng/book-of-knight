@@ -106,11 +106,11 @@ export default class BackgroundLayer extends PIXI.Container {
     // Thin wrapper for existing state-driven flow.
     setByState(stateTitle) {
         if (HAW_STATES.has(stateTitle)) {
-            // this.transitionToHaw();
+            this.transitionToHaw();
             return;
         }
         if (FG_STATES.has(stateTitle)) {
-            // this.transitionToFg();
+            this.transitionToFg();
             return;
         }
         this.transitionToBase();

@@ -132,6 +132,11 @@ export default class Controller {
     if (bgLayer && bgLayer.setByState) {
       bgLayer.setByState(this.state.title);
     }
+
+    const reelsFrameLayer = this.game.reelsFrameLayer;
+    if (reelsFrameLayer && reelsFrameLayer.setByState) {
+      reelsFrameLayer.setByState(this.state.title);
+    }
   }
 
   destroy(): void {

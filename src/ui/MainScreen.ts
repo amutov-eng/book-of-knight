@@ -4,6 +4,7 @@
  */
 import BaseScreen from "../core/BaseScreen";
 import BackgroundLayer from './BackgroundLayer';
+import ReelsFrameLayer from './ReelsFrameLayer';
 import ServerErrorModal from './ServerErrorModal';
 
 /** @typedef {import('../core/BaseGame').default} BaseGame */
@@ -26,6 +27,9 @@ export default class MainScreen extends BaseScreen {
         this.game.backgroundLayer.setByState(this.game.controller.state.title);
         this.game.screen.stage.addChild(this.game.backgroundLayer);
         this.game.reels.show();
+        this.game.reelsFrameLayer = new ReelsFrameLayer();
+        this.game.reelsFrameLayer.setByState(this.game.controller.state.title);
+        this.game.screen.stage.addChild(this.game.reelsFrameLayer);
         this.game.menu.show();
         this.stage.addChild(this.game.menu);
         this.buildServerErrorModal();

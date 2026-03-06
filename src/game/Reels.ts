@@ -50,7 +50,6 @@ export default class Reels extends Container {
   private isBuilt = false;
   public lineRenderer: LineRender | null = null;
   private reelsBackground: Sprite | null = null;
-  private reelsFrame: Sprite | null = null;
 
   constructor(game: BaseGame) {
     super();
@@ -136,7 +135,6 @@ export default class Reels extends Container {
     if (!this.isBuilt) {
       this.drawReelLayers();
       this.buildReels();
-      this.drawReelFrameLayer();
       this.isBuilt = true;
     }
 
@@ -206,25 +204,6 @@ export default class Reels extends Container {
     this.addChild(this.reelsBackground);
   }
 
-  private drawReelFrameLayer(): void {
-    const textureCache = getTextureCache() as Record<string, Texture>;
-    const manifest = getAssetsManifest();
-    const frameKey = getReelTextureKey(manifest, 'frame', 'base');
-    const frameTexture = frameKey ? textureCache[frameKey] : null;
-    if (!frameTexture) return;
-
-    if (this.reelsFrame) {
-      this.reelsFrame.texture = frameTexture;
-      this.reelsFrame.position.set(this.BG_POSITION_X, this.BG_POSITION_Y);
-      return;
-    }
-
-    this.reelsFrame = new Sprite(frameTexture);
-    this.reelsFrame.position.set(this.BG_POSITION_X, this.BG_POSITION_Y);
-    this.addChild(this.reelsFrame);
-    this.applyLineRendererLayer();
-  }
-
   private applyLineRendererLayer(): void {
     if (!this.lineRenderer || this.lineRenderer.parent !== this || this.reels.length === 0) {
       return;
@@ -249,9 +228,7 @@ export default class Reels extends Container {
     }
 
     if (linesAboveSymbols) {
-      const targetIndex = this.reelsFrame && this.reelsFrame.parent === this
-        ? this.getChildIndex(this.reelsFrame)
-        : Math.min(lastReelIndex + 1, this.children.length - 1);
+      const targetIndex = Math.min(lastReelIndex + 1, this.children.length - 1);
       this.setChildIndex(this.lineRenderer, targetIndex);
       return;
     }

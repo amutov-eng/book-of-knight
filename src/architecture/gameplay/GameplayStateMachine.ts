@@ -309,6 +309,7 @@ GameplayState.SHOW_LAST_WINS = createState('SHOW_LAST_WINS', {
   entry: (controller) => {
     controller.lineCounter = 0;
     controller.game.menu.enableControls();
+    controller.game.reels.resetLineLayer();
   },
   process: (controller) => {
     if (controller.event === GameplayEvent.START) {
@@ -334,8 +335,8 @@ GameplayState.SHOW_LAST_WINS = createState('SHOW_LAST_WINS', {
     }
 
     controller.lineCounter = 0;
-    controller.timerCounter = -showLastWinsLoopDelay();
-    controller.game.reels.unhighlightAll();
+    controller.showWin();
+    controller.lineCounter = 1;
   },
   leave: (controller) => {
     controller.game.reels.unhighlightAll();

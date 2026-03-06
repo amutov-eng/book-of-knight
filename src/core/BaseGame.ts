@@ -10,6 +10,7 @@ import type Messages from '../ui/Messages';
 import type GsLink from '../net/GsLink';
 import type Textures from '../game/Textures';
 import type BackgroundLayer from '../ui/BackgroundLayer';
+import type ReelsFrameLayer from '../ui/ReelsFrameLayer';
 import type BaseScreen from './BaseScreen';
 import type GameplayEngine from '../architecture/gameplay/GameplayEngine';
 import type LocalizationService from '../localization/LocalizationService';
@@ -33,6 +34,7 @@ export default class BaseGame {
   messages: Messages | null;
   gsLink: GsLink | null;
   backgroundLayer: BackgroundLayer | null;
+  reelsFrameLayer: ReelsFrameLayer | null;
   gameplayEngine: GameplayEngine | null;
   localization: LocalizationService | null;
   timers: Timers | null;
@@ -55,6 +57,7 @@ export default class BaseGame {
     this.messages = null;
     this.gsLink = null;
     this.backgroundLayer = null;
+    this.reelsFrameLayer = null;
     this.gameplayEngine = null;
     this.localization = null;
     this.timers = null;
