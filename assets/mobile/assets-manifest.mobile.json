@@ -82,18 +82,6 @@
       }
     ]
   },
-  "gameplay": {
-    "timings": {
-      "spinTimeout": 11,
-      "showAllLinesTimeout": 35,
-      "spinEndTimeout": 0,
-      "noWinLastWinsTimeout": 16,
-      "autoTakeWinTimeout": 10,
-      "takeWinTimeout": 100,
-      "showLastWinsLoopDelay": 16,
-      "winToCreditStep": 200
-    }
-  },
   "ui": {
     "hud": {
       "fonts": {

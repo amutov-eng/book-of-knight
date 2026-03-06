@@ -9,6 +9,10 @@ function showAllLinesTimeout(): number {
   return getGameplayConfig().showAllLinesTimeout;
 }
 
+function showAllLinesStartDelay(): number {
+  return getGameplayConfig().showAllLinesStartDelay;
+}
+
 function spinEndTimeout(): number {
   return getGameplayConfig().spinEndTimeout;
 }
@@ -232,6 +236,7 @@ GameplayState.REELS_STOPPED = createState('REELS_STOPPED', {
 
 GameplayState.SHOW_WINS = createState('SHOW_WINS', {
   entry: (controller) => {
+    controller.game.reels.resetLineLayer();
     controller.lineCounter = 0;
     controller.game.context.onscreenWinMeter = 0;
     controller.game.menu.setWin(0);
@@ -274,14 +279,29 @@ GameplayState.SHOW_WINS = createState('SHOW_WINS', {
 
 GameplayState.SHOW_ALL_WINNING_LINES = createState('SHOW_ALL_WINNING_LINES', {
   entry: (controller) => {
-    controller.showAllWinningLines();
-    controller.game.menu.updateMeters();
+    controller.game.reels.setLinesAboveSymbols(true);
+    controller.lineCounter = 0;
   },
   process: (controller) => {
+    if (controller.lineCounter === 0) {
+      if (controller.timerCounter < showAllLinesStartDelay()) {
+        return;
+      }
+
+      controller.showAllWinningLines();
+      controller.game.menu.updateMeters();
+      controller.lineCounter = 1;
+      controller.timerCounter = 0;
+      return;
+    }
+
     if (controller.timerCounter > showAllLinesTimeout()) {
       controller.clearAllLines();
       toState(controller, GameplayState.WIN_TO_CREDIT);
     }
+  },
+  leave: (controller) => {
+    controller.game.reels.resetLineLayer();
   }
 });
 

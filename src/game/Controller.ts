@@ -45,7 +45,13 @@ export default class Controller {
 
   keyDown(code: string): boolean {
     if (code === 'Space') {
-      if (this.state === State.IDLE) {
+      const startHandler = this.game?.menu && typeof this.game.menu.onStartPressed === 'function'
+        ? this.game.menu.onStartPressed.bind(this.game.menu)
+        : null;
+
+      if (startHandler) {
+        startHandler();
+      } else if (this.state === State.IDLE) {
         this.event = Event.START;
       }
     }

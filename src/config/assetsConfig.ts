@@ -79,6 +79,37 @@ function mergeBranch(base, override) {
     return result;
 }
 
+function mergeManifestLayers(base, override) {
+    if (!isObject(base) && !isObject(override)) {
+        return override !== undefined ? override : base;
+    }
+
+    const baseObj = isObject(base) ? base : {};
+    const overrideObj = isObject(override) ? override : {};
+    const result = {};
+    const keys = [...new Set([...Object.keys(baseObj), ...Object.keys(overrideObj)])];
+
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const baseValue = baseObj[key];
+        const overrideValue = overrideObj[key];
+
+        if (Array.isArray(overrideValue)) {
+            result[key] = [...overrideValue];
+            continue;
+        }
+
+        if (isObject(baseValue) || isObject(overrideValue)) {
+            result[key] = mergeManifestLayers(baseValue, overrideValue);
+            continue;
+        }
+
+        result[key] = overrideValue !== undefined ? overrideValue : baseValue;
+    }
+
+    return result;
+}
+
 function getLayoutBranch(manifest, variant, isLandscape) {
     if (!manifest || !isObject(manifest.layout)) return null;
     const layout = manifest.layout;
@@ -132,13 +163,15 @@ export async function loadAssetsManifest(variant = getRuntimeVariant()) {
     }
 
     const fallbackVariant = variant === 'mobile' ? 'desktop' : 'mobile';
+    const commonManifest = await fetchJsonIfExists('assets/assets-manifest.common.json');
     const lookup = [
         `assets/assets-manifest.${variant}.json`,
         `assets/assets-manifest.${fallbackVariant}.json`
     ];
 
     for (let i = 0; i < lookup.length; i++) {
-        const manifest = await fetchJsonIfExists(lookup[i]);
+        const variantManifest = await fetchJsonIfExists(lookup[i]);
+        const manifest = mergeManifestLayers(commonManifest, variantManifest);
         if (manifest) {
             cachedManifest = manifest;
             cachedManifestErrors = validateAssetsManifest(cachedManifest, variant);
@@ -147,7 +180,7 @@ export async function loadAssetsManifest(variant = getRuntimeVariant()) {
     }
 
     cachedManifest = null;
-    cachedManifestErrors = ['Missing assets manifest. Expected one of: ' + lookup.join(', ')];
+    cachedManifestErrors = ['Missing assets manifest. Expected one of: ' + ['assets/assets-manifest.common.json', ...lookup].join(', ')];
     return cachedManifest;
 }
 

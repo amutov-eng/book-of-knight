@@ -923,6 +923,7 @@ export default class Menu extends PIXI.Container {
             : '';
         const isReelsSpinning = title === 'REELS_SPINNING';
         const isReelsStopping = title === 'REELS_STOPPING';
+        const canInterruptShowWins = title === 'SHOW_WINS';
         const showStopButton = isReelsSpinning || isReelsStopping;
         const connected = !!(this.game && this.game.gsLink && this.game.gsLink.isFullyConnected && this.game.gsLink.isFullyConnected());
         const serverSpinResultReady = !!(this.game && this.game.gsLink && this.game.gsLink.spinEnded);
@@ -933,9 +934,10 @@ export default class Menu extends PIXI.Container {
         const buyConfirmOpen = this.isBuyBonusConfirmOpen();
 
         const mainEnabled = connected && !this.controlsDisabled;
+        const startEnabled = connected && (!this.controlsDisabled || canInterruptShowWins);
 
         if (this.startButton && this.startButton.setEnabled) {
-            this.startButton.setEnabled(mainEnabled);
+            this.startButton.setEnabled(startEnabled);
         }
         if (this.stopButton && this.stopButton.setEnabled) {
             const canForceStop = connected && showStopButton && serverSpinResultReady;

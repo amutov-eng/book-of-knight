@@ -2,7 +2,8 @@ import { getAssetsManifest } from '../core/RuntimeContext';
 
 const DEFAULT_GAMEPLAY_CONFIG = Object.freeze({
   spinTimeout: 11,
-  showAllLinesTimeout: 35,
+  showAllLinesStartDelay: 8,
+  showAllLinesTimeout: 11135,
   spinEndTimeout: 0,
   noWinLastWinsTimeout: 16,
   autoTakeWinTimeout: 10,
@@ -29,6 +30,7 @@ export function getGameplayConfig() {
 
   return {
     spinTimeout: asFiniteNumber(timings.spinTimeout, DEFAULT_GAMEPLAY_CONFIG.spinTimeout),
+    showAllLinesStartDelay: asFiniteNumber(timings.showAllLinesStartDelay, DEFAULT_GAMEPLAY_CONFIG.showAllLinesStartDelay),
     showAllLinesTimeout: asFiniteNumber(timings.showAllLinesTimeout, DEFAULT_GAMEPLAY_CONFIG.showAllLinesTimeout),
     spinEndTimeout: asFiniteNumber(timings.spinEndTimeout, DEFAULT_GAMEPLAY_CONFIG.spinEndTimeout),
     noWinLastWinsTimeout: asFiniteNumber(timings.noWinLastWinsTimeout, DEFAULT_GAMEPLAY_CONFIG.noWinLastWinsTimeout),

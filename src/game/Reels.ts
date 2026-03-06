@@ -37,7 +37,8 @@ export default class Reels extends Container {
   private FORCE_SYMBOL_INDEX: number | null = null;
   private TITLE_POSITION_X = 0;
   private TITLE_POSITION_Y = 0;
-  private LINES_ABOVE_SYMBOLS = true;
+  private defaultLinesAboveSymbols = true;
+  private linesAboveSymbolsOverride: boolean | null = null;
   private variant: string;
   private stripMode: 'normal' | 'free' | 'holdAndWin' = 'normal';
   private autoStopTimers: ReturnType<typeof setTimeout>[] = [];
@@ -120,7 +121,7 @@ export default class Reels extends Container {
     this.BG_POSITION_Y = layout.layers.reelsBgY;
     this.TITLE_POSITION_X = layout.layers.titleX;
     this.TITLE_POSITION_Y = layout.layers.titleY;
-    this.LINES_ABOVE_SYMBOLS = layout.layers.linesAboveSymbols !== false;
+    this.defaultLinesAboveSymbols = layout.layers.linesAboveSymbols !== false;
     this.applyLineRendererLayer();
   }
 
@@ -229,6 +230,10 @@ export default class Reels extends Container {
       return;
     }
 
+    const linesAboveSymbols = this.linesAboveSymbolsOverride == null
+      ? this.defaultLinesAboveSymbols
+      : this.linesAboveSymbolsOverride;
+
     let firstReelIndex = Number.POSITIVE_INFINITY;
     let lastReelIndex = -1;
     for (let i = 0; i < this.reels.length; i++) {
@@ -243,7 +248,7 @@ export default class Reels extends Container {
       return;
     }
 
-    if (this.LINES_ABOVE_SYMBOLS) {
+    if (linesAboveSymbols) {
       const targetIndex = this.reelsFrame && this.reelsFrame.parent === this
         ? this.getChildIndex(this.reelsFrame)
         : Math.min(lastReelIndex + 1, this.children.length - 1);
@@ -252,6 +257,16 @@ export default class Reels extends Container {
     }
 
     this.setChildIndex(this.lineRenderer, firstReelIndex);
+  }
+
+  setLinesAboveSymbols(enabled: boolean): void {
+    this.linesAboveSymbolsOverride = !!enabled;
+    this.applyLineRendererLayer();
+  }
+
+  resetLineLayer(): void {
+    this.linesAboveSymbolsOverride = null;
+    this.applyLineRendererLayer();
   }
 
   act(delta: number): void {
@@ -367,6 +382,7 @@ export default class Reels extends Container {
       this.reelControllers[i].removeHighlight();
     }
     this.lineRenderer?.clear();
+    this.resetLineLayer();
   }
 
   stopAllReels(force = false): void {
