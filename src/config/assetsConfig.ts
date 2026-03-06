@@ -155,7 +155,12 @@ function isNumericArray(value) {
 }
 
 /**
- * Loads the variant-specific manifest and falls back to the opposite variant when missing.
+ * Loads the merged runtime manifest.
+ *
+ * Merge order:
+ * 1. `assets/assets-manifest.common.json`
+ * 2. active variant manifest
+ * 3. fallback variant manifest when the active one is missing
  */
 export async function loadAssetsManifest(variant = getRuntimeVariant()) {
     if (cachedManifest !== undefined) {

@@ -1,9 +1,21 @@
 import { getAssetsManifest } from '../core/RuntimeContext';
 
+export interface GameplayConfig {
+  spinTimeout: number;
+  showAllLinesStartDelay: number;
+  showAllLinesTimeout: number;
+  spinEndTimeout: number;
+  noWinLastWinsTimeout: number;
+  autoTakeWinTimeout: number;
+  takeWinTimeout: number;
+  showLastWinsLoopDelay: number;
+  winToCreditStep: number;
+}
+
 const DEFAULT_GAMEPLAY_CONFIG = Object.freeze({
   spinTimeout: 11,
   showAllLinesStartDelay: 8,
-  showAllLinesTimeout: 11135,
+  showAllLinesTimeout: 35,
   spinEndTimeout: 0,
   noWinLastWinsTimeout: 16,
   autoTakeWinTimeout: 10,
@@ -17,11 +29,12 @@ function asFiniteNumber(value: unknown, fallback: number): number {
 }
 
 /**
- * Reads timing-related gameplay knobs from the assets manifest with safe defaults.
+ * Reads gameplay timing knobs from the merged assets manifest.
  *
- * Values are in seconds unless a downstream consumer documents otherwise.
+ * Source of truth: `assets/common/assets-manifest.common.json`.
+ * Values are frame ticks consumed by the gameplay state machine, not seconds.
  */
-export function getGameplayConfig() {
+export function getGameplayConfig(): GameplayConfig {
   const manifest = getAssetsManifest<any>();
   const gameplay = manifest && typeof manifest === 'object' && manifest.gameplay && typeof manifest.gameplay === 'object'
     ? manifest.gameplay

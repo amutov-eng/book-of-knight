@@ -131,6 +131,7 @@ export default class Menu extends PIXI.Container {
         this.autoPlayMenu = null;
         this.buyBonusMenu = null;
         this.buyBonusConfirm = null;
+        this.buttonStateKey = '';
 
         this.eventMode = 'passive';
         this.interactiveChildren = true;
@@ -176,6 +177,12 @@ export default class Menu extends PIXI.Container {
         return sprite;
     }
 
+    getControllerStateTitle() {
+        return this.game && this.game.controller && this.game.controller.state
+            ? this.game.controller.state.title
+            : '';
+    }
+
     buildHud() {
         const backgrounds = this.hudConfig && this.hudConfig.backgrounds ? this.hudConfig.backgrounds : {};
         const bottom = backgrounds.bottom || {};
@@ -213,7 +220,8 @@ export default class Menu extends PIXI.Container {
             const labelText = String(cfg.labelText || '');
 
             if (frame) {
-                const panel = this.getTexture(frame) ? new PIXI.Sprite(this.getTexture(frame)) : null;
+                const panelTexture = this.getTexture(frame);
+                const panel = panelTexture ? new PIXI.Sprite(panelTexture) : null;
                 if (panel) {
                     panel.position.set(toNumber(cfg.x, 0), toNumber(cfg.y, 0));
                     this.topJackpotLayer.addChild(panel);
@@ -789,7 +797,7 @@ export default class Menu extends PIXI.Container {
             this.closeAutoPlayMenu(false);
         }
 
-        const stateTitle = this.game.controller && this.game.controller.state ? this.game.controller.state.title : '';
+        const stateTitle = this.getControllerStateTitle();
         const spinning = stateTitle === 'REELS_SPINNING' || stateTitle === 'REELS_STOPPING' || stateTitle === 'START_SPIN';
         if (!spinning) {
             this.enableControls();
@@ -829,7 +837,7 @@ export default class Menu extends PIXI.Container {
         this.setStatus('');
         this.updateAutoPlayButtonVisibility();
 
-        const stateTitle = this.game.controller && this.game.controller.state ? this.game.controller.state.title : '';
+        const stateTitle = this.getControllerStateTitle();
         if (stateTitle === 'WIN_TO_CREDIT') {
             this.game.controller.event = GameplayEvent.TAKEWIN;
         } else {
@@ -838,9 +846,7 @@ export default class Menu extends PIXI.Container {
     }
 
     updateSpinButtonVisibility() {
-        const title = this.game && this.game.controller && this.game.controller.state
-            ? this.game.controller.state.title
-            : '';
+        const title = this.getControllerStateTitle();
         const spinning = title === 'REELS_SPINNING' || title === 'REELS_STOPPING';
 
         if (this.startButton) this.startButton.visible = !spinning;
@@ -917,10 +923,11 @@ export default class Menu extends PIXI.Container {
         }
     }
 
+    /**
+     * Syncs enabled/disabled button states with the current gameplay state and modal visibility.
+     */
     updateButtonState() {
-        const title = this.game && this.game.controller && this.game.controller.state
-            ? this.game.controller.state.title
-            : '';
+        const title = this.getControllerStateTitle();
         const isReelsSpinning = title === 'REELS_SPINNING';
         const isReelsStopping = title === 'REELS_STOPPING';
         const canInterruptShowWins = title === 'SHOW_WINS';
@@ -932,6 +939,23 @@ export default class Menu extends PIXI.Container {
         const autoMenuOpen = this.isAutoPlayMenuOpen();
         const buyMenuOpen = this.isBuyBonusMenuOpen();
         const buyConfirmOpen = this.isBuyBonusConfirmOpen();
+        const betMenuOpen = this.isBetMenuOpen();
+        const nextStateKey = [
+            title,
+            connected ? 1 : 0,
+            serverSpinResultReady ? 1 : 0,
+            this.controlsDisabled ? 1 : 0,
+            autoplayActive ? 1 : 0,
+            autoMenuOpen ? 1 : 0,
+            buyMenuOpen ? 1 : 0,
+            buyConfirmOpen ? 1 : 0,
+            betMenuOpen ? 1 : 0
+        ].join(':');
+
+        if (nextStateKey === this.buttonStateKey) {
+            return;
+        }
+        this.buttonStateKey = nextStateKey;
 
         const mainEnabled = connected && !this.controlsDisabled;
         const startEnabled = connected && (!this.controlsDisabled || canInterruptShowWins);
@@ -945,7 +969,7 @@ export default class Menu extends PIXI.Container {
         }
 
         const sideEnabled = connected && !this.controlsDisabled;
-        const betEnabled = connected && (!this.controlsDisabled || this.isBetMenuOpen());
+        const betEnabled = connected && (!this.controlsDisabled || betMenuOpen);
         const autoEnabled = sideEnabled && !autoMenuOpen && !buyMenuOpen && !buyConfirmOpen && !autoplayActive;
         const autoStopEnabled = connected && autoplayActive;
 
@@ -964,15 +988,21 @@ export default class Menu extends PIXI.Container {
     }
 
     setStatus(value) {
-        this.pendingState.status = typeof value === 'string' ? value : '';
-        if (this.pendingState.status.trim().length > 0) {
+        const nextValue = typeof value === 'string' ? value : '';
+        if (this.pendingState.status === nextValue) {
+            return;
+        }
+        this.pendingState.status = nextValue;
+        if (nextValue.trim().length > 0) {
             this.idleBlinkStartedAt = 0;
         }
         this.applyPendingState();
     }
 
     setWinStatus(value) {
-        this.pendingState.winStatus = typeof value === 'string' ? value : '';
+        const nextValue = typeof value === 'string' ? value : '';
+        if (this.pendingState.winStatus === nextValue) return;
+        this.pendingState.winStatus = nextValue;
         this.applyPendingState();
     }
 
@@ -982,17 +1012,23 @@ export default class Menu extends PIXI.Container {
     setDenom(_denom) {}
 
     setTotalBet(value) {
-        this.pendingState.totalBet = toNumber(value, 0);
+        const nextValue = toNumber(value, 0);
+        if (this.pendingState.totalBet === nextValue) return;
+        this.pendingState.totalBet = nextValue;
         this.applyPendingState();
     }
 
     setWin(value) {
-        this.pendingState.win = toNumber(value, 0);
+        const nextValue = toNumber(value, 0);
+        if (this.pendingState.win === nextValue) return;
+        this.pendingState.win = nextValue;
         this.applyPendingState();
     }
 
     setCredit(value) {
-        this.pendingState.credit = toNumber(value, 0);
+        const nextValue = toNumber(value, 0);
+        if (this.pendingState.credit === nextValue) return;
+        this.pendingState.credit = nextValue;
         this.applyPendingState();
     }
 
@@ -1043,6 +1079,9 @@ export default class Menu extends PIXI.Container {
         this.applyPendingState();
     }
 
+    /**
+     * Applies buffered meter and status values to Pixi text nodes.
+     */
     applyPendingState() {
         if (!this.assetsLoaded) return;
         this.refreshJackpotValues();
@@ -1094,11 +1133,13 @@ export default class Menu extends PIXI.Container {
 
     disableControls() {
         this.controlsDisabled = true;
+        this.buttonStateKey = '';
         this.updateButtonState();
     }
 
     enableControls() {
         this.controlsDisabled = false;
+        this.buttonStateKey = '';
         this.updateButtonState();
     }
 

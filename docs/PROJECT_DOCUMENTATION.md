@@ -41,8 +41,9 @@ npm run test:smoke
 
 Primary manifests:
 
+- `assets/common/assets-manifest.common.json`
 - `assets/desktop/assets-manifest.desktop.json`
-- `assets/desktop/assets-manifest.mobile.json`
+- `assets/mobile/assets-manifest.mobile.json`
 
 Resolved by:
 
@@ -50,6 +51,7 @@ Resolved by:
 
 Manifest should control:
 
+- Shared gameplay timing and runtime tuning
 - UI positions/sizes/colors/fonts
 - Reel geometry values
 - Atlas lists and symbol offsets

@@ -60,8 +60,9 @@ This file is a practical map for developers who are new to the project.
 
 ## Assets / Data Source of Truth
 
+- `assets/common/assets-manifest.common.json`
 - `assets/desktop/assets-manifest.desktop.json`
-- `assets/desktop/assets-manifest.mobile.json`
+- `assets/mobile/assets-manifest.mobile.json`
 - `assets/common/localization/translations.json`
 
 ## Legacy Reference (Read-Only)
