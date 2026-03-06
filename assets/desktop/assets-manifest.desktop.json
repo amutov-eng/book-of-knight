@@ -16,6 +16,12 @@
                                 "haw":  "assets/backgrounds/reels_frame_fg_haw.png"
                             }
               },
+    "lines":  {
+                  "atlases":  [
+                                  "assets/lines/lines-0.json",
+                                  "assets/lines/lines-1.json"
+                              ]
+              },
     "layout":  {
                    "shared":  {
                                   "baseReel":  {
@@ -40,7 +46,8 @@
                                                  "reelsBgX":  0,
                                                  "reelsBgY":  0,
                                                  "titleX":  0,
-                                                 "titleY":  0
+                                                 "titleY":  0,
+                                                 "linesAboveSymbols":  false
                                              }
                               },
                    "desktop":  {

@@ -33,17 +33,37 @@ export default class LocalizationService {
     }
 
     static async loadFromUrl(url, options = {}) {
-        const response = await fetch(url, { cache: 'no-cache' });
-        if (!response.ok) {
-            throw new Error(`Failed to load translations: ${response.status} ${response.statusText}`);
+        const candidates = [];
+        if (typeof url === 'string' && url.length > 0) {
+            candidates.push(url);
+            if (!/^([a-z]+:)?\/\//i.test(url) && !url.startsWith('/')) {
+                candidates.unshift(`/${url}`);
+            }
         }
 
-        const payload = await response.json();
-        const locales = payload && payload.locales ? payload.locales : {};
-        const fallbackLocale = options.fallbackLocale || (payload.meta && payload.meta.fallbackLocale) || 'en';
-        const currentLocale = options.currentLocale || fallbackLocale;
+        let lastError = 'Failed to load translations';
+        for (let i = 0; i < candidates.length; i++) {
+            const response = await fetch(candidates[i], { cache: 'no-cache' });
+            if (!response.ok) {
+                lastError = `Failed to load translations: ${response.status} ${response.statusText}`;
+                continue;
+            }
 
-        return new LocalizationService({ locales, currentLocale, fallbackLocale });
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.toLowerCase().includes('json')) {
+                lastError = `Failed to load translations: expected JSON but received ${contentType || 'unknown content type'}`;
+                continue;
+            }
+
+            const payload = await response.json();
+            const locales = payload && payload.locales ? payload.locales : {};
+            const fallbackLocale = options.fallbackLocale || (payload.meta && payload.meta.fallbackLocale) || 'en';
+            const currentLocale = options.currentLocale || fallbackLocale;
+
+            return new LocalizationService({ locales, currentLocale, fallbackLocale });
+        }
+
+        throw new Error(lastError);
     }
 
     setLocale(locale) {

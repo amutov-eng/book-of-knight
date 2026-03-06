@@ -21,13 +21,29 @@ const BASE_REEL_KEYS = [
 ];
 
 async function fetchJsonIfExists(path) {
-    try {
-        const response = await fetch(path, { cache: 'no-cache' });
-        if (!response.ok) return null;
-        return await response.json();
-    } catch (error) {
-        return null;
+    const candidates = [];
+    if (typeof path !== 'string' || path.length === 0) return null;
+
+    candidates.push(path);
+    if (!/^([a-z]+:)?\/\//i.test(path) && !path.startsWith('/')) {
+        candidates.unshift(`/${path}`);
     }
+
+    for (let i = 0; i < candidates.length; i++) {
+        try {
+            const response = await fetch(candidates[i], { cache: 'no-cache' });
+            if (!response.ok) continue;
+
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.toLowerCase().includes('json')) continue;
+
+            return await response.json();
+        } catch (_error) {
+            // Try the next candidate URL.
+        }
+    }
+
+    return null;
 }
 
 function getModeValue(map, mode) {
@@ -202,6 +218,14 @@ export function validateAssetsManifest(manifest, variant = getRuntimeVariant()) 
         }
     }
 
+    if (manifest.lines != null) {
+        if (!isObject(manifest.lines)) {
+            errors.push('manifest.lines must be an object.');
+        } else if (manifest.lines.atlases != null && !Array.isArray(manifest.lines.atlases)) {
+            errors.push('manifest.lines.atlases must be an array.');
+        }
+    }
+
     if (manifest.layout != null && !isObject(manifest.layout)) {
         errors.push('manifest.layout must be an object.');
     } else if (isObject(manifest.layout)) {
@@ -244,8 +268,17 @@ export function getLoadingManifest(manifest) {
         : [];
     entries.push(...atlases);
     entries.push(...getUiAtlases(manifest));
+    entries.push(...getLineAtlases(manifest));
 
     return [...new Set(entries)];
+}
+
+export function getLineAtlases(manifest) {
+    if (!manifest || !manifest.lines || !Array.isArray(manifest.lines.atlases)) {
+        return [];
+    }
+
+    return manifest.lines.atlases.filter((value) => typeof value === 'string');
 }
 
 /**
@@ -573,7 +606,8 @@ export function getReelsLayoutConfig(manifest, variant, isLandscape) {
             reelsBgX: 0,
             reelsBgY: 0,
             titleX: 0,
-            titleY: 0
+            titleY: 0,
+            linesAboveSymbols: false
         },
         betMenu: {
             panel: { frame: 'bg_bet.png', x: 846, y: 86 },
@@ -629,7 +663,8 @@ export function getReelsLayoutConfig(manifest, variant, isLandscape) {
             reelsBgX: Number.isFinite(layers.reelsBgX) ? layers.reelsBgX : fallback.layers.reelsBgX,
             reelsBgY: Number.isFinite(layers.reelsBgY) ? layers.reelsBgY : fallback.layers.reelsBgY,
             titleX: Number.isFinite(layers.titleX) ? layers.titleX : fallback.layers.titleX,
-            titleY: Number.isFinite(layers.titleY) ? layers.titleY : fallback.layers.titleY
+            titleY: Number.isFinite(layers.titleY) ? layers.titleY : fallback.layers.titleY,
+            linesAboveSymbols: typeof layers.linesAboveSymbols === 'boolean' ? layers.linesAboveSymbols : fallback.layers.linesAboveSymbols
         },
         betMenu: {
             panel: { frame: 'bg_bet.png', x: 846, y: 86 },

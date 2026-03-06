@@ -23,7 +23,7 @@ interface WinLike {
 
 export default class Reels extends Container {
   private readonly game: BaseGame & { variant?: string; screen: { stage: Container } };
-  private NUMBER_OF_REELS: number;
+  public NUMBER_OF_REELS: number;
   private REELS_SPACING = 162;
   private REELS_POSITION_X = 105;
   private REELS_POSITION_Y = 65;
@@ -37,6 +37,7 @@ export default class Reels extends Container {
   private FORCE_SYMBOL_INDEX: number | null = null;
   private TITLE_POSITION_X = 0;
   private TITLE_POSITION_Y = 0;
+  private LINES_ABOVE_SYMBOLS = true;
   private variant: string;
   private stripMode: 'normal' | 'free' | 'holdAndWin' = 'normal';
   private autoStopTimers: ReturnType<typeof setTimeout>[] = [];
@@ -46,7 +47,7 @@ export default class Reels extends Container {
   matrix: Matrix3xN;
   private readonly VISIBLE_ROWS: number;
   private isBuilt = false;
-  private lineRenderer: LineRender | null = null;
+  public lineRenderer: LineRender | null = null;
   private reelsBackground: Sprite | null = null;
   private reelsFrame: Sprite | null = null;
 
@@ -119,6 +120,8 @@ export default class Reels extends Container {
     this.BG_POSITION_Y = layout.layers.reelsBgY;
     this.TITLE_POSITION_X = layout.layers.titleX;
     this.TITLE_POSITION_Y = layout.layers.titleY;
+    this.LINES_ABOVE_SYMBOLS = layout.layers.linesAboveSymbols !== false;
+    this.applyLineRendererLayer();
   }
 
   show(): void {
@@ -138,6 +141,12 @@ export default class Reels extends Container {
 
     if (!this.lineRenderer) {
       this.lineRenderer = new LineRender();
+      if (this.lineRenderer.hasAssets()) {
+        this.addChild(this.lineRenderer);
+        this.applyLineRendererLayer();
+      } else {
+        this.lineRenderer = null;
+      }
     }
     debug('Reels');
   }
@@ -212,6 +221,37 @@ export default class Reels extends Container {
     this.reelsFrame = new Sprite(frameTexture);
     this.reelsFrame.position.set(this.BG_POSITION_X, this.BG_POSITION_Y);
     this.addChild(this.reelsFrame);
+    this.applyLineRendererLayer();
+  }
+
+  private applyLineRendererLayer(): void {
+    if (!this.lineRenderer || this.lineRenderer.parent !== this || this.reels.length === 0) {
+      return;
+    }
+
+    let firstReelIndex = Number.POSITIVE_INFINITY;
+    let lastReelIndex = -1;
+    for (let i = 0; i < this.reels.length; i++) {
+      const reel = this.reels[i];
+      if (!reel || reel.parent !== this) continue;
+      const childIndex = this.getChildIndex(reel);
+      if (childIndex < firstReelIndex) firstReelIndex = childIndex;
+      if (childIndex > lastReelIndex) lastReelIndex = childIndex;
+    }
+
+    if (!Number.isFinite(firstReelIndex) || lastReelIndex < 0) {
+      return;
+    }
+
+    if (this.LINES_ABOVE_SYMBOLS) {
+      const targetIndex = this.reelsFrame && this.reelsFrame.parent === this
+        ? this.getChildIndex(this.reelsFrame)
+        : Math.min(lastReelIndex + 1, this.children.length - 1);
+      this.setChildIndex(this.lineRenderer, targetIndex);
+      return;
+    }
+
+    this.setChildIndex(this.lineRenderer, firstReelIndex);
   }
 
   act(delta: number): void {
@@ -326,6 +366,7 @@ export default class Reels extends Container {
     for (let i = 0; i < this.reelControllers.length; i++) {
       this.reelControllers[i].removeHighlight();
     }
+    this.lineRenderer?.clear();
   }
 
   stopAllReels(force = false): void {

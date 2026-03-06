@@ -50,6 +50,9 @@ export default class WinPresentationSystem {
         switch (win.type) {
             case WINTYPES.LINE:
                 this.game.reels.highlightWin(win, false, true);
+                if (this.game.reels.lineRenderer) {
+                    this.game.reels.lineRenderer.addLine(win.winningLine);
+                }
                 this.game.context.onscreenWinMeter += this.getWinValue(win);
                 this.game.menu.setWin(this.game.context.onscreenWinMeter);
                 this.game.menu.setWinStatus(this.winningLineToText(win));
@@ -99,6 +102,10 @@ export default class WinPresentationSystem {
     }
 
     showAllWinningLines() {
+        if (!this.game.reels.lineRenderer) {
+            return;
+        }
+
         for (let line = 0; line < this.game.context.outcome.wins.length; line++) {
             const win = this.game.context.outcome.wins[line];
             if (win.type === WINTYPES.LINE) {

@@ -1,4 +1,4 @@
-﻿import { copyFile, mkdir, readdir, rm } from 'node:fs/promises';
+﻿import { copyFile, mkdir, readdir, readFile, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -88,6 +88,42 @@ function assetsSyncPlugin(activeVariant: string): Plugin {
       server.watcher.on('unlink', scheduleSync);
       server.watcher.on('addDir', scheduleSync);
       server.watcher.on('unlinkDir', scheduleSync);
+
+      server.middlewares.use(async (req, res, next) => {
+        const rawUrl = req.url || '';
+        const pathname = rawUrl.split('?')[0];
+        if (!pathname.startsWith('/assets/')) {
+          next();
+          return;
+        }
+
+        const relativePath = pathname.replace(/^\/assets\//, '');
+        const targetPath = path.join(outputDir, relativePath);
+        if (!existsSync(targetPath)) {
+          next();
+          return;
+        }
+
+        const ext = path.extname(targetPath).toLowerCase();
+        const typeMap: Record<string, string> = {
+          '.json': 'application/json; charset=utf-8',
+          '.png': 'image/png',
+          '.jpg': 'image/jpeg',
+          '.jpeg': 'image/jpeg',
+          '.webp': 'image/webp',
+          '.svg': 'image/svg+xml; charset=utf-8',
+          '.txt': 'text/plain; charset=utf-8'
+        };
+
+        try {
+          const file = await readFile(targetPath);
+          res.statusCode = 200;
+          res.setHeader('Content-Type', typeMap[ext] || 'application/octet-stream');
+          res.end(file);
+        } catch {
+          next();
+        }
+      });
 
       runSync();
     }

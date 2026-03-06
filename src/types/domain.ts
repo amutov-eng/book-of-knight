@@ -42,6 +42,7 @@ export interface RuntimeConfig {
 export interface AssetsManifest {
   backgrounds?: Record<string, unknown>;
   reels?: Record<string, unknown>;
+  lines?: Record<string, unknown>;
   layout?: Record<string, unknown>;
   symbols?: Record<string, unknown>;
   ui?: Record<string, unknown>;
