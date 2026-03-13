@@ -250,10 +250,7 @@ export default class Reel extends PIXI.Container {
     }
 
     updateSymbolAnimations(delta) {
-        // Update symbol animations at ~25fps.
-        this.timeElapsed += delta;
-        if (this.timeElapsed - this.lastTimeElapsed <= 0.040) return;
-        this.lastTimeElapsed = this.timeElapsed;
+        // Symbols update every frame; each symbol decides how to throttle specific sub-animations.
         for (let i = 0; i < this.TOTAL_SYMBOLS; i++) {
             this.visibleSymbols[i].act(delta);
         }

@@ -20,6 +20,8 @@ interface ReelGameLike {
   textures: TexturesLike;
 }
 
+const DEFAULT_SYMBOL_ANIMATION_DT = 1 / 60;
+const OVERLAY_FRAME_STEP_SEC = 1 / 25;
 export default class ReelSymbol extends Sprite {
   private readonly game: ReelGameLike;
   private readonly reel: PixiContainer | null;
@@ -39,6 +41,7 @@ export default class ReelSymbol extends Sprite {
   delayAnimation: number;
   totalFrames: number;
   private winProfile: string;
+  private transformFrameProgress: number;
 
   constructor(game: ReelGameLike, reel: unknown, index: number) {
     super(game.textures.regions[index][0]);
@@ -59,6 +62,7 @@ export default class ReelSymbol extends Sprite {
     this.delayAnimation = 0;
     this.totalFrames = 0;
     this.winProfile = 'normal';
+    this.transformFrameProgress = 0;
 
     this.anchor.set(0.5);
     this.blendMode = 'normal' as never;
@@ -130,13 +134,14 @@ export default class ReelSymbol extends Sprite {
     this.animationFrameCnt = 0;
     this.delayAnimation = 0;
     this.totalFrames = this.getCurveLength();
+    this.transformFrameProgress = 0;
     if (!animate) {
       this.resetWinAnimation();
     } else {
       if (this.winOverlay && this.reel && this.winOverlay.parent !== this.reel) {
         this.reel.addChild(this.winOverlay);
       }
-      this.applyWinAnimationFrame(0);
+      this.applyWinAnimationFrame(0, 0);
     }
   }
 
@@ -162,7 +167,7 @@ export default class ReelSymbol extends Sprite {
     parent.children.push(this);
   }
 
-  act(_delta?: number): void {
+  act(delta?: number): void {
     if (!this.anim) return;
 
     const totalFrames = this.getCurveLength();
@@ -172,9 +177,21 @@ export default class ReelSymbol extends Sprite {
       return;
     }
 
-    const frameIndex = Math.max(0, Math.min(this.animationFrameCnt, totalFrames - 1));
-    this.applyWinAnimationFrame(frameIndex);
-    this.animationFrameCnt++;
+    const dt = Number.isFinite(delta) && Number(delta) > 0 ? Number(delta) : DEFAULT_SYMBOL_ANIMATION_DT;
+
+    this.delayAnimation += dt;
+    while (this.delayAnimation >= OVERLAY_FRAME_STEP_SEC) {
+      this.delayAnimation -= OVERLAY_FRAME_STEP_SEC;
+      this.animationFrameCnt++;
+    }
+
+    this.transformFrameProgress = Math.min(
+      this.animationFrameCnt + (this.delayAnimation / OVERLAY_FRAME_STEP_SEC),
+      totalFrames - 1
+    );
+
+    const overlayFrameIndex = Math.max(0, Math.min(this.animationFrameCnt, totalFrames - 1));
+    this.applyWinAnimationFrame(overlayFrameIndex, this.transformFrameProgress);
 
     if (this.animationFrameCnt < totalFrames) {
       return;
@@ -187,6 +204,8 @@ export default class ReelSymbol extends Sprite {
 
     this.anim = false;
     this.animationFrameCnt = 0;
+    this.transformFrameProgress = 0;
+    this.delayAnimation = 0;
     this.resetWinAnimation();
   }
 
@@ -236,7 +255,7 @@ export default class ReelSymbol extends Sprite {
     return this.getWinAnimationProfile().scale.length;
   }
 
-  private applyWinAnimationFrame(frameIndex: number): void {
+  private applyWinAnimationFrame(frameIndex: number, transformFrameProgress: number): void {
     const winFrames = this.getWinFrames();
     if (this.winOverlay && winFrames.length > 0) {
       const overlayFrame = winFrames[Math.min(frameIndex, winFrames.length - 1)];
@@ -247,13 +266,25 @@ export default class ReelSymbol extends Sprite {
     }
 
     const animationProfile = this.getWinAnimationProfile();
-    const scaleCurve = animationProfile.scale;
-    const scale = (scaleCurve[Math.min(frameIndex, scaleCurve.length - 1)] || 100) / 100;
+    const scale = this.sampleCurve(animationProfile.scale, transformFrameProgress) / 100;
     this.scale.set(scale);
 
-    const rotateCurve = animationProfile.rotate;
-    const rotation = rotateCurve[Math.min(frameIndex, rotateCurve.length - 1)] || 0;
+    const rotation = this.sampleCurve(animationProfile.rotate, transformFrameProgress);
     this.rotation = rotation * (Math.PI / 180);
+  }
+
+  private sampleCurve(curve: number[], frameProgress: number): number {
+    if (!Array.isArray(curve) || curve.length === 0) {
+      return 0;
+    }
+
+    const clamped = Math.max(0, Math.min(frameProgress, curve.length - 1));
+    const leftIndex = Math.floor(clamped);
+    const rightIndex = Math.min(leftIndex + 1, curve.length - 1);
+    const mix = clamped - leftIndex;
+    const left = Number(curve[leftIndex] ?? curve[0] ?? 0);
+    const right = Number(curve[rightIndex] ?? left);
+    return left + (right - left) * mix;
   }
 
   private resetWinAnimation(): void {
