@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { getGameplayConfig } from '../../../config/gameplayConfig';
+import { SOUND_IDS } from '../../../config/soundConfig';
 
 export default class MeterTransferSystem {
     /**
@@ -18,6 +19,8 @@ export default class MeterTransferSystem {
             return false;
         }
 
+        this.game.soundSystem?.stop(SOUND_IDS.COINEND);
+        this.game.soundSystem?.play(SOUND_IDS.COINUP, true);
         this.game.context.onscreenWinMeter = this.game.meters.win;
         this.game.menu.setWin(this.game.context.onscreenWinMeter);
         this.game.context.onscreenCreditMeter = this.game.meters.credit;
@@ -45,6 +48,8 @@ export default class MeterTransferSystem {
             return false;
         }
 
+        this.game.soundSystem?.stop(SOUND_IDS.COINUP);
+        this.game.soundSystem?.play(SOUND_IDS.COINEND);
         this.game.meters.credit = targetCredit;
         this.game.menu.setCredit(targetCredit);
         return true;

@@ -21,6 +21,8 @@ import { restorePixiGlobals } from '../../core/globals';
 import { getTextureCache, setAssetsManifest, setAssetManager } from '../../core/RuntimeContext';
 import { getMaxStripSymbolIndex } from '../../config/stripsConfig';
 import createBootIntroPlayer from '../../intro/createIntroPlayer';
+import { SOUND_IDS } from '../../config/soundConfig';
+import BootSoundPrompt from '../boot/BootSoundPrompt';
 /** @typedef {import('pixi.js').Texture} PixiTexture */
 /** @typedef {import('../../core/BaseGame').default} BaseGame */
 
@@ -38,6 +40,7 @@ export default class LoadingScreen extends BaseScreen {
         this.assetsManifest = null;
         this.assetManager = new AssetManager({ textureCache: getTextureCache() });
         this.bootIntroPlayer = null;
+        this.bootSoundPrompt = null;
         setAssetManager(this.assetManager);
         this.loadWithAssets();
     }
@@ -133,12 +136,24 @@ export default class LoadingScreen extends BaseScreen {
         }
 
         await this.loadManifestAndValidate();
-        const resources = await this.loadAssetResources(this.assetsToLoad);
+        const resourcesPromise = this.loadAssetResources(this.assetsToLoad);
+        const promptAssetsPromise = this.loadAssetResources(['assets/ui/menu_buttons-0.json']);
+        const promptSoundsPromise = this.game.soundSystem
+            ? this.game.soundSystem.preload([SOUND_IDS.SPIN_BACKGROUND, SOUND_IDS.KNOCK])
+            : Promise.resolve();
+        const soundsPromise = this.game.soundSystem
+            ? this.game.soundSystem.preload([SOUND_IDS.SPIN_BACKGROUND, SOUND_IDS.COINUP, SOUND_IDS.COINEND, SOUND_IDS.REEL_STOP, SOUND_IDS.KNOCK])
+            : Promise.resolve();
+
+        await Promise.all([promptAssetsPromise, promptSoundsPromise]);
         if (this.bootIntroPlayer && this.bootIntroPlayer.destroy) {
             await this.bootIntroPlayer.destroy();
             this.bootIntroPlayer = null;
         }
         restorePixiGlobals();
+        await this.presentBootSoundPrompt();
+
+        const [resources] = await Promise.all([resourcesPromise, soundsPromise]);
         this.setup({ resources });
     }
 
@@ -155,9 +170,25 @@ export default class LoadingScreen extends BaseScreen {
     }
 
     hide() {
+        if (this.bootSoundPrompt) {
+            this.stage.removeChild(this.bootSoundPrompt);
+            this.bootSoundPrompt.destroy({ children: true });
+            this.bootSoundPrompt = null;
+        }
         if (this.bootIntroPlayer && this.bootIntroPlayer.destroy) {
             this.bootIntroPlayer.destroy();
             this.bootIntroPlayer = null;
         }
+    }
+
+    async presentBootSoundPrompt() {
+        if (this.bootSoundPrompt) {
+            this.stage.removeChild(this.bootSoundPrompt);
+            this.bootSoundPrompt.destroy({ children: true });
+        }
+
+        this.bootSoundPrompt = new BootSoundPrompt(this.game);
+        this.stage.addChild(this.bootSoundPrompt);
+        await this.bootSoundPrompt.present();
     }
 }

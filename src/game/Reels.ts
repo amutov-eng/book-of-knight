@@ -10,6 +10,7 @@ import { getReelTextureKey, getReelsLayoutConfig, getReelStripsConfig, getDefaul
 import { getRuntimeVariant } from '../config/runtimeConfig';
 import { getAssetsManifest, getIsLandscape, getTextureCache } from '../core/RuntimeContext';
 import { GAME_RULES } from '../config/gameRules';
+import { SOUND_IDS } from '../config/soundConfig';
 import type BaseGame from '../core/BaseGame';
 import type { ReelStopRow } from '../types/reels';
 
@@ -171,7 +172,7 @@ export default class Reels extends Container {
       this.addChild(reelDisplayObject);
 
       reelView.onStopped(() => {
-        // reserved for reel stop SFX
+        this.game.soundSystem?.play(SOUND_IDS.REEL_STOP);
       });
     }
   }

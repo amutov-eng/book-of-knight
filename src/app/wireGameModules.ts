@@ -7,6 +7,8 @@ import Meters from '../game/Meters';
 import Context from '../game/Context';
 import Messages from '../ui/Messages';
 import GsLink from '../net/GsLink';
+import SoundSystem from '../game/systems/SoundSystem';
+import SettingsStore from '../engine/settings/SettingsStore';
 import type { AppRuntimeServices, GameRuntime } from './types';
 
 /**
@@ -23,6 +25,8 @@ export function wireGameModules(baseGame: BaseGame, services: AppRuntimeServices
   game.messages = new Messages(game);
   game.context = new Context();
   game.meters = new Meters();
+  game.soundSystem = new SoundSystem();
+  game.settings = new SettingsStore({ audioEnabled: true }, 'book-of-knight.settings');
   game.controller = new Controller(game);
   game.gsLink = new GsLink(game);
 

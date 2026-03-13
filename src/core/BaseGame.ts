@@ -15,6 +15,8 @@ import type BaseScreen from './BaseScreen';
 import type GameplayEngine from '../architecture/gameplay/GameplayEngine';
 import type LocalizationService from '../localization/LocalizationService';
 import type Timers from './time/Timers';
+import type SoundSystem from '../game/systems/SoundSystem';
+import type SettingsStore from '../engine/settings/SettingsStore';
 
 export default class BaseGame {
   stage: Container;
@@ -38,6 +40,8 @@ export default class BaseGame {
   gameplayEngine: GameplayEngine | null;
   localization: LocalizationService | null;
   timers: Timers | null;
+  soundSystem: SoundSystem | null;
+  settings: SettingsStore | null;
 
   constructor() {
     this.stage = new Container();
@@ -61,6 +65,8 @@ export default class BaseGame {
     this.gameplayEngine = null;
     this.localization = null;
     this.timers = null;
+    this.soundSystem = null;
+    this.settings = null;
   }
 
   async initRenderer(): Promise<void> {

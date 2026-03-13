@@ -13,6 +13,8 @@ import type LocalizationService from '../localization/LocalizationService';
 import type Timers from '../core/time/Timers';
 import type LifecycleStateMachine from '../architecture/state/LifecycleStateMachine';
 import type EventBus from '../core/events/EventBus';
+import type SoundSystem from '../game/systems/SoundSystem';
+import type SettingsStore from '../engine/settings/SettingsStore';
 
 /**
  * Minimal screen contract consumed by the app ticker and renderer.
@@ -37,6 +39,8 @@ export type GameRuntime = BaseGame & {
   gameplayEngine: GameplayEngine;
   localization: LocalizationService;
   timers: Timers;
+  soundSystem: SoundSystem;
+  settings: SettingsStore;
   screen?: RuntimeScreen;
   renderer?: Renderer;
 };
