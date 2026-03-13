@@ -8,7 +8,7 @@ Runtime composition layer.
 - create renderer and RAF ticker
 - resolve URL-driven runtime flags and locale
 - wire gameplay services onto `BaseGame`
-- bridge lifecycle events such as `spin:requested` and `spin:resolved`
+- own boot-time lifecycle transitions while gameplay runtime emits `spin:started`, `spin:resultReceived`, and `spin:resolved`
 
 ## Main Files
 

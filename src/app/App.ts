@@ -82,7 +82,6 @@ export default class App {
     this.baseGame.timers = this.timers;
 
     this.setupDebugToggle();
-    this.setupEventBridge();
 
     if (this.runtime.debugOverlayEnabled) {
       this.debugOverlay.visible = true;
@@ -164,29 +163,6 @@ export default class App {
       if (event.code !== 'Backquote') return;
       this.debugOverlay.toggle();
       this.bus.emit('debug:toggle', { visible: this.debugOverlay.visible });
-    });
-  }
-
-  private setupEventBridge(): void {
-    // App lifecycle reacts to gameplay events emitted by controller/network systems.
-    this.bus.on('spin:requested', () => {
-      if (this.flow.state !== LifecycleState.IDLE) return;
-      this.transition(LifecycleState.SPIN);
-    });
-
-    this.bus.on('spin:resultReceived', () => {
-      if (this.flow.state === LifecycleState.SPIN) {
-        this.transition(LifecycleState.RESOLVE);
-      }
-    });
-
-    this.bus.on('spin:resolved', () => {
-      if (this.flow.state === LifecycleState.RESOLVE) {
-        this.transition(LifecycleState.RETURN);
-      }
-      if (this.flow.state === LifecycleState.RETURN) {
-        this.transition(LifecycleState.IDLE);
-      }
     });
   }
 

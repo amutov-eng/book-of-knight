@@ -1,6 +1,7 @@
 import { Container, type Texture } from 'pixi.js';
 import ReelView from '../architecture/reels/ReelView';
 import ReelController from '../architecture/reels/ReelController';
+import ReelSpinScheduler from './reels/ReelSpinScheduler';
 import LineRender from '../ui/LineRender';
 import Sprite from '../ui/Sprite';
 import { WINTYPES } from './Win';
@@ -41,10 +42,10 @@ export default class Reels extends Container {
   private linesAboveSymbolsOverride: boolean | null = null;
   private variant: string;
   private stripMode: 'normal' | 'free' | 'holdAndWin' = 'normal';
-  private autoStopTimers: ReturnType<typeof setTimeout>[] = [];
   private reels: Container[] = [];
   private reelViews: ReelView[] = [];
   private reelControllers: ReelController[] = [];
+  private readonly spinScheduler: ReelSpinScheduler;
   matrix: Matrix3xN;
   private readonly VISIBLE_ROWS: number;
   private isBuilt = false;
@@ -61,6 +62,7 @@ export default class Reels extends Container {
 
     this.matrix = this.createEmptyMatrix(GAME_RULES.SYMBOLS, GAME_RULES.REELS);
     this.VISIBLE_ROWS = this.matrix.length;
+    this.spinScheduler = new ReelSpinScheduler(this.game.timers ?? null);
   }
 
   private createEmptyMatrix(rows: number, cols: number): Matrix3xN {
@@ -254,23 +256,16 @@ export default class Reels extends Container {
   }
 
   startSpin(): void {
-    this.clearAutoStopTimers();
+    this.spinScheduler.cancel();
     for (let i = 0; i < this.reelControllers.length; i++) {
-      const reelController = this.reelControllers[i];
-      reelController.startSpin();
-      const timerId = setTimeout(() => {
-        const target = this.getReelController(i);
-        if (target) target.stop();
-      }, 400 * i + 100);
-      this.autoStopTimers.push(timerId);
+      this.reelControllers[i].startSpin();
     }
-  }
-
-  private clearAutoStopTimers(): void {
-    for (let i = 0; i < this.autoStopTimers.length; i++) {
-      clearTimeout(this.autoStopTimers[i]);
-    }
-    this.autoStopTimers.length = 0;
+    this.spinScheduler.scheduleStops(this.reelControllers.length, (reelIndex) => {
+      const target = this.getReelController(reelIndex);
+      if (target) {
+        target.stop();
+      }
+    });
   }
 
   updateStopSymbols(): void {
@@ -371,7 +366,7 @@ export default class Reels extends Container {
         reelController.stop();
       }
     }
-    this.clearAutoStopTimers();
+    this.spinScheduler.cancel();
   }
 
   reelStopped(reel: number): boolean {

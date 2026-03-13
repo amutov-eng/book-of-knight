@@ -78,6 +78,8 @@ type ServerOutcome = {
   pattern?: string;
 };
 
+type SpinAppliedListener = (outcome: GameOutcomeShape) => void;
+
 function toInt(value: unknown, fallback = 0): number {
   const parsed = Number.parseInt(String(value), 10);
   return Number.isNaN(parsed) ? fallback : parsed;
@@ -235,6 +237,7 @@ export default class GsLink {
   private winPool: Pool<WinLike>;
   private activePooledWins: WinLike[];
   private balance = 0;
+  private readonly spinAppliedListeners: Set<SpinAppliedListener>;
 
   constructor(game: BaseGame) {
     this.game = game as any;
@@ -273,6 +276,7 @@ export default class GsLink {
     this.numberPattern = getDefaultNumberPattern();
     this.numberPatternLocked = false;
     this.pendingLoginTimerId = 0;
+    this.spinAppliedListeners = new Set();
     this.winPool = new Pool<WinLike>({
       create: () => Object.assign({}, Win),
       reset: resetPooledWin,
@@ -636,6 +640,7 @@ export default class GsLink {
     }
     this.game.reels.updateStopSymbols();
     this.game.controller.updateMeters();
+    this.emitSpinApplied(mappedOutcome);
   }
 
   private onLogin(balance: number, demo: boolean): void {
@@ -800,6 +805,19 @@ export default class GsLink {
 
   private hasVisibleServerError(): boolean {
     return hasActiveServerError(this.game);
+  }
+
+  onSpinApplied(listener: SpinAppliedListener): () => void {
+    this.spinAppliedListeners.add(listener);
+    return () => {
+      this.spinAppliedListeners.delete(listener);
+    };
+  }
+
+  private emitSpinApplied(outcome: GameOutcomeShape): void {
+    for (const listener of this.spinAppliedListeners) {
+      listener(outcome);
+    }
   }
 }
 

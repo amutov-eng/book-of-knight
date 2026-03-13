@@ -5,6 +5,7 @@ import type EventBus from '../events/EventBus';
 import type Controller from '../../game/Controller';
 import type GsLink from '../../net/GsLink';
 import type LifecycleStateMachine from '../state/LifecycleStateMachine';
+import type { GameOutcomeShape } from '../../game/GameOutcome';
 
 const STATE_TO_LIFECYCLE = new Map<string, string>([
   [GameplayState.IDLE.title, LifecycleState.IDLE],
@@ -28,6 +29,9 @@ export default class GameplayEngine {
   private flow: LifecycleStateMachine | null = null;
   private spinInFlight = false;
   private isWired = false;
+  private detachControllerStateChange: (() => void) | null = null;
+  private detachSpinStarted: (() => void) | null = null;
+  private detachSpinApplied: (() => void) | null = null;
 
   constructor(game: BaseGame, bus: EventBus) {
     this.game = game;
@@ -50,9 +54,9 @@ export default class GameplayEngine {
     if (this.isWired || !this.controller || !this.gsLink) return;
     this.isWired = true;
 
-    this.wrapControllerStateChange();
-    this.wrapStartSpin();
-    this.wrapSpinResult();
+    this.bindControllerStateChanges();
+    this.bindSpinStarted();
+    this.bindSpinResult();
   }
 
   update(delta: number): void {
@@ -71,46 +75,36 @@ export default class GameplayEngine {
     return this.controller.state.title;
   }
 
-  private wrapControllerStateChange(): void {
+  private bindControllerStateChanges(): void {
     if (!this.controller) return;
-    const original = this.controller.setNextState.bind(this.controller);
-    this.controller.setNextState = (nextState: any): void => {
-      const before = this.controller && this.controller.state && this.controller.state.title ? this.controller.state.title : 'UNKNOWN';
-      original(nextState);
-      const after = nextState && nextState.title ? nextState.title : 'UNKNOWN';
-      (this.bus as any).emit('controller:stateChanged', { from: before, to: after });
-      this.syncLifecycle(after);
-    };
+    this.detachControllerStateChange = this.controller.onStateChanged(({ from, to }) => {
+      this.bus.emit('gameplay:stateChanged', { from, to });
+      this.syncLifecycle(to);
+    });
   }
 
-  private wrapStartSpin(): void {
+  private bindSpinStarted(): void {
     if (!this.controller) return;
-    const originalStartSpin = this.controller.startSpin.bind(this.controller);
-    this.controller.startSpin = (): boolean => {
-      (this.bus as any).emit('spin:requested', { turbo: false, quick: false });
-      const ok = originalStartSpin();
-      if (ok) {
-        this.spinInFlight = true;
-        this.syncLifecycle(GameplayState.REELS_SPINNING.title);
-      }
-      return ok;
-    };
+    this.detachSpinStarted = this.controller.onSpinStarted(() => {
+      this.spinInFlight = true;
+      this.bus.emit('spin:started', { source: 'controller' });
+      this.syncLifecycle(GameplayState.REELS_SPINNING.title);
+    });
   }
 
-  private wrapSpinResult(): void {
+  private bindSpinResult(): void {
     if (!this.gsLink) return;
-    const originalOnSpin = this.gsLink.onSpin.bind(this.gsLink);
-    this.gsLink.onSpin = (outcome: any): void => {
-      originalOnSpin(outcome);
-      (this.bus as any).emit('spin:resultReceived', {
+    this.detachSpinApplied = this.gsLink.onSpinApplied((outcome: GameOutcomeShape) => {
+      const totalWin = Number((this.game as BaseGame & { meters?: { win?: number } }).meters?.win ?? 0) || 0;
+      this.bus.emit('spin:resultReceived', {
         result: {
-          reelStops: Array.isArray(outcome && outcome.matrix) ? outcome.matrix : [],
-          totalWin: Number.isFinite(Number(outcome && outcome.win)) ? Number(outcome && outcome.win) : 0,
-          hasBonus: false
+          reelStops: Array.isArray(outcome.matrix) ? outcome.matrix : [],
+          totalWin,
+          hasBonus: !!outcome.hasFreeGames
         }
       });
       this.syncLifecycle(GameplayState.REELS_STOPPING.title);
-    };
+    });
   }
 
   private syncLifecycle(controllerStateTitle: string): void {
@@ -119,7 +113,7 @@ export default class GameplayEngine {
     this.transitionLifecycle(mapped);
     if (mapped === LifecycleState.IDLE && this.spinInFlight) {
       this.spinInFlight = false;
-      (this.bus as any).emit('spin:resolved', { result: null });
+      this.bus.emit('spin:resolved', { result: null });
     }
   }
 
@@ -128,18 +122,18 @@ export default class GameplayEngine {
     if ((this.flow as any).state === target) return;
     if ((this.flow as any).canTransition(target)) {
       const payload = (this.flow as any).transition(target);
-      (this.bus as any).emit('lifecycle:changed', payload);
+      this.bus.emit('lifecycle:changed', payload);
       return;
     }
 
     if (target === LifecycleState.IDLE && (this.flow as any).state !== LifecycleState.IDLE) {
       if ((this.flow as any).canTransition(LifecycleState.RETURN)) {
         const ret = (this.flow as any).transition(LifecycleState.RETURN);
-        (this.bus as any).emit('lifecycle:changed', ret);
+        this.bus.emit('lifecycle:changed', ret);
       }
       if ((this.flow as any).canTransition(LifecycleState.IDLE)) {
         const idle = (this.flow as any).transition(LifecycleState.IDLE);
-        (this.bus as any).emit('lifecycle:changed', idle);
+        this.bus.emit('lifecycle:changed', idle);
       }
     }
   }

@@ -5,6 +5,9 @@ import MeterTransferSystem from '../architecture/gameplay/systems/MeterTransferS
 import { debug } from '../core/utils/logger';
 import type BaseGame from '../core/BaseGame';
 
+type StateChangeListener = (payload: { from: string; to: string }) => void;
+type SpinStartedListener = () => void;
+
 export default class Controller {
   game: BaseGame & Record<string, any>;
   state: any;
@@ -26,6 +29,8 @@ export default class Controller {
   meterTransferSystem: MeterTransferSystem;
 
   private boundKeyDownHandler: ((event: KeyboardEvent) => void) | null;
+  private readonly stateChangeListeners: Set<StateChangeListener>;
+  private readonly spinStartedListeners: Set<SpinStartedListener>;
 
   constructor(game: BaseGame) {
     this.game = game as BaseGame & Record<string, any>;
@@ -36,6 +41,8 @@ export default class Controller {
     this.meterTransferSystem = new MeterTransferSystem(this.game);
 
     this.boundKeyDownHandler = this.handleKeyDownEvent.bind(this);
+    this.stateChangeListeners = new Set();
+    this.spinStartedListeners = new Set();
     window.addEventListener('keydown', this.boundKeyDownHandler);
   }
 
@@ -59,13 +66,16 @@ export default class Controller {
   }
 
   setNextState(nextState: any): void {
-    debug(`Controller::setNextState ${this.state.title} > ${nextState.title}, timerCounter: ${this.timerCounter}`);
+    const previousTitle = this.state && this.state.title ? this.state.title : 'UNKNOWN';
+    const nextTitle = nextState && nextState.title ? nextState.title : 'UNKNOWN';
+    debug(`Controller::setNextState ${previousTitle} > ${nextTitle}, timerCounter: ${this.timerCounter}`);
     this.state.leave(this);
     this.state = nextState;
     this.state.entry(this);
     this.syncBackgroundLayerWithState();
     this.timerCounter = 0;
     this.idleTimerCounter = 0;
+    this.emitStateChanged(previousTitle, nextTitle);
   }
 
   update(_delta?: number): void {
@@ -74,7 +84,11 @@ export default class Controller {
   }
 
   startSpin(): boolean {
-    return this.spinSystem.startSpin(this);
+    const started = this.spinSystem.startSpin(this);
+    if (started) {
+      this.emitSpinStarted();
+    }
+    return started;
   }
 
   processWin(): void {
@@ -143,6 +157,32 @@ export default class Controller {
     if (this.boundKeyDownHandler) {
       window.removeEventListener('keydown', this.boundKeyDownHandler);
       this.boundKeyDownHandler = null;
+    }
+  }
+
+  onStateChanged(listener: StateChangeListener): () => void {
+    this.stateChangeListeners.add(listener);
+    return () => {
+      this.stateChangeListeners.delete(listener);
+    };
+  }
+
+  onSpinStarted(listener: SpinStartedListener): () => void {
+    this.spinStartedListeners.add(listener);
+    return () => {
+      this.spinStartedListeners.delete(listener);
+    };
+  }
+
+  private emitStateChanged(from: string, to: string): void {
+    for (const listener of this.stateChangeListeners) {
+      listener({ from, to });
+    }
+  }
+
+  private emitSpinStarted(): void {
+    for (const listener of this.spinStartedListeners) {
+      listener();
     }
   }
 }
