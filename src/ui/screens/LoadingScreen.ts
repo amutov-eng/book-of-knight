@@ -255,7 +255,11 @@ export default class LoadingScreen extends BaseScreen {
         return {
             ...BOOT_INTRO_CONFIG,
             backgroundColor: Number.isFinite(intro.boot?.backgroundColor) ? Number(intro.boot.backgroundColor) : BOOT_INTRO_CONFIG.backgroundColor,
-            layoutMode: typeof intro.boot?.layoutMode === 'string' ? intro.boot.layoutMode : BOOT_INTRO_CONFIG.layoutMode
+            layoutMode: typeof intro.boot?.layoutMode === 'string' ? intro.boot.layoutMode : BOOT_INTRO_CONFIG.layoutMode,
+            viewport: {
+                spine: intro.boot?.spine || BOOT_INTRO_CONFIG.viewport?.spine,
+                loadingBar: intro.boot?.loadingBar || BOOT_INTRO_CONFIG.viewport?.loadingBar
+            }
         };
     }
 

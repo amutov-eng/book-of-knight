@@ -622,14 +622,24 @@ export function getIntroConfig(manifest) {
     const fallback = {
         boot: {
             layoutMode: 'fit-center',
-            backgroundColor: 0x000000
+            backgroundColor: 0x000000,
+            spine: { x: 960, y: 420, offsetX: -360, offsetY: 0, scale: 0.58 },
+            loadingBar: {
+                atlasPath: 'assets/spine/intro/loading.json',
+                x: 0,
+                y: 36,
+                width: 440,
+                height: 10,
+                sweepSpeed: 420,
+                chunkFraction: 0.25
+            }
         },
         gameplay: {
             layoutMode: 'native-center-top',
             backgroundColor: 0x000000,
             backgroundImagePath: 'assets/backgrounds/bg.jpg',
             background: { x: 0, y: 0, width: 1920, height: 1080 },
-            spine: { x: 960, y: 0 }
+            spine: { x: 960, y: 0, offsetX: 0, offsetY: 0, scale: 1 }
         }
     };
 

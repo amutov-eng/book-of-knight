@@ -197,11 +197,13 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
       const targetY = Number.isFinite(this.config.viewport?.spine?.y)
         ? Number(this.config.viewport.spine.y)
         : 0;
-      this.spine.scale.set(1);
-      this.spine.position.set(
-        targetX - (bounds.x + bounds.width * 0.5),
-        targetY - bounds.y
-      );
+      const explicitScale = Number.isFinite(this.config.viewport?.spine?.scale)
+        ? Number(this.config.viewport.spine.scale)
+        : 1;
+      this.spine.scale.set(explicitScale);
+      this.spine.pivot.set(bounds.x + bounds.width * 0.5, bounds.y);
+      this.spine.position.set(targetX, targetY);
+      this.alignSpineToTarget(targetX, targetY, 'top-center');
       return;
     }
 
@@ -216,14 +218,15 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     const availableHeight = this.app.screen.height * 0.28;
     const safeWidth = bounds.width > 0 ? bounds.width : 1;
     const safeHeight = bounds.height > 0 ? bounds.height : 1;
-    const scale = Math.min(availableWidth / safeWidth, availableHeight / safeHeight);
+    const explicitScale = Number.isFinite(this.config.viewport?.spine?.scale)
+      ? Number(this.config.viewport.spine.scale)
+      : null;
+    const scale = explicitScale ?? Math.min(availableWidth / safeWidth, availableHeight / safeHeight);
 
     this.spine.scale.set(scale);
-
-    this.spine.position.set(
-      targetX - (bounds.x + bounds.width * 0.5) * scale,
-      targetY - (bounds.y + bounds.height * 0.5) * scale
-    );
+    this.spine.pivot.set(bounds.x + bounds.width * 0.5, bounds.y + bounds.height * 0.5);
+    this.spine.position.set(targetX, targetY);
+    this.alignSpineToTarget(targetX, targetY, 'center');
 
     this.layoutLoadingBar();
   }
@@ -275,10 +278,20 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     if (!this.loadingEmptyBar || !this.loadingFillBar) return;
 
     const cfg = this.config.viewport?.loadingBar;
-    const x = Number.isFinite(cfg?.x) ? Number(cfg.x) : 678;
-    const y = Number.isFinite(cfg?.y) ? Number(cfg.y) : 408;
     const width = Number.isFinite(cfg?.width) ? Number(cfg.width) : this.loadingEmptyBar.texture.width;
     const height = Number.isFinite(cfg?.height) ? Number(cfg.height) : this.loadingEmptyBar.texture.height;
+    const offsetX = Number.isFinite(cfg?.x) ? Number(cfg.x) : 0;
+    const offsetY = Number.isFinite(cfg?.y) ? Number(cfg.y) : 36;
+
+    let x = offsetX;
+    let y = offsetY;
+
+    if (this.spine && this.config.layoutMode === 'fit-center') {
+      const globalBounds = this.spine.getBounds();
+      const visualBottom = globalBounds.y + globalBounds.height;
+      x = globalBounds.x + globalBounds.width * 0.5 - width * 0.5 + offsetX;
+      y = visualBottom + offsetY;
+    }
 
     this.loadingEmptyBar.position.set(x, y);
     this.loadingEmptyBar.width = width;
@@ -313,5 +326,25 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     this.loadingFillMask?.beginFill(0xffffff, 1);
     this.loadingFillMask?.drawRect(this.loadingEmptyBar.position.x + left, this.loadingEmptyBar.position.y, visible, this.loadingEmptyBar.height);
     this.loadingFillMask?.endFill();
+  }
+
+  private alignSpineToTarget(targetX: number, targetY: number, mode: 'center' | 'top-center'): void {
+    if (!this.spine) return;
+
+    const globalBounds = this.spine.getBounds();
+    const currentCenterX = globalBounds.x + globalBounds.width * 0.5;
+    const currentCenterY = globalBounds.y + globalBounds.height * 0.5;
+    const currentTopY = globalBounds.y;
+    const offsetX = Number.isFinite(this.config.viewport?.spine?.offsetX)
+      ? Number(this.config.viewport?.spine?.offsetX)
+      : 0;
+    const offsetY = Number.isFinite(this.config.viewport?.spine?.offsetY)
+      ? Number(this.config.viewport?.spine?.offsetY)
+      : 0;
+
+    this.spine.position.x += targetX - currentCenterX + offsetX;
+    this.spine.position.y += mode === 'top-center'
+      ? targetY - currentTopY + offsetY
+      : targetY - currentCenterY + offsetY;
   }
 }

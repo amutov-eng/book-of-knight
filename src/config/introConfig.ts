@@ -17,6 +17,9 @@ export interface SpineIntroConfig {
     spine?: {
       x?: number;
       y?: number;
+      offsetX?: number;
+      offsetY?: number;
+      scale?: number;
     };
     loadingBar?: {
       atlasPath?: string;
@@ -41,12 +44,15 @@ export const BOOT_INTRO_CONFIG: SpineIntroConfig = Object.freeze({
   viewport: {
     spine: {
       x: 960,
-      y: 420
+      y: 420,
+      offsetX: -360,
+      offsetY: 0,
+      scale: 0.58
     },
     loadingBar: {
       atlasPath: 'assets/spine/intro/loading.json',
-      x: 678,
-      y: 408,
+      x: 0,
+      y: 36,
       width: 440,
       height: 10,
       sweepSpeed: 420,
