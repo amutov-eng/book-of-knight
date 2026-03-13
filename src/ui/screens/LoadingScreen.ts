@@ -13,7 +13,8 @@ import {
     getSymbolAtlases,
     getSymbolFrameDefsByIndex,
     getAnimationAtlases,
-    getSymbolWinAnimationProfiles
+    getSymbolWinAnimationProfiles,
+    getIntroConfig
 } from '../../config/assetsConfig';
 import { getRuntimeVariant } from '../../config/runtimeConfig';
 import AssetManager from '../../core/assets/AssetManager';
@@ -21,6 +22,7 @@ import { restorePixiGlobals } from '../../core/globals';
 import { getTextureCache, setAssetsManifest, setAssetManager } from '../../core/RuntimeContext';
 import { getMaxStripSymbolIndex } from '../../config/stripsConfig';
 import createBootIntroPlayer from '../../intro/createIntroPlayer';
+import { BOOT_INTRO_CONFIG, GAMEPLAY_INTRO_CONFIG } from '../../config/introConfig';
 import { SOUND_IDS } from '../../config/soundConfig';
 import BootSoundPrompt from '../boot/BootSoundPrompt';
 /** @typedef {import('pixi.js').Texture} PixiTexture */
@@ -40,6 +42,7 @@ export default class LoadingScreen extends BaseScreen {
         this.assetsManifest = null;
         this.assetManager = new AssetManager({ textureCache: getTextureCache() });
         this.bootIntroPlayer = null;
+        this.gameplayIntroPlayer = null;
         this.bootSoundPrompt = null;
         setAssetManager(this.assetManager);
         this.loadWithAssets();
@@ -127,8 +130,11 @@ export default class LoadingScreen extends BaseScreen {
     }
 
     async loadWithAssets() {
+        let resourcesPromise = null;
+        let soundsPromise = null;
+
         try {
-            this.bootIntroPlayer = createBootIntroPlayer();
+            this.bootIntroPlayer = createBootIntroPlayer(this.resolveBootIntroConfig());
             await this.bootIntroPlayer.start();
         } catch (error) {
             log(`LoadingScreen::bootIntroFailed ${error instanceof Error ? error.message : String(error)}`, 'warn');
@@ -136,25 +142,29 @@ export default class LoadingScreen extends BaseScreen {
         }
 
         await this.loadManifestAndValidate();
-        const resourcesPromise = this.loadAssetResources(this.assetsToLoad);
+        resourcesPromise = this.loadAssetResources(this.assetsToLoad);
         const promptAssetsPromise = this.loadAssetResources(['assets/ui/menu_buttons-0.json']);
         const promptSoundsPromise = this.game.soundSystem
             ? this.game.soundSystem.preload([SOUND_IDS.SPIN_BACKGROUND, SOUND_IDS.KNOCK])
             : Promise.resolve();
-        const soundsPromise = this.game.soundSystem
+        soundsPromise = this.game.soundSystem
             ? this.game.soundSystem.preload([SOUND_IDS.SPIN_BACKGROUND, SOUND_IDS.COINUP, SOUND_IDS.COINEND, SOUND_IDS.REEL_STOP, SOUND_IDS.KNOCK])
             : Promise.resolve();
 
+        await this.waitForBootIntro();
         await Promise.all([promptAssetsPromise, promptSoundsPromise]);
+        await this.primeBootSoundPrompt();
         if (this.bootIntroPlayer && this.bootIntroPlayer.destroy) {
             await this.bootIntroPlayer.destroy();
             this.bootIntroPlayer = null;
         }
         restorePixiGlobals();
+        await this.waitForNextFrame();
         await this.presentBootSoundPrompt();
 
         const [resources] = await Promise.all([resourcesPromise, soundsPromise]);
         this.setup({ resources });
+        await this.playGameplayIntro();
     }
 
     setup(loader) {
@@ -175,6 +185,10 @@ export default class LoadingScreen extends BaseScreen {
             this.bootSoundPrompt.destroy({ children: true });
             this.bootSoundPrompt = null;
         }
+        if (this.gameplayIntroPlayer && this.gameplayIntroPlayer.destroy) {
+            this.gameplayIntroPlayer.destroy();
+            this.gameplayIntroPlayer = null;
+        }
         if (this.bootIntroPlayer && this.bootIntroPlayer.destroy) {
             this.bootIntroPlayer.destroy();
             this.bootIntroPlayer = null;
@@ -182,13 +196,80 @@ export default class LoadingScreen extends BaseScreen {
     }
 
     async presentBootSoundPrompt() {
-        if (this.bootSoundPrompt) {
-            this.stage.removeChild(this.bootSoundPrompt);
-            this.bootSoundPrompt.destroy({ children: true });
+        if (!this.bootSoundPrompt) {
+            this.bootSoundPrompt = new BootSoundPrompt(this.game);
+            this.stage.addChild(this.bootSoundPrompt);
         }
+        await this.bootSoundPrompt.present();
+    }
 
+    async primeBootSoundPrompt() {
+        if (this.bootSoundPrompt) return;
         this.bootSoundPrompt = new BootSoundPrompt(this.game);
         this.stage.addChild(this.bootSoundPrompt);
-        await this.bootSoundPrompt.present();
+        this.bootSoundPrompt.visible = true;
+        this.bootSoundPrompt.interactiveChildren = false;
+        if (this.game.renderer) {
+            this.game.renderer.render(this.stage);
+        }
+    }
+
+    async waitForBootIntro() {
+        if (!this.bootIntroPlayer || typeof this.bootIntroPlayer.waitForCompletion !== 'function') {
+            return;
+        }
+
+        try {
+            await this.bootIntroPlayer.waitForCompletion();
+        } catch (error) {
+            log(`LoadingScreen::bootIntroWaitFailed ${error instanceof Error ? error.message : String(error)}`, 'warn');
+        }
+    }
+
+    waitForNextFrame() {
+        return new Promise((resolve) => {
+            window.requestAnimationFrame(() => resolve(undefined));
+        });
+    }
+
+    async playGameplayIntro() {
+        try {
+            this.gameplayIntroPlayer = createBootIntroPlayer(this.resolveGameplayIntroConfig());
+            await this.gameplayIntroPlayer.start();
+            if (typeof this.gameplayIntroPlayer.waitForCompletion === 'function') {
+                await this.gameplayIntroPlayer.waitForCompletion();
+            }
+        } catch (error) {
+            log(`LoadingScreen::gameplayIntroFailed ${error instanceof Error ? error.message : String(error)}`, 'warn');
+        } finally {
+            if (this.gameplayIntroPlayer && this.gameplayIntroPlayer.destroy) {
+                await this.gameplayIntroPlayer.destroy();
+                this.gameplayIntroPlayer = null;
+            }
+            restorePixiGlobals();
+        }
+    }
+
+    resolveBootIntroConfig() {
+        const intro = getIntroConfig(this.assetsManifest);
+        return {
+            ...BOOT_INTRO_CONFIG,
+            backgroundColor: Number.isFinite(intro.boot?.backgroundColor) ? Number(intro.boot.backgroundColor) : BOOT_INTRO_CONFIG.backgroundColor,
+            layoutMode: typeof intro.boot?.layoutMode === 'string' ? intro.boot.layoutMode : BOOT_INTRO_CONFIG.layoutMode
+        };
+    }
+
+    resolveGameplayIntroConfig() {
+        const intro = getIntroConfig(this.assetsManifest);
+        return {
+            ...GAMEPLAY_INTRO_CONFIG,
+            backgroundColor: Number.isFinite(intro.gameplay?.backgroundColor) ? Number(intro.gameplay.backgroundColor) : GAMEPLAY_INTRO_CONFIG.backgroundColor,
+            backgroundImagePath: typeof intro.gameplay?.backgroundImagePath === 'string' ? intro.gameplay.backgroundImagePath : GAMEPLAY_INTRO_CONFIG.backgroundImagePath,
+            layoutMode: typeof intro.gameplay?.layoutMode === 'string' ? intro.gameplay.layoutMode : GAMEPLAY_INTRO_CONFIG.layoutMode,
+            viewport: {
+                background: intro.gameplay?.background || GAMEPLAY_INTRO_CONFIG.viewport?.background,
+                spine: intro.gameplay?.spine || GAMEPLAY_INTRO_CONFIG.viewport?.spine
+            }
+        };
     }
 }

@@ -726,8 +726,63 @@
                                                                                "wordWrapWidth":  930
                                                                            }
                                                              }
+                                               },
+                           "bootSoundPrompt":  {
+                                                   "background":  {
+                                                                      "x":  0,
+                                                                      "y":  0,
+                                                                      "width":  1920,
+                                                                      "height":  1080,
+                                                                      "alpha":  0.92
+                                                                  },
+                                                   "panel":  {
+                                                                 "x":  611,
+                                                                 "y":  297
+                                                             },
+                                                   "logo":  {
+                                                                "x":  711,
+                                                                "y":  496
+                                                            },
+                                                   "buttons":  {
+                                                                   "yes":  {
+                                                                               "x":  665,
+                                                                               "y":  341
+                                                                           },
+                                                                   "no":  {
+                                                                              "x":  988,
+                                                                              "y":  341
+                                                                          }
+                                                               },
+                                                   "texts":  {
+                                                                 "title":  {
+                                                                               "x":  960,
+                                                                               "y":  250,
+                                                                               "fontSize":  54
+                                                                           }
+                                                             }
                                                }
                        }
-           }
+           },
+    "intro":  {
+                  "boot":  {
+                               "layoutMode":  "fit-center",
+                               "backgroundColor":  0
+                           },
+                  "gameplay":  {
+                                   "layoutMode":  "native-center-top",
+                                   "backgroundColor":  0,
+                                   "backgroundImagePath":  "assets/backgrounds/bg.jpg",
+                                   "background":  {
+                                                      "x":  0,
+                                                      "y":  0,
+                                                      "width":  1920,
+                                                      "height":  1080
+                                                  },
+                                   "spine":  {
+                                                 "x":  960,
+                                                 "y":  -130
+                                             }
+                               }
+              }
 }
 

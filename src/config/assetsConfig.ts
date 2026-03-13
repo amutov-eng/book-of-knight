@@ -584,6 +584,18 @@ export function getUiHudConfig(manifest) {
             texts: {
                 title: { x: 960, y: 345, fontSize: 54, wordWrapWidth: 930 }
             }
+        },
+        bootSoundPrompt: {
+            background: { x: 0, y: 0, width: 1920, height: 1080, alpha: 0.92 },
+            panel: { x: 611, y: 297 },
+            logo: { x: 711, y: 496 },
+            buttons: {
+                yes: { x: 665, y: 341 },
+                no: { x: 988, y: 341 }
+            },
+            texts: {
+                title: { x: 960, y: 250, fontSize: 54 }
+            }
         }
     }; 
 
@@ -601,7 +613,34 @@ export function getUiHudConfig(manifest) {
         betMenu: mergeBranch(fallback.betMenu, hud.betMenu),
         autoPlayMenu: mergeBranch(fallback.autoPlayMenu, hud.autoPlayMenu),
         buyBonusMenu: mergeBranch(fallback.buyBonusMenu, hud.buyBonusMenu),
-        buyBonusConfirm: mergeBranch(fallback.buyBonusConfirm, hud.buyBonusConfirm)
+        buyBonusConfirm: mergeBranch(fallback.buyBonusConfirm, hud.buyBonusConfirm),
+        bootSoundPrompt: mergeBranch(fallback.bootSoundPrompt, hud.bootSoundPrompt)
+    };
+}
+
+export function getIntroConfig(manifest) {
+    const fallback = {
+        boot: {
+            layoutMode: 'fit-center',
+            backgroundColor: 0x000000
+        },
+        gameplay: {
+            layoutMode: 'native-center-top',
+            backgroundColor: 0x000000,
+            backgroundImagePath: 'assets/backgrounds/bg.jpg',
+            background: { x: 0, y: 0, width: 1920, height: 1080 },
+            spine: { x: 960, y: 0 }
+        }
+    };
+
+    if (!manifest || !isObject(manifest.intro)) {
+        return fallback;
+    }
+
+    const intro = manifest.intro;
+    return {
+        boot: mergeBranch(fallback.boot, intro.boot),
+        gameplay: mergeBranch(fallback.gameplay, intro.gameplay)
     };
 }
 

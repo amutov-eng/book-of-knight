@@ -10,6 +10,8 @@ import {
 } from 'pixi.js';
 import type BaseGame from '../../core/BaseGame';
 import { SOUND_IDS } from '../../config/soundConfig';
+import { getUiHudConfig } from '../../config/assetsConfig';
+import { getAssetsManifest } from '../../core/RuntimeContext';
 import { getLocalizedText } from '../uiTextFormat';
 
 type PromptSelection = 'yes' | 'no' | 'outside';
@@ -24,6 +26,7 @@ const SCREEN_HEIGHT = 1080;
 
 export default class BootSoundPrompt extends Container {
   private readonly game: BaseGame & Record<string, any>;
+  private readonly config: any;
   private readonly blocker: Graphics;
   private readonly panel: Sprite | null;
   private readonly logo: Sprite | null;
@@ -36,6 +39,7 @@ export default class BootSoundPrompt extends Container {
   constructor(game: BaseGame) {
     super();
     this.game = game as BaseGame & Record<string, any>;
+    this.config = getUiHudConfig(getAssetsManifest()).bootSoundPrompt || {};
     this.pendingResolve = null;
     this.resolved = false;
 
@@ -44,28 +48,33 @@ export default class BootSoundPrompt extends Container {
     this.hitArea = new Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     this.blocker = new Graphics();
-    this.blocker.beginFill(0x000000, 0.92);
-    this.blocker.drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    this.blocker.beginFill(0x000000, this.toNumber(this.config.background?.alpha, 0.92));
+    this.blocker.drawRect(
+      this.toNumber(this.config.background?.x, 0),
+      this.toNumber(this.config.background?.y, 0),
+      this.toNumber(this.config.background?.width, SCREEN_WIDTH),
+      this.toNumber(this.config.background?.height, SCREEN_HEIGHT)
+    );
     this.blocker.endFill();
     this.blocker.eventMode = 'static';
     this.blocker.on('pointertap', () => this.complete('outside'));
     this.addChild(this.blocker);
 
-    this.panel = this.createSprite('loading_sound_bg.png', 611, 297);
-    this.logo = this.createSprite('loading_logo.png', 711, 496);
+    this.panel = this.createSprite('loading_sound_bg.png', this.toNumber(this.config.panel?.x, 611), this.toNumber(this.config.panel?.y, 297));
+    this.logo = this.createSprite('loading_logo.png', this.toNumber(this.config.logo?.x, 711), this.toNumber(this.config.logo?.y, 496));
 
     this.title = new Text({
       text: getLocalizedText(this.game, 'soundTitle', 'PLAY SOUND'),
       style: new TextStyle({
         fontFamily: 'Arial',
-        fontSize: 54,
+        fontSize: this.toNumber(this.config.texts?.title?.fontSize, 54),
         fill: 0x93a7bf,
         fontWeight: '700',
         align: 'center'
       })
     });
     this.title.anchor.set(0.5, 0);
-    this.title.position.set(960, 250);
+    this.title.position.set(this.toNumber(this.config.texts?.title?.x, 960), this.toNumber(this.config.texts?.title?.y, 250));
     this.title.eventMode = 'static';
     this.title.on('pointertap', (event) => {
       event.stopPropagation();
@@ -75,16 +84,16 @@ export default class BootSoundPrompt extends Container {
     this.yesButton = this.createButton(
       'loading_sound_button_001.png',
       'loading_sound_button_002.png',
-      665,
-      341,
+      this.toNumber(this.config.buttons?.yes?.x, 665),
+      this.toNumber(this.config.buttons?.yes?.y, 341),
       getLocalizedText(this.game, 'soundYes', 'YES'),
       () => this.complete('yes')
     );
     this.noButton = this.createButton(
       'loading_sound_button_001.png',
       'loading_sound_button_002.png',
-      988,
-      341,
+      this.toNumber(this.config.buttons?.no?.x, 988),
+      this.toNumber(this.config.buttons?.no?.y, 341),
       getLocalizedText(this.game, 'soundNo', 'NO'),
       () => this.complete('no')
     );
@@ -240,5 +249,9 @@ export default class BootSoundPrompt extends Container {
     } catch {
       return null;
     }
+  }
+
+  private toNumber(value: unknown, fallback: number): number {
+    return Number.isFinite(value) ? Number(value) : fallback;
   }
 }
