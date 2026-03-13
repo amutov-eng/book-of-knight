@@ -1,0 +1,1007 @@
+
+1920_intro_v1.png
+size: 2047,2009
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Eye_blick
+  rotate: true
+  xy: 1988, 1449
+  size: 124, 57
+  orig: 124, 57
+  offset: 0, 0
+  index: -1
+bg_effect_bottom
+  rotate: false
+  xy: 2, 444
+  size: 1924, 236
+  orig: 1924, 236
+  offset: 0, 0
+  index: -1
+bg_effect_top
+  rotate: false
+  xy: 2, 682
+  size: 1924, 237
+  orig: 1924, 237
+  offset: 0, 0
+  index: -1
+black
+  rotate: false
+  xy: 2, 921
+  size: 1922, 1086
+  orig: 1922, 1086
+  offset: 0, 0
+  index: -1
+book_fx2_02
+  rotate: false
+  xy: 1506, 10
+  size: 400, 432
+  orig: 400, 432
+  offset: 0, 0
+  index: -1
+book_rock
+  rotate: true
+  xy: 1928, 743
+  size: 120, 100
+  orig: 120, 100
+  offset: 0, 0
+  index: -1
+book_text_1
+  rotate: false
+  xy: 1908, 15
+  size: 133, 180
+  orig: 133, 180
+  offset: 0, 0
+  index: -1
+helmet_fx2
+  rotate: false
+  xy: 1928, 622
+  size: 70, 119
+  orig: 70, 119
+  offset: 0, 0
+  index: -1
+helmet_fx4
+  rotate: false
+  xy: 1908, 197
+  size: 115, 245
+  orig: 115, 245
+  offset: 0, 0
+  index: -1
+helmet_fx7
+  rotate: false
+  xy: 1928, 502
+  size: 66, 118
+  orig: 66, 118
+  offset: 0, 0
+  index: -1
+hold_and_win
+  rotate: true
+  xy: 1926, 1449
+  size: 558, 60
+  orig: 558, 60
+  offset: 0, 0
+  index: -1
+horn_L_fx
+  rotate: false
+  xy: 1988, 1668
+  size: 18, 28
+  orig: 18, 28
+  offset: 0, 0
+  index: -1
+horn_R_fx
+  rotate: false
+  xy: 1988, 1575
+  size: 31, 34
+  orig: 31, 34
+  offset: 0, 0
+  index: -1
+knight_headhair
+  rotate: false
+  xy: 1945, 445
+  size: 86, 60
+  orig: 88, 62
+  offset: 1, 1
+  index: -1
+knight_tarp_R
+  rotate: false
+  xy: 1988, 1611
+  size: 31, 29
+  orig: 31, 29
+  offset: 0, 0
+  index: -1
+knight_tarp_l
+  rotate: false
+  xy: 1988, 1642
+  size: 23, 24
+  orig: 23, 24
+  offset: 0, 0
+  index: -1
+knight_text_G
+  rotate: false
+  xy: 1928, 865
+  size: 109, 91
+  orig: 109, 91
+  offset: 0, 0
+  index: -1
+knight_text_H
+  rotate: true
+  xy: 1926, 1057
+  size: 120, 92
+  orig: 120, 92
+  offset: 0, 0
+  index: -1
+knight_text_K
+  rotate: true
+  xy: 1926, 1312
+  size: 135, 100
+  orig: 135, 100
+  offset: 0, 0
+  index: -1
+knight_text_N
+  rotate: true
+  xy: 1926, 1179
+  size: 131, 92
+  orig: 131, 92
+  offset: 0, 0
+  index: -1
+knight_text_T
+  rotate: false
+  xy: 1926, 958
+  size: 105, 97
+  orig: 105, 97
+  offset: 0, 0
+  index: -1
+logo_Particle_01
+  rotate: false
+  xy: 2, 2
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_02
+  rotate: false
+  xy: 754, 2
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+
+1920_intro_v12.png
+size: 2048,1976
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Blick_B
+  rotate: true
+  xy: 1948, 1505
+  size: 81, 70
+  orig: 81, 70
+  offset: 0, 0
+  index: -1
+book_fx2_03
+  rotate: false
+  xy: 1506, 38
+  size: 400, 432
+  orig: 400, 432
+  offset: 0, 0
+  index: -1
+book_of_fx1
+  rotate: false
+  xy: 754, 498
+  size: 605, 150
+  orig: 605, 150
+  offset: 0, 0
+  index: -1
+book_red_ribbon
+  rotate: false
+  xy: 1945, 423
+  size: 100, 61
+  orig: 100, 63
+  offset: 0, 1
+  index: -1
+book_text_4
+  rotate: false
+  xy: 2, 26
+  size: 573, 180
+  orig: 573, 180
+  offset: 0, 0
+  index: -1
+helmet_fx1
+  rotate: false
+  xy: 1948, 1878
+  size: 80, 96
+  orig: 80, 96
+  offset: 0, 0
+  index: -1
+helmet_fx5
+  rotate: true
+  xy: 1948, 1784
+  size: 92, 80
+  orig: 92, 80
+  offset: 0, 0
+  index: -1
+helmet_fx6
+  rotate: false
+  xy: 1948, 1588
+  size: 59, 102
+  orig: 59, 102
+  offset: 0, 0
+  index: -1
+helmet_fx9
+  rotate: true
+  xy: 1361, 496
+  size: 152, 127
+  orig: 152, 127
+  offset: 0, 0
+  index: -1
+knight_part_top
+  rotate: false
+  xy: 1948, 1437
+  size: 95, 68
+  orig: 95, 71
+  offset: 0, 0
+  index: -1
+knight_text_I
+  rotate: false
+  xy: 1948, 1692
+  size: 67, 90
+  orig: 67, 90
+  offset: 0, 0
+  index: -1
+logo_Particle_03
+  rotate: false
+  xy: 2, 1534
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_04
+  rotate: false
+  xy: 754, 1534
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_05
+  rotate: false
+  xy: 2, 1092
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_06
+  rotate: false
+  xy: 754, 1092
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_07
+  rotate: true
+  xy: 1506, 1224
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_08
+  rotate: false
+  xy: 2, 650
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_09
+  rotate: false
+  xy: 754, 650
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_10
+  rotate: true
+  xy: 1506, 472
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_11
+  rotate: false
+  xy: 2, 208
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_12
+  rotate: false
+  xy: 754, 30
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+of_text_O
+  rotate: true
+  xy: 577, 2
+  size: 204, 158
+  orig: 204, 158
+  offset: 0, 0
+  index: -1
+ribbon_top
+  rotate: true
+  xy: 1939, 446
+  size: 193, 107
+  orig: 194, 109
+  offset: 1, 1
+  index: -1
+
+1920_intro_v13.png
+size: 1948,2022
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+book_fx2_04
+  rotate: false
+  xy: 1506, 84
+  size: 400, 432
+  orig: 400, 432
+  offset: 0, 0
+  index: -1
+book_text_3
+  rotate: false
+  xy: 2, 72
+  size: 427, 180
+  orig: 427, 180
+  offset: 0, 0
+  index: -1
+knight_inner
+  rotate: false
+  xy: 754, 574
+  size: 726, 120
+  orig: 726, 120
+  offset: 0, 0
+  index: -1
+logo_Particle_13
+  rotate: false
+  xy: 2, 1580
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_14
+  rotate: false
+  xy: 754, 1580
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_15
+  rotate: false
+  xy: 2, 1138
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_16
+  rotate: false
+  xy: 754, 1138
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_17
+  rotate: true
+  xy: 1506, 1270
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_18
+  rotate: false
+  xy: 2, 696
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_19
+  rotate: false
+  xy: 754, 696
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_20
+  rotate: true
+  xy: 1506, 518
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_21
+  rotate: false
+  xy: 2, 254
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_22
+  rotate: false
+  xy: 754, 76
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+topor_fx
+  rotate: true
+  xy: 431, 2
+  size: 250, 254
+  orig: 250, 254
+  offset: 0, 0
+  index: -1
+
+1920_intro_v14.png
+size: 1948,1973
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+blick
+  rotate: false
+  xy: 754, 472
+  size: 172, 173
+  orig: 172, 173
+  offset: 0, 0
+  index: -1
+body_bottom
+  rotate: false
+  xy: 928, 507
+  size: 293, 139
+  orig: 293, 139
+  offset: 0, 0
+  index: -1
+book_fx2_05
+  rotate: false
+  xy: 1506, 35
+  size: 400, 432
+  orig: 400, 432
+  offset: 0, 0
+  index: -1
+knight_body
+  rotate: false
+  xy: 380, 3
+  size: 349, 200
+  orig: 349, 200
+  offset: 0, 0
+  index: -1
+logo_Particle_23
+  rotate: false
+  xy: 2, 1531
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_24
+  rotate: false
+  xy: 754, 1531
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_25
+  rotate: false
+  xy: 2, 1089
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_26
+  rotate: false
+  xy: 754, 1089
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_27
+  rotate: true
+  xy: 1506, 1221
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_28
+  rotate: false
+  xy: 2, 647
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_29
+  rotate: false
+  xy: 754, 647
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_30
+  rotate: true
+  xy: 1506, 469
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_31
+  rotate: false
+  xy: 2, 205
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_32
+  rotate: false
+  xy: 754, 27
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+of_fx
+  rotate: false
+  xy: 2, 23
+  size: 376, 180
+  orig: 376, 180
+  offset: 0, 0
+  index: -1
+of_text_F
+  rotate: false
+  xy: 1222, 487
+  size: 178, 158
+  orig: 178, 158
+  offset: 0, 0
+  index: -1
+
+1920_intro_v15.png
+size: 1948,1973
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+book_fx2_06
+  rotate: false
+  xy: 1506, 35
+  size: 400, 432
+  orig: 400, 432
+  offset: 0, 0
+  index: -1
+book_text_2
+  rotate: false
+  xy: 2, 23
+  size: 312, 180
+  orig: 312, 180
+  offset: 0, 0
+  index: -1
+logo_Particle_33
+  rotate: false
+  xy: 2, 1531
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_34
+  rotate: false
+  xy: 754, 1531
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_35
+  rotate: false
+  xy: 2, 1089
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_36
+  rotate: false
+  xy: 754, 1089
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_37
+  rotate: true
+  xy: 1506, 1221
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_38
+  rotate: false
+  xy: 2, 647
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_39
+  rotate: false
+  xy: 754, 647
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_40
+  rotate: true
+  xy: 1506, 469
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_41
+  rotate: false
+  xy: 2, 205
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_42
+  rotate: false
+  xy: 754, 27
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+topor_fx_01
+  rotate: true
+  xy: 316, 3
+  size: 200, 309
+  orig: 200, 309
+  offset: 0, 0
+  index: -1
+
+1920_intro_v16.png
+size: 1948,2021
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+book_bottom
+  rotate: false
+  xy: 447, 3
+  size: 332, 242
+  orig: 332, 243
+  offset: 0, 0
+  index: -1
+book_fx2_07
+  rotate: false
+  xy: 1506, 83
+  size: 400, 432
+  orig: 400, 432
+  offset: 0, 0
+  index: -1
+logo_Particle_43
+  rotate: false
+  xy: 2, 1579
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_44
+  rotate: false
+  xy: 754, 1579
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_45
+  rotate: false
+  xy: 2, 1137
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_46
+  rotate: false
+  xy: 754, 1137
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_47
+  rotate: true
+  xy: 1506, 1269
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_48
+  rotate: false
+  xy: 2, 695
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_49
+  rotate: false
+  xy: 754, 695
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_50
+  rotate: true
+  xy: 1506, 517
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_51
+  rotate: false
+  xy: 2, 253
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_52
+  rotate: false
+  xy: 754, 75
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+topor
+  rotate: true
+  xy: 235, 74
+  size: 177, 210
+  orig: 177, 210
+  offset: 0, 0
+  index: -1
+topor_glow
+  rotate: true
+  xy: 2, 51
+  size: 200, 231
+  orig: 200, 231
+  offset: 0, 0
+  index: -1
+
+1920_intro_v17.png
+size: 1998,2016
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+book_cut
+  rotate: false
+  xy: 2, 574
+  size: 586, 556
+  orig: 588, 556
+  offset: 2, 0
+  index: -1
+book_fx2_08
+  rotate: false
+  xy: 589, 448
+  size: 400, 432
+  orig: 400, 432
+  offset: 0, 0
+  index: -1
+book_fx2_09
+  rotate: true
+  xy: 2, 172
+  size: 400, 432
+  orig: 400, 432
+  offset: 0, 0
+  index: -1
+book_fx2_10
+  rotate: true
+  xy: 436, 46
+  size: 400, 432
+  orig: 400, 432
+  offset: 0, 0
+  index: -1
+book_text
+  rotate: true
+  xy: 754, 882
+  size: 1132, 230
+  orig: 1132, 230
+  offset: 0, 0
+  index: -1
+book_text_5
+  rotate: true
+  xy: 1168, 882
+  size: 762, 180
+  orig: 762, 180
+  offset: 0, 0
+  index: -1
+book_text_6
+  rotate: true
+  xy: 986, 882
+  size: 884, 180
+  orig: 884, 180
+  offset: 0, 0
+  index: -1
+cape_back
+  rotate: true
+  xy: 1702, 737
+  size: 556, 280
+  orig: 556, 280
+  offset: 0, 0
+  index: -1
+knight_head
+  rotate: false
+  xy: 493, 949
+  size: 189, 181
+  orig: 190, 181
+  offset: 1, 0
+  index: -1
+knight_part_00
+  rotate: false
+  xy: 870, 17
+  size: 365, 350
+  orig: 365, 350
+  offset: 0, 0
+  index: -1
+knight_part_01
+  rotate: true
+  xy: 1168, 1649
+  size: 365, 350
+  orig: 365, 350
+  offset: 0, 0
+  index: -1
+knight_part_02
+  rotate: true
+  xy: 1237, 2
+  size: 365, 350
+  orig: 365, 350
+  offset: 0, 0
+  index: -1
+knight_part_03
+  rotate: true
+  xy: 1293, 369
+  size: 365, 350
+  orig: 365, 350
+  offset: 0, 0
+  index: -1
+knight_part_04
+  rotate: true
+  xy: 1350, 737
+  size: 365, 350
+  orig: 365, 350
+  offset: 0, 0
+  index: -1
+knight_part_05
+  rotate: true
+  xy: 1350, 1104
+  size: 365, 350
+  orig: 365, 350
+  offset: 0, 0
+  index: -1
+knight_part_06
+  rotate: true
+  xy: 1520, 1471
+  size: 365, 350
+  orig: 365, 350
+  offset: 0, 0
+  index: -1
+knight_part_07
+  rotate: true
+  xy: 1589, 2
+  size: 365, 350
+  orig: 365, 350
+  offset: 0, 0
+  index: -1
+knight_part_08
+  rotate: true
+  xy: 1645, 369
+  size: 365, 350
+  orig: 365, 350
+  offset: 0, 0
+  index: -1
+logo_Particle_00
+  rotate: true
+  xy: 991, 369
+  size: 511, 300
+  orig: 511, 300
+  offset: 0, 0
+  index: -1
+logo_Particle_53
+  rotate: false
+  xy: 2, 1574
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+logo_Particle_54
+  rotate: false
+  xy: 2, 1132
+  size: 750, 440
+  orig: 750, 440
+  offset: 0, 0
+  index: -1
+
+1920_intro_v18.png
+size: 2048,802
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+book_gold
+  rotate: 270
+  xy: 1730, 3
+  size: 357, 316
+  orig: 358, 350
+  offset: 1, 34
+  index: -1
+fx_particulas_01
+  rotate: false
+  xy: 2, 500
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_02
+  rotate: false
+  xy: 304, 500
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_03
+  rotate: false
+  xy: 606, 500
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_04
+  rotate: false
+  xy: 908, 500
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_05
+  rotate: false
+  xy: 1210, 500
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_06
+  rotate: false
+  xy: 1512, 500
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_07
+  rotate: false
+  xy: 2, 198
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_08
+  rotate: false
+  xy: 304, 198
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_09
+  rotate: false
+  xy: 606, 198
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_10
+  rotate: false
+  xy: 908, 198
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_11
+  rotate: false
+  xy: 1210, 198
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1
+fx_particulas_12
+  rotate: false
+  xy: 1512, 198
+  size: 300, 300
+  orig: 300, 300
+  offset: 0, 0
+  index: -1

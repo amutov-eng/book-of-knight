@@ -25,13 +25,15 @@
   "author": "Jean-Pierre Sierens",
   "license": "ISC",
   "devDependencies": {
-    "cross-env": "^7.0.3",
-    "pixi.js": "^8.9.2",
-    "ws": "^8.18.3",
-    "vite": "^6.3.5",
-    "typescript": "^5.9.2",
     "@types/node": "^24.3.0",
-    "tsx": "^4.20.4"
+    "cross-env": "^7.0.3",
+    "pixi-spine": "4.0.6",
+    "pixi.js": "^8.9.2",
+    "pixi7": "npm:pixi.js@7.4.3",
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2",
+    "vite": "^6.3.5",
+    "ws": "^8.18.3"
   },
   "type": "module"
 }

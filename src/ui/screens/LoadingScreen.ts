@@ -17,8 +17,10 @@ import {
 } from '../../config/assetsConfig';
 import { getRuntimeVariant } from '../../config/runtimeConfig';
 import AssetManager from '../../core/assets/AssetManager';
+import { restorePixiGlobals } from '../../core/globals';
 import { getTextureCache, setAssetsManifest, setAssetManager } from '../../core/RuntimeContext';
 import { getMaxStripSymbolIndex } from '../../config/stripsConfig';
+import createBootIntroPlayer from '../../intro/createIntroPlayer';
 /** @typedef {import('pixi.js').Texture} PixiTexture */
 /** @typedef {import('../../core/BaseGame').default} BaseGame */
 
@@ -35,6 +37,7 @@ export default class LoadingScreen extends BaseScreen {
         this.assetsToLoad = [];
         this.assetsManifest = null;
         this.assetManager = new AssetManager({ textureCache: getTextureCache() });
+        this.bootIntroPlayer = null;
         setAssetManager(this.assetManager);
         this.loadWithAssets();
     }
@@ -121,8 +124,21 @@ export default class LoadingScreen extends BaseScreen {
     }
 
     async loadWithAssets() {
+        try {
+            this.bootIntroPlayer = createBootIntroPlayer();
+            await this.bootIntroPlayer.start();
+        } catch (error) {
+            log(`LoadingScreen::bootIntroFailed ${error instanceof Error ? error.message : String(error)}`, 'warn');
+            this.bootIntroPlayer = null;
+        }
+
         await this.loadManifestAndValidate();
         const resources = await this.loadAssetResources(this.assetsToLoad);
+        if (this.bootIntroPlayer && this.bootIntroPlayer.destroy) {
+            await this.bootIntroPlayer.destroy();
+            this.bootIntroPlayer = null;
+        }
+        restorePixiGlobals();
         this.setup({ resources });
     }
 
@@ -136,5 +152,12 @@ export default class LoadingScreen extends BaseScreen {
 
         this.game.gsLink.connect();
         this.game.setScreen(new MainScreen(this.game));
+    }
+
+    hide() {
+        if (this.bootIntroPlayer && this.bootIntroPlayer.destroy) {
+            this.bootIntroPlayer.destroy();
+            this.bootIntroPlayer = null;
+        }
     }
 }

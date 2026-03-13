@@ -15,7 +15,13 @@ if (!['desktop', 'mobile'].includes(variant)) {
 
 const srcCommon = path.join(root, 'assets', 'common');
 const srcVariant = path.join(root, 'assets', variant);
+const srcDesktop = path.join(root, 'assets', 'desktop');
 const outAssets = path.join(root, 'public', 'assets');
+const sharedIntroRelativePaths = [
+  path.join('spine', 'intro', '600_felix_logo.json'),
+  path.join('spine', 'intro', '600_felix_logo.atlas'),
+  path.join('spine', 'intro', '600_felix_logo.png')
+];
 
 async function copyDir(from, to) {
   if (!existsSync(from)) return;
@@ -37,5 +43,16 @@ await rm(outAssets, { recursive: true, force: true });
 await mkdir(outAssets, { recursive: true });
 await copyDir(srcCommon, outAssets);
 await copyDir(srcVariant, outAssets);
+
+for (const relativePath of sharedIntroRelativePaths) {
+  const target = path.join(outAssets, relativePath);
+  if (existsSync(target)) continue;
+
+  const desktopFallback = path.join(srcDesktop, relativePath);
+  if (!existsSync(desktopFallback)) continue;
+
+  await mkdir(path.dirname(target), { recursive: true });
+  await copyFile(desktopFallback, target);
+}
 
 console.log(`[prepare-assets] variant=${variant} -> ${path.relative(root, outAssets)}`);

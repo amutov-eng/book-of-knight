@@ -17,15 +17,19 @@ declare global {
 
 const runtime = window;
 
-runtime.PIXI = runtime.PIXI || PIXI;
-runtime.Container = runtime.PIXI.Container;
-runtime.Sprite = runtime.PIXI.Sprite;
-runtime.Application = runtime.PIXI.Application;
-runtime.Texture = runtime.PIXI.Texture;
-runtime.Graphics = runtime.PIXI.Graphics;
-(runtime as any).Text = runtime.PIXI.Text;
-runtime.TextureCache = runtime.TextureCache || {};
-runtime.log = importedLog;
+export function restorePixiGlobals(): void {
+  runtime.PIXI = PIXI;
+  runtime.Container = PIXI.Container;
+  runtime.Sprite = PIXI.Sprite;
+  runtime.Application = PIXI.Application;
+  runtime.Texture = PIXI.Texture;
+  runtime.Graphics = PIXI.Graphics;
+  (runtime as any).Text = PIXI.Text;
+  runtime.TextureCache = runtime.TextureCache || {};
+  runtime.log = importedLog;
+}
+
+restorePixiGlobals();
 
 export {};
 

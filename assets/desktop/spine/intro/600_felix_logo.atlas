@@ -1,0 +1,34 @@
+
+600_felix_logo.png
+size: 541,158
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Felix
+  rotate: false
+  xy: 2, 81
+  size: 375, 75
+  orig: 375, 75
+  offset: 0, 0
+  index: -1
+cloover
+  rotate: true
+  xy: 379, 2
+  size: 154, 160
+  orig: 154, 160
+  offset: 0, 0
+  index: -1
+gaming
+  rotate: false
+  xy: 2, 26
+  size: 375, 53
+  orig: 375, 53
+  offset: 0, 0
+  index: -1
+linea
+  rotate: true
+  xy: 2, 13
+  size: 11, 148
+  orig: 11, 148
+  offset: 0, 0
+  index: -1
