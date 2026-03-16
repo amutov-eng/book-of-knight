@@ -1,4 +1,4 @@
-import { Application, Assets, Graphics, Sprite, Texture } from 'pixi7';
+import { Application, Assets, Graphics, Rectangle, Sprite, Text, TextStyle, Texture } from 'pixi7';
 import { Spine } from 'pixi-spine';
 import type { SpineIntroConfig } from '../config/introConfig';
 import type { IntroPlayer } from './types';
@@ -20,12 +20,14 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
   private loadingEmptyBar: Sprite | null = null;
   private loadingFillBar: Sprite | null = null;
   private loadingFillMask: Graphics | null = null;
+  private skipPromptLabel: Text | null = null;
   private host: HTMLDivElement | null = null;
   private readonly onResize: () => void;
   private completionPromise: Promise<void> | null = null;
   private resolveCompletion: (() => void) | null = null;
   private completed: boolean = false;
   private loadingSweepTime: number = 0;
+  private skipPromptElapsed: number = 0;
 
   constructor(config: SpineIntroConfig) {
     this.config = config;
@@ -56,6 +58,7 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
 
     this.host.appendChild(this.app.view as HTMLCanvasElement);
     document.body.appendChild(this.host);
+    this.configurePointerHandling();
     this.displayManager.applyRendererResolution(this.app.renderer);
     this.displayManager.applyViewport(this.app.renderer);
 
@@ -83,8 +86,10 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     this.spine.eventMode = 'none';
     this.app.stage.addChild(this.spine);
     this.playAnimation(resource);
+    this.setupSkipPrompt();
     this.layout();
     this.app.ticker.add(this.updateLoadingBar, this);
+    this.app.ticker.add(this.updateSkipPrompt, this);
     window.addEventListener('resize', this.onResize);
   }
 
@@ -94,6 +99,7 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
 
     if (this.app) {
       this.app.ticker.remove(this.updateLoadingBar, this);
+      this.app.ticker.remove(this.updateSkipPrompt, this);
     }
 
     if (this.spine) {
@@ -115,6 +121,10 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     if (this.loadingEmptyBar) {
       this.loadingEmptyBar.destroy();
       this.loadingEmptyBar = null;
+    }
+    if (this.skipPromptLabel) {
+      this.skipPromptLabel.destroy();
+      this.skipPromptLabel = null;
     }
 
     if (this.background) {
@@ -141,7 +151,6 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     host.style.position = 'fixed';
     host.style.inset = '0';
     host.style.zIndex = '9999';
-    host.style.pointerEvents = 'none';
     return host;
   }
 
@@ -245,6 +254,46 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     resolve?.();
   }
 
+  private configurePointerHandling(): void {
+    if (!this.host || !this.app) return;
+
+    const skipEnabled = !!this.config.skipPrompt?.enabled;
+    this.host.style.pointerEvents = skipEnabled ? 'auto' : 'none';
+    if (!skipEnabled) return;
+
+    this.app.stage.eventMode = 'static';
+    this.app.stage.hitArea = new Rectangle(0, 0, this.app.screen.width, this.app.screen.height);
+    this.app.stage.on('pointertap', () => {
+      if (!this.skipPromptLabel || !this.skipPromptLabel.visible) return;
+      this.finish();
+    });
+  }
+
+  private setupSkipPrompt(): void {
+    if (!this.app || !this.config.skipPrompt?.enabled) return;
+
+    const prompt = this.config.skipPrompt;
+    this.skipPromptElapsed = 0;
+    this.skipPromptLabel = new Text(
+      prompt.text || 'TAP TO CONTINUE',
+      new TextStyle({
+        fontFamily: 'Arial',
+        fontSize: Number.isFinite(prompt.fontSize) ? Number(prompt.fontSize) : 60,
+        fill: Number.isFinite(prompt.color) ? Number(prompt.color) : 0xffffff,
+        align: 'center',
+        fontWeight: '700'
+      })
+    );
+    this.skipPromptLabel.anchor.set(0.5, 0.5);
+    this.skipPromptLabel.position.set(
+      Number.isFinite(prompt.x) ? Number(prompt.x) : this.app.screen.width * 0.5,
+      Number.isFinite(prompt.y) ? Number(prompt.y) : this.app.screen.height * 0.57
+    );
+    this.skipPromptLabel.visible = false;
+    this.skipPromptLabel.eventMode = 'none';
+    this.app.stage.addChild(this.skipPromptLabel);
+  }
+
   private async setupLoadingBar(): Promise<void> {
     if (!this.app || this.config.layoutMode !== 'fit-center') return;
 
@@ -326,6 +375,24 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     this.loadingFillMask?.beginFill(0xffffff, 1);
     this.loadingFillMask?.drawRect(this.loadingEmptyBar.position.x + left, this.loadingEmptyBar.position.y, visible, this.loadingEmptyBar.height);
     this.loadingFillMask?.endFill();
+  }
+
+  private updateSkipPrompt(): void {
+    if (!this.app || !this.skipPromptLabel || !this.config.skipPrompt?.enabled) return;
+
+    this.skipPromptElapsed += this.app.ticker.deltaMS / 1000;
+    const prompt = this.config.skipPrompt;
+    const delaySec = Number.isFinite(prompt.delaySec) ? Number(prompt.delaySec) : 1.2;
+    if (this.skipPromptElapsed < delaySec) {
+      this.skipPromptLabel.visible = false;
+      return;
+    }
+
+    this.skipPromptLabel.visible = true;
+    const minAlpha = Number.isFinite(prompt.minAlpha) ? Number(prompt.minAlpha) : 0.15;
+    const maxAlpha = Number.isFinite(prompt.maxAlpha) ? Number(prompt.maxAlpha) : 1;
+    const pulse = (Math.sin((this.skipPromptElapsed - delaySec) * Math.PI * 2) + 1) * 0.5;
+    this.skipPromptLabel.alpha = minAlpha + (maxAlpha - minAlpha) * pulse;
   }
 
   private alignSpineToTarget(targetX: number, targetY: number, mode: 'center' | 'top-center'): void {

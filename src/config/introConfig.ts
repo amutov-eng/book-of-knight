@@ -31,6 +31,17 @@ export interface SpineIntroConfig {
       chunkFraction?: number;
     };
   };
+  skipPrompt?: {
+    enabled?: boolean;
+    text?: string;
+    x?: number;
+    y?: number;
+    fontSize?: number;
+    color?: number;
+    delaySec?: number;
+    minAlpha?: number;
+    maxAlpha?: number;
+  };
 }
 
 export const BOOT_INTRO_CONFIG: SpineIntroConfig = Object.freeze({
@@ -58,6 +69,9 @@ export const BOOT_INTRO_CONFIG: SpineIntroConfig = Object.freeze({
       sweepSpeed: 420,
       chunkFraction: 0.25
     }
+  },
+  skipPrompt: {
+    enabled: false
   }
 });
 
@@ -81,5 +95,16 @@ export const GAMEPLAY_INTRO_CONFIG: SpineIntroConfig = Object.freeze({
       x: 960,
       y: 0
     }
+  },
+  skipPrompt: {
+    enabled: true,
+    text: 'TAP TO CONTINUE',
+    x: 960,
+    y: 620,
+    fontSize: 60,
+    color: 0xffffff,
+    delaySec: 1.2,
+    minAlpha: 0.15,
+    maxAlpha: 1
   }
 });

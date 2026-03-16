@@ -639,7 +639,18 @@ export function getIntroConfig(manifest) {
             backgroundColor: 0x000000,
             backgroundImagePath: 'assets/backgrounds/bg.jpg',
             background: { x: 0, y: 0, width: 1920, height: 1080 },
-            spine: { x: 960, y: 0, offsetX: 0, offsetY: 0, scale: 1 }
+            spine: { x: 960, y: 0, offsetX: 0, offsetY: 0, scale: 1 },
+            skipPrompt: {
+                enabled: true,
+                text: 'TAP TO CONTINUE',
+                x: 960,
+                y: 620,
+                fontSize: 60,
+                color: 0xffffff,
+                delaySec: 1.2,
+                minAlpha: 0.15,
+                maxAlpha: 1
+            }
         }
     };
 

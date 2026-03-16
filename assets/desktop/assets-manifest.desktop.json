@@ -800,6 +800,17 @@
                                                  "offsetX":  0,
                                                  "offsetY":  0,
                                                  "scale":  1
+                                             },
+                                   "skipPrompt":  {
+                                                      "enabled":  true,
+                                                      "text":  "TAP TO CONTINUE",
+                                                      "x":  960,
+                                                      "y":  620,
+                                                      "fontSize":  60,
+                                                      "color":  16777215,
+                                                      "delaySec":  1.2,
+                                                      "minAlpha":  0.15,
+                                                      "maxAlpha":  1
                                              }
                                }
               }

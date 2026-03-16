@@ -265,6 +265,9 @@ export default class LoadingScreen extends BaseScreen {
 
     resolveGameplayIntroConfig() {
         const intro = getIntroConfig(this.assetsManifest);
+        const skipPromptText = this.game && this.game.localization && typeof this.game.localization.t === 'function'
+            ? String(this.game.localization.t('startTap', {}, { defaultValue: 'TAP TO CONTINUE' }))
+            : 'TAP TO CONTINUE';
         return {
             ...GAMEPLAY_INTRO_CONFIG,
             backgroundColor: Number.isFinite(intro.gameplay?.backgroundColor) ? Number(intro.gameplay.backgroundColor) : GAMEPLAY_INTRO_CONFIG.backgroundColor,
@@ -273,6 +276,13 @@ export default class LoadingScreen extends BaseScreen {
             viewport: {
                 background: intro.gameplay?.background || GAMEPLAY_INTRO_CONFIG.viewport?.background,
                 spine: intro.gameplay?.spine || GAMEPLAY_INTRO_CONFIG.viewport?.spine
+            },
+            skipPrompt: {
+                ...(GAMEPLAY_INTRO_CONFIG.skipPrompt || {}),
+                ...(intro.gameplay?.skipPrompt || {}),
+                text: typeof intro.gameplay?.skipPrompt?.text === 'string' && intro.gameplay.skipPrompt.text.length > 0
+                    ? intro.gameplay.skipPrompt.text
+                    : skipPromptText
             }
         };
     }
