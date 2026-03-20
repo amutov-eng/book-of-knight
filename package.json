@@ -38,8 +38,8 @@
   },
   "type": "module",
   "dependencies": {
-    "@esotericsoftware/spine-pixi-v8": "^4.2.107",
+    "@esotericsoftware/spine-pixi-v8": "4.2.107",
     "@fontsource/roboto": "^5.2.10",
-    "@pixi-spine/all-3.8": "^4.0.6"
+    "@pixi-spine/all-3.8": "4.0.6"
   }
 }
