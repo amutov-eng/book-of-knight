@@ -88,6 +88,11 @@ export default class SymbolSpineOverlayV8 {
     this.reelMask = null;
   }
 
+  setVisible(visible: boolean): void {
+    if (!this.host) return;
+    this.host.style.display = visible ? '' : 'none';
+  }
+
   private async ensureApp(): Promise<void> {
     if (this.app) {
       this.syncViewport();

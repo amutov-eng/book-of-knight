@@ -47,6 +47,11 @@ export default class SymbolSpineOverlay {
     this.overlayV8.destroy();
   }
 
+  setVisible(visible: boolean): void {
+    this.overlay38.setVisible(visible);
+    this.overlayV8.setVisible(visible);
+  }
+
   private resolveRuntime(clip: SymbolSpineClipConfig): SymbolSpineRuntime {
     return clip && clip.runtime === '4.2' ? '4.2' : '3.8';
   }

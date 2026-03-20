@@ -491,6 +491,7 @@ export default class Menu extends PIXI.Container {
 
     act(delta = 1) {
         if (!this.assetsLoaded) return;
+        this.syncSymbolSpineOverlayVisibility();
         this.updateSpinButtonVisibility();
         this.updateAutoPlayButtonVisibility();
         this.updateButtonState();
@@ -498,5 +499,18 @@ export default class Menu extends PIXI.Container {
             this.buttonLayer.stepTransitions(delta);
         }
         this.refreshIdleStatus();
+    }
+
+    syncSymbolSpineOverlayVisibility() {
+        const overlayVisible = !(
+            this.isBetMenuOpen()
+            || this.isAutoPlayMenuOpen()
+            || this.isBuyBonusMenuOpen()
+            || this.isBuyBonusConfirmOpen()
+        );
+
+        if (this.game?.symbolSpineOverlay && typeof this.game.symbolSpineOverlay.setVisible === 'function') {
+            this.game.symbolSpineOverlay.setVisible(overlayVisible);
+        }
     }
 }

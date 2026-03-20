@@ -1,875 +1,874 @@
 {
-    "backgrounds":  {
-                        "base":  "assets/backgrounds/bg.jpg",
-                        "fg":  "assets/backgrounds/bg_fg.jpg",
-                        "haw":  "assets/backgrounds/bg_haw.jpg"
-                    },
-    "reels":  {
-                  "background":  {
-                                     "base":  "assets/backgrounds/reels_bg.png",
-                                     "fg":  "assets/backgrounds/reels_bg_fg.png",
-                                     "haw":  "assets/backgrounds/reels_bg_haw.png"
-                                 },
-                  "frame":  {
-                                "base":  "assets/backgrounds/reels_frame.png",
-                                "fg":  "assets/backgrounds/reels_frame_fg_haw.png",
-                                "haw":  "assets/backgrounds/reels_frame_fg_haw.png"
-                            }
-              },
-    "lines":  {
-                  "atlases":  [
-                                  "assets/lines/lines-0.json",
-                                  "assets/lines/lines-1.json"
-                              ]
-              },
-    "animations":  {
-                        "atlases":  [
-                                        "assets/animations/win-0.json"
-                                    ]
-                    },
-    "layout":  {
-                   "shared":  {
-                                  "baseReel":  {
-                                                   "spinStep":  28,
-                                                   "pitch":  272,
-                                                   "symbolWidth":  278,
-                                                   "symbolHeight":  264,
-                                                   "trimTopY":  30,
-                                                   "trimBottomY":  30
-                                               },
-                                  "reels":  {
-                                                "strip":  [
-                                                              1,
-                                                              5,
-                                                              6,
-                                                              4,
-                                                              5
-                                                          ],
-                                                "forceSymbolIndex":  null
-                                            },
-                                  "layers":  {
-                                                 "reelsBgX":  0,
-                                                 "reelsBgY":  0,
-                                                 "titleX":  0,
-                                                 "titleY":  0,
-                                                 "linesAboveSymbols":  false
-                                             }
-                              },
-                   "desktop":  {
-                                   "reels":  {
-                                                 "spacing":  282,
-                                                 "x":  257,
-                                                 "y":  130,
-                                                 "width":  278,
-                                                 "height":  792
-                                             }
-                               }
-               },
-    "symbols":  {
-                    "atlases":  [
-                                    "assets/symbols/symbols-0.json",
-                                    "assets/symbols/symbols-1.json"
-                                ],
-                    "frames":  [
-                                   {
-                                       "prefix":  "book_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "normal",
-                                       "offsetX":  5,
-                                       "offsetY":  0,
-                                       "spine":  {
-                                                     "scatter":  {
-                                                                     "jsonPath":  "assets/spine/symbols/1920_book_v1.json",
-                                                                     "atlasPath":  "assets/spine/symbols/1920_book_v1.atlas",
-                                                                     "runtime":  "3.8",
-                                                                     "loop":  false,
-                                                                     "scale":  1,
-                                                                     "offsetX":  0,
-                                                                     "offsetY":  0
-                                                                 }
-                                                 }
-                                   },
-                                   {
-                                       "prefix":  "10_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "normal",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "J_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "normal",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "Q_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "normal",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "K_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "normal",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "A_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "normal",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "torch_blur_",
-                                       "atlas":  "symbols-1.json",
-                                       "winProfile":  "high",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "axe_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "high",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "chalice_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "high",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "knight_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "high",
-                                       "offsetX":  0,
-                                       "offsetY":  0,
-                                       "spine":  {
-                                                     "win":  {
-                                                                 "jsonPath":  "assets/spine/symbols/1920_knight_v1.json",
-                                                                 "atlasPath":  "assets/spine/symbols/1920_knight_v1.atlas",
-                                                                 "runtime":  "3.8",
-                                                                 "loop":  false,
-                                                                 "scale":  1,
-                                                                 "offsetX":  0,
-                                                                 "offsetY":  132
-                                                             }
-                                                 }
-                                   },
-                                   {
-                                       "prefix":  "shield_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "high",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "mini_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "high",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "major_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "high",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   },
-                                   {
-                                       "prefix":  "mega_blur_",
-                                       "atlas":  "symbols-0.json",
-                                       "winProfile":  "high",
-                                       "offsetX":  0,
-                                       "offsetY":  0
-                                   }
-                               ]
+    "backgrounds": {
+        "base": "assets/backgrounds/bg.jpg",
+        "fg": "assets/backgrounds/bg_fg.jpg",
+        "haw": "assets/backgrounds/bg_haw.jpg"
+    },
+    "reels": {
+        "background": {
+            "base": "assets/backgrounds/reels_bg.png",
+            "fg": "assets/backgrounds/reels_bg_fg.png",
+            "haw": "assets/backgrounds/reels_bg_haw.png"
+        },
+        "frame": {
+            "base": "assets/backgrounds/reels_frame.png",
+            "fg": "assets/backgrounds/reels_frame_fg_haw.png",
+            "haw": "assets/backgrounds/reels_frame_fg_haw.png"
+        }
+    },
+    "lines": {
+        "atlases": [
+            "assets/lines/lines-0.json",
+            "assets/lines/lines-1.json"
+        ]
+    },
+    "animations": {
+        "atlases": [
+            "assets/animations/win-0.json"
+        ]
+    },
+    "layout": {
+        "shared": {
+            "baseReel": {
+                "spinStep": 28,
+                "pitch": 272,
+                "symbolWidth": 278,
+                "symbolHeight": 264,
+                "trimTopY": 30,
+                "trimBottomY": 30
+            },
+            "reels": {
+                "strip": [
+                    1,
+                    5,
+                    6,
+                    4,
+                    5
+                ],
+                "forceSymbolIndex": null
+            },
+            "layers": {
+                "reelsBgX": 0,
+                "reelsBgY": 0,
+                "titleX": 0,
+                "titleY": 0,
+                "linesAboveSymbols": false
+            }
+        },
+        "desktop": {
+            "reels": {
+                "spacing": 282,
+                "x": 257,
+                "y": 130,
+                "width": 278,
+                "height": 792
+            }
+        }
+    },
+    "symbols": {
+        "atlases": [
+            "assets/symbols/symbols-0.json",
+            "assets/symbols/symbols-1.json"
+        ],
+        "frames": [
+            {
+                "prefix": "book_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "normal",
+                "offsetX": 5,
+                "offsetY": 0,
+                "spine": {
+                    "scatter": {
+                        "jsonPath": "assets/spine/symbols/1920_book_v1.json",
+                        "atlasPath": "assets/spine/symbols/1920_book_v1.atlas",
+                        "runtime": "3.8",
+                        "loop": false,
+                        "scale": 1,
+                        "offsetX": 0,
+                        "offsetY": 0
+                    }
+                }
+            },
+            {
+                "prefix": "10_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "normal",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "J_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "normal",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "Q_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "normal",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "K_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "normal",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "A_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "normal",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "torch_blur_",
+                "atlas": "symbols-1.json",
+                "winProfile": "high",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "axe_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "high",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "chalice_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "high",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "knight_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "high",
+                "offsetX": 0,
+                "offsetY": 0,
+                "spine": {
+                    "win": {
+                        "jsonPath": "assets/spine/symbols/1920_knight_v1.json",
+                        "atlasPath": "assets/spine/symbols/1920_knight_v1.atlas",
+                        "runtime": "3.8",
+                        "loop": false,
+                        "scale": 1,
+                        "offsetX": 0,
+                        "offsetY": 132
+                    }
+                }
+            },
+            {
+                "prefix": "shield_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "high",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "mini_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "high",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "major_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "high",
+                "offsetX": 0,
+                "offsetY": 0
+            },
+            {
+                "prefix": "mega_blur_",
+                "atlas": "symbols-0.json",
+                "winProfile": "high",
+                "offsetX": 0,
+                "offsetY": 0
+            }
+        ]
+    },
+    "ui": {
+        "atlases": [
+            "assets/ui/interface-0.json",
+            "assets/ui/menu_buttons-0.json",
+            "assets/ui/common.json"
+        ],
+        "hud": {
+            "backgrounds": {
+                "bottom": {
+                    "frame": "bottom_bg.png",
+                    "x": 0,
+                    "y": 1034
                 },
-    "ui":  {
-               "atlases":  [
-                               "assets/ui/interface-0.json",
-                               "assets/ui/menu_buttons-0.json",
-                               "assets/ui/common.json"
-                           ],
-               "hud":  {
-                           "backgrounds":  {
-                                               "bottom":  {
-                                                              "frame":  "bottom_bg.png",
-                                                              "x":  0,
-                                                              "y":  1034
-                                                          },
-                                               "winField":  {
-                                                                "frame":  "win_field.png",
-                                                                "x":  0,
-                                                                "y":  942
-                                                            }
-                                           },
-                           "buttons":  {
-                                           "start":  {
-                                                         "base":  "button_start",
-                                                         "x":  1616,
-                                                         "y":  368,
-                                                         "width":  300,
-                                                         "height":  300,
-                                                         "enableFadeFrames":  0,
-                                                         "enableFadeFromAlpha":  1
-                                                     },
-                                           "stop":  {
-                                                        "base":  "button_stop",
-                                                        "x":  1616,
-                                                        "y":  368,
-                                                        "width":  300,
-                                                        "height":  300,
-                                                        "enableFadeFrames":  0,
-                                                        "enableFadeFromAlpha":  1
-                                                    },
-                                           "auto":  {
-                                                        "base":  "button_autoplay",
-                                                        "x":  1728,
-                                                        "y":  88,
-                                                        "width":  162,
-                                                        "height":  162,
-                                                        "enableFadeFrames":  10,
-                                                        "enableFadeFromAlpha":  0.55
-                                                    },
-                                           "bet":  {
-                                                       "base":  "button_bet",
-                                                       "x":  1728,
-                                                       "y":  820,
-                                                       "width":  162,
-                                                       "height":  162,
-                                                       "enableFadeFrames":  10,
-                                                       "enableFadeFromAlpha":  0.55
-                                                   },
-                                           "settings":  {
-                                                            "base":  "button_settings",
-                                                            "x":  30,
-                                                            "y":  820,
-                                                            "width":  162,
-                                                            "height":  162,
-                                                            "enableFadeFrames":  10,
-                                                            "enableFadeFromAlpha":  0.55
-                                                        },
-                                           "buyBonus":  {
-                                                            "base":  "bb_yellow",
-                                                            "x":  0,
-                                                            "y":  430,
-                                                            "width":  194,
-                                                            "height":  164,
-                                                            "enableFadeFrames":  10,
-                                                            "enableFadeFromAlpha":  0.55
-                                                        },
-                                           "home":  {
-                                                        "base":  "button_home",
-                                                        "x":  83,
-                                                        "y":  1030,
-                                                        "width":  50,
-                                                        "height":  50,
-                                                        "enableFadeFrames":  8,
-                                                        "enableFadeFromAlpha":  0.55
-                                                    },
-                                           "autoStop":  {
-                                                            "base":  "button_autoX",
-                                                            "x":  1728,
-                                                            "y":  88,
-                                                            "width":  162,
-                                                            "height":  162,
-                                                            "enableFadeFrames":  10,
-                                                            "enableFadeFromAlpha":  0.55,
-                                                            "counter":  {
-                                                                            "x":  82,
-                                                                            "y":  91,
-                                                                            "fontSize":  44,
-                                                                            "minFontSize":  26,
-                                                                            "maxWidth":  118,
-                                                                            "color":  16777215,
-                                                                            "fontWeight": "400",
-                                                                            "align":  "center"
-                                                                        }
-                                                        }
-                                       },
-                           "texts":  {
-                                         "credit":  {
-                                                        "x":  220,
-                                                        "y":  1039,
-                                                        "fontSize":  34,
-                                                        "align":  "left",
-                                                        "labelColor":  16762368,
-                                                        "valueColor":  15989241
-                                                    },
-                                         "totalBet":  {
-                                                          "x":  1490,
-                                                          "y":  1039,
-                                                          "fontSize":  34,
-                                                          "align":  "left",
-                                                          "labelColor":  16762368,
-                                                          "valueColor":  15989241
-                                                      },
-                                         "status":  {
-                                                        "x":  960,
-                                                        "y":  969,
-                                                        "fontSize":  36,
-                                                        "align":  "center",
-                                                        "anchorX":  0.5
-                                                    },
-                                         "winStatus":  {
-                                                           "x":  960,
-                                                           "y":  990,
-                                                           "fontSize":  34,
-                                                           "align":  "center",
-                                                           "anchorX":  0.5
-                                                       },
-                                         "win":  {
-                                                     "x":  960,
-                                                     "y":  953,
-                                                     "fontSize":  36,
-                                                     "align":  "center",
-                                                     "anchorX":  0.5
-                                                 }
-                                     },
-                           "topBar":  {
-                                          "logo":  {
-                                                       "frame":  "logo.png",
-                                                       "x":  20,
-                                                       "y":  6
-                                                   },
-                                          "jackpots":  [
-                                                           {
-                                                               "frame":  "jackpot_gold_act.png",
-                                                               "x":  248,
-                                                               "y":  6,
-                                                               "valueX":  497.5,
-                                                               "valueY":  15,
-                                                               "valueText":  "1000.00",
-                                                               "serverValueKey":  "GRAND_JACKPOT_VALUE",
-                                                               "betMultiplier":  1000,
-                                                               "labelX":  515,
-                                                               "labelY":  73,
-                                                               "labelText":  "",
-                                                               "valueFontSize":  48,
-                                                               "valueMaxWidth":  300,
-                                                               "valueMinFontSize":  28,
-                                                               "valueOffsetY":  1,
-                                                               "labelFontSize":  22,
-                                                               "valueColor":  16765440,
-                                                               "labelColor":  16765440
-                                                           },
-                                                           {
-                                                               "frame":  "jackpot_silver_act.png",
-                                                               "x":  736,
-                                                               "y":  6,
-                                                               "valueX":  977.5,
-                                                               "valueY":  15,
-                                                               "valueText":  "10.00",
-                                                               "serverValueKey":  "MAJOR_JACKPOT_VALUE",
-                                                               "betMultiplier":  100,
-                                                               "labelX":  976,
-                                                               "labelY":  73,
-                                                               "labelText":  "",
-                                                               "valueFontSize":  48,
-                                                               "valueMaxWidth":  300,
-                                                               "valueMinFontSize":  28,
-                                                               "valueOffsetY":  -8,
-                                                               "labelFontSize":  22,
-                                                               "valueColor":  12246527,
-                                                               "labelColor":  12246527
-                                                           },
-                                                           {
-                                                               "frame":  "jackpot_bronze_act.png",
-                                                               "x":  1224,
-                                                               "y":  6,
-                                                               "valueX":  1464.5,
-                                                               "valueY":  15,
-                                                               "valueText":  "2.00",
-                                                               "serverValueKey":  "MINOR_JACKPOT_VALUE",
-                                                               "betMultiplier":  20,
-                                                               "labelX":  1464,
-                                                               "labelY":  73,
-                                                               "labelText":  "",
-                                                               "valueFontSize":  48,
-                                                               "valueMaxWidth":  300,
-                                                               "valueMinFontSize":  28,
-                                                               "valueOffsetY":  -8,
-                                                               "labelFontSize":  22,
-                                                               "valueColor":  16547151,
-                                                               "labelColor":  16547151
-                                                           }
-                                                       ]
-                                      },
-                           "fonts":  {
-                                         "primary":  "Roboto",
-                                         "jackpot":  "Roboto",
-                                         "creditLabel":  "Roboto",
-                                         "creditValue":  "Roboto",
-                                         "creditLabelBitmap":  "Roboto_Condensed-Medium",
-                                         "creditValueBitmap":  "Roboto_Condensed-Medium",
-                                         "totalBetLabel":  "Roboto",
-                                         "totalBetValue":  "Roboto",
-                                         "totalBetLabelBitmap":  "Roboto_Condensed-Medium",
-                                         "totalBetValueBitmap":  "Roboto_Condensed-Medium",
-                                         "status":  "Roboto",
-                                         "winStatus":  "Roboto",
-                                         "win":  "Roboto",
-                                         "winStatusBitmap":  "Roboto_Condensed-Medium",
-                                         "winBitmap":  "Roboto-Black",
-                                         "jackpotValue":  "Roboto",
-                                         "jackpotLabel":  "Roboto"
-                                     },
-                           "betMenu":  {
-                                           "overlay":  {
-                                                           "color":  0,
-                                                           "alpha":  0.5
-                                                       },
-                                           "panel":  {
-                                                         "frame":  "bg_bet.png",
-                                                         "x":  846,
-                                                         "y":  70
-                                                     },
-                                           "valueField":  {
-                                                              "frame":  "bet_value.png",
-                                                              "x":  1040,
-                                                              "y":  382
-                                                          },
-                                           "title":  {
-                                                         "x":  1293,
-                                                         "y":  110,
-                                                         "fontSize":  56,
-                                                         "color":  12509685
-                                                     },
-                                           "totalBetLabel":  {
-                                                                 "x":  1293,
-                                                                 "y":  324,
-                                                                 "fontSize":  44,
-                                                                 "color":  12509685
-                                                             },
-                                           "valueText":  {
-                                                             "x":  1293,
-                                                             "y":  409,
-                                                             "fontSize":  44,
-                                                             "minFontSize":  22,
-                                                             "maxWidth":  220,
-                                                             "color":  12509685
-                                                         },
-                                           "lines":  {
-                                                         "x":  1293,
-                                                         "y":  840,
-                                                         "fontSize":  42,
-                                                         "color":  12509685
-                                                     },
-                                           "buttons":  {
-                                                           "max":  {
-                                                                       "frame":  "button_maxbet_001.png",
-                                                                       "pressed":  "button_maxbet_002.png",
-                                                                       "x":  1142,
-                                                                       "y":  208,
-                                                                       "fontSize":  32,
-                                                                       "minFontSize":  22,
-                                                                       "maxTextWidth":  250,
-                                                                       "textOffsetY":  0,
-                                                                       "color":  12509685
-                                                                   },
-                                                           "plus":  {
-                                                                        "frame":  "plus_001.png",
-                                                                        "pressed":  "plus_002.png",
-                                                                        "x":  1392,
-                                                                        "y":  375
-                                                                    },
-                                                           "minus":  {
-                                                                         "frame":  "minus_001.png",
-                                                                         "pressed":  "minus_002.png",
-                                                                         "x":  1058,
-                                                                         "y":  375
-                                                                     },
-                                                           "close":  {
-                                                                         "frame":  "button_closesmall_001.png",
-                                                                         "pressed":  "button_closesmall_002.png",
-                                                                         "hover":  "button_close_hover.png",
-                                                                         "x":  1520,
-                                                                         "y":  76
-                                                                     },
-                                                           "preset":  {
-                                                                          "frame":  "button_digit_001.png",
-                                                                          "pressed":  "button_digit_002.png",
-                                                                          "fontSize":  30,
-                                                                          "minFontSize":  20,
-                                                                          "maxTextWidth":  170,
-                                                                          "textOffsetY":  0,
-                                                                          "color":  12509685,
-                                                                          "positions":  [
-                                                                                            {
-                                                                                                "x":  954,
-                                                                                                "y":  540
-                                                                                            },
-                                                                                            {
-                                                                                                "x":  1188,
-                                                                                                "y":  540
-                                                                                            },
-                                                                                            {
-                                                                                                "x":  1422,
-                                                                                                "y":  540
-                                                                                            },
-                                                                                            {
-                                                                                                "x":  954,
-                                                                                                "y":  682
-                                                                                            },
-                                                                                            {
-                                                                                                "x":  1188,
-                                                                                                "y":  682
-                                                                                            },
-                                                                                            {
-                                                                                                "x":  1422,
-                                                                                                "y":  682
-                                                                                            }
-                                                                                        ]
-                                                                      }
-                                                       }
-                                       },
-                           "autoPlayMenu":  {
-                                                "overlay":  {
-                                                                "color":  0,
-                                                                "alpha":  0.55
-                                                            },
-                                                "panel":  {
-                                                              "frame":  "bg_auto.png",
-                                                              "x":  853,
-                                                              "y":  6
-                                                          },
-                                                "title":  {
-                                                              "x":  1300,
-                                                              "y":  96,
-                                                              "fontSize":  60,
-                                                              "color":  9676735,
-                                                              "maxWidth":  760,
-                                                              "minFontSize":  30
-                                                          },
-                                                "autoSpinsLabel":  {
-                                                                       "x":  1300,
-                                                                       "y":  700,
-                                                                       "fontSize":  54,
-                                                                       "color":  9676735,
-                                                                       "maxWidth":  880,
-                                                                       "minFontSize":  26
-                                                                   },
-                                                "infoText":  {
-                                                                 "x":  1296,
-                                                                 "y":  312,
-                                                                 "fontSize":  36,
-                                                                 "color":  12174803
-                                                             },
-                                                "buttons":  {
-                                                                "close":  {
-                                                                              "frame":  "button_closesmall_001.png",
-                                                                              "pressed":  "button_closesmall_002.png",
-                                                                              "x":  1512,
-                                                                              "y":  59
-                                                                          },
-                                                                "start":  {
-                                                                              "frame":  "start_autospins_001.png",
-                                                                              "pressed":  "start_autospins_002.png",
-                                                                              "x":  901,
-                                                                              "y":  835,
-                                                                              "fontSize":  60,
-                                                                              "color":  12509685,
-                                                                              "maxTextWidth":  760,
-                                                                              "minFontSize":  18,
-                                                                              "textOffsetY":  0
-                                                                          },
-                                                                "spin":  {
-                                                                             "frame":  "button_digit_001.png",
-                                                                             "pressed":  "button_digit_002.png",
-                                                                             "fontSize":  60,
-                                                                             "color":  12509685,
-                                                                             "values":  [
-                                                                                            10,
-                                                                                            20,
-                                                                                            50,
-                                                                                            100,
-                                                                                            1000
-                                                                                        ],
-                                                                             "positions":  [
-                                                                                               {
-                                                                                                   "x":  963,
-                                                                                                   "y":  427
-                                                                                               },
-                                                                                               {
-                                                                                                   "x":  1190,
-                                                                                                   "y":  427
-                                                                                               },
-                                                                                               {
-                                                                                                   "x":  1417,
-                                                                                                   "y":  427
-                                                                                               },
-                                                                                               {
-                                                                                                   "x":  1070,
-                                                                                                   "y":  554
-                                                                                               },
-                                                                                               {
-                                                                                                   "x":  1297,
-                                                                                                   "y":  554
-                                                                                               }
-                                                                                           ]
-                                                                         },
-                                                                "turbo":  {
-                                                                              "frame":  "turbo_bg_001.png",
-                                                                              "pressed":  "turbo_bg_002.png",
-                                                                              "x":  1043,
-                                                                              "y":  212,
-                                                                              "fontSize":  36,
-                                                                              "color":  12174803,
-                                                                              "textAlign":  "left",
-                                                                              "textX":  80,
-                                                                              "textY":  53,
-                                                                              "textOffsetY":  0
-                                                                          },
-                                                                "skip":  {
-                                                                             "frame":  "skipscreen_bg_001.png",
-                                                                             "pressed":  "skipscreen_bg_002.png",
-                                                                             "x":  1043,
-                                                                             "y":  371,
-                                                                             "fontSize":  36,
-                                                                             "color":  12174803,
-                                                                             "textAlign":  "left",
-                                                                             "textX":  80,
-                                                                             "textY":  53,
-                                                                             "textOffsetY":  0
-                                                                         }
-                                                            }
-                                            },
-                           "buyBonusMenu":  {
-                                                "background":  {
-                                                                   "x":  0,
-                                                                   "y":  0,
-                                                                   "width":  1920,
-                                                                   "height":  1080
-                                                               },
-                                                "panels":  {
-                                                               "free":  {
-                                                                            "x":  420,
-                                                                            "y":  190
-                                                                        },
-                                                               "haw":  {
-                                                                           "x":  989,
-                                                                           "y":  190
-                                                                       }
-                                                           },
-                                                "symbols":  {
-                                                                "free":  {
-                                                                             "x":  493,
-                                                                             "y":  605
-                                                                         },
-                                                                "haw":  {
-                                                                            "x":  1100,
-                                                                            "y":  590
-                                                                        }
-                                                            },
-                                                "controls":  {
-                                                                 "betBg":  {
-                                                                               "x":  703,
-                                                                               "y":  86
-                                                                           },
-                                                                 "plus":  {
-                                                                              "x":  1068,
-                                                                              "y":  78
-                                                                          },
-                                                                 "minus":  {
-                                                                               "x":  709,
-                                                                               "y":  78
-                                                                           },
-                                                                 "close":  {
-                                                                               "x":  1711,
-                                                                               "y":  829
-                                                                           },
-                                                                 "freeBuy":  {
-                                                                                 "x":  552,
-                                                                                 "y":  285
-                                                                             },
-                                                                 "hawBuy":  {
-                                                                                "x":  1121,
-                                                                                "y":  285
-                                                                            }
-                                                             },
-                                              "texts":  {
-                                                              "buyButton":  {
-                                                                                "maxWidth":  180,
-                                                                                "minFontSize":  24
-                                                                            },
-                                                              "title":  {
-                                                                            "x":  960,
-                                                                            "y":  40,
-                                                                            "fontSize":  60,
-                                                                            "maxWidth":  760,
-                                                                            "minFontSize":  30
-                                                                        },
-                                                              "totalBetLabel":  {
-                                                                                    "x":  956,
-                                                                                    "y":  206,
-                                                                                    "fontSize":  46
-                                                                                },
-                                                              "totalBetValue":  {
-                                                                                    "x":  956,
-                                                                                    "y":  139,
-                                                                                    "fontSize":  46
-                                                                                },
-                                                              "freeTitle":  {
-                                                                                 "x":  672,
-                                                                                 "y":  560,
-                                                                                 "fontSize":  54,
-                                                                                 "maxWidth":  430,
-                                                                                 "minFontSize":  28
-                                                                             },
-                                                              "hawTitle":  {
-                                                                                "x":  1241,
-                                                                                "y":  560,
-                                                                                "fontSize":  54,
-                                                                                "maxWidth":  430,
-                                                                                "minFontSize":  28
-                                                                            },
-                                                              "freePrice":  {
-                                                                               "x":  672,
-                                                                               "y":  465,
-                                                                               "fontSize":  54
-                                                                           },
-                                                              "hawPrice":  {
-                                                                              "x":  1241,
-                                                                              "y":  465,
-                                                                              "fontSize":  54
-                                                                          }
-                                                          }
-                                            },
-                           "buyBonusConfirm":  {
-                                                   "background":  {
-                                                                      "x":  0,
-                                                                      "y":  0,
-                                                                      "width":  1920,
-                                                                      "height":  1080
-                                                                  },
-                                                   "panel":  {
-                                                                 "x":  465,
-                                                                 "y":  240
-                                                             },
-                                                   "symbols":  {
-                                                                   "free":  {
-                                                                                "x":  782,
-                                                                                "y":  581
-                                                                            },
-                                                                   "haw":  {
-                                                                               "x":  811,
-                                                                               "y":  566
-                                                                           }
-                                                               },
-                                                   "buttons":  {
-                                                                   "yes":  {
-                                                                               "x":  665,
-                                                                               "y":  331
-                                                                           },
-                                                                   "no":  {
-                                                                              "x":  988,
-                                                                              "y":  331
-                                                                          }
-                                                               },
-                                                   "texts":  {
-                                                                 "title":  {
-                                                                               "x":  960,
-                                                                               "y":  345,
-                                                                               "fontSize":  54,
-                                                                               "wordWrapWidth":  930
-                                                                           }
-                                                             }
-                                               },
-                           "bootSoundPrompt":  {
-                                                   "background":  {
-                                                                      "x":  0,
-                                                                      "y":  0,
-                                                                      "width":  1920,
-                                                                      "height":  1080,
-                                                                      "alpha":  0.92
-                                                                  },
-                                                   "panel":  {
-                                                                 "x":  611,
-                                                                 "y":  297
-                                                             },
-                                                   "logo":  {
-                                                                "x":  711,
-                                                                "y":  496
-                                                            },
-                                                   "buttons":  {
-                                                                   "yes":  {
-                                                                               "x":  665,
-                                                                               "y":  341
-                                                                           },
-                                                                   "no":  {
-                                                                              "x":  988,
-                                                                              "y":  341
-                                                                          }
-                                                               },
-                                                   "texts":  {
-                                                                 "title":  {
-                                                                               "x":  960,
-                                                                               "y":  250,
-                                                                               "fontSize":  54
-                                                                           }
-                                                             }
-                                               }
-                       }
-           },
-    "intro":  {
-                  "boot":  {
-                               "layoutMode":  "fit-center",
-                               "backgroundColor":  0,
-                               "spine":  {
-                                              "x":  960,
-                                              "y":  420,
-                                              "offsetX":  -360,
-                                              "offsetY":  0,
-                                              "scale":  0.58
-                                          },
-                               "loadingBar":  {
-                                                  "atlasPath":  "assets/spine/intro/loading.json",
-                                                  "x":  0,
-                                                  "y":  36,
-                                                  "width":  440,
-                                                  "height":  10,
-                                                  "sweepSpeed":  420,
-                                                  "chunkFraction":  0.25
-                                              }
-                           },
-                  "gameplay":  {
-                                   "layoutMode":  "native-center-top",
-                                   "backgroundColor":  0,
-                                   "backgroundImagePath":  "assets/backgrounds/bg.jpg",
-                                   "background":  {
-                                                      "x":  0,
-                                                      "y":  0,
-                                                      "width":  1920,
-                                                      "height":  1080
-                                                  },
-                                   "spine":  {
-                                                 "x":  960,
-                                                 "y":  -130,
-                                                 "offsetX":  0,
-                                                 "offsetY":  0,
-                                                 "scale":  1
-                                             },
-                                   "skipPrompt":  {
-                                                      "enabled":  true,
-                                                      "text":  "TAP TO CONTINUE",
-                                                      "x":  960,
-                                                      "y":  620,
-                                                      "fontSize":  60,
-                                                      "color":  16777215,
-                                                      "delaySec":  1.2,
-                                                      "minAlpha":  0.15,
-                                                      "maxAlpha":  1
-                                             }
-                               }
-              }
+                "winField": {
+                    "frame": "win_field.png",
+                    "x": 0,
+                    "y": 942
+                }
+            },
+            "buttons": {
+                "start": {
+                    "base": "button_start",
+                    "x": 1616,
+                    "y": 368,
+                    "width": 300,
+                    "height": 300,
+                    "enableFadeFrames": 0,
+                    "enableFadeFromAlpha": 1
+                },
+                "stop": {
+                    "base": "button_stop",
+                    "x": 1616,
+                    "y": 368,
+                    "width": 300,
+                    "height": 300,
+                    "enableFadeFrames": 0,
+                    "enableFadeFromAlpha": 1
+                },
+                "auto": {
+                    "base": "button_autoplay",
+                    "x": 1728,
+                    "y": 88,
+                    "width": 162,
+                    "height": 162,
+                    "enableFadeFrames": 10,
+                    "enableFadeFromAlpha": 0.55
+                },
+                "bet": {
+                    "base": "button_bet",
+                    "x": 1728,
+                    "y": 820,
+                    "width": 162,
+                    "height": 162,
+                    "enableFadeFrames": 10,
+                    "enableFadeFromAlpha": 0.55
+                },
+                "settings": {
+                    "base": "button_settings",
+                    "x": 30,
+                    "y": 820,
+                    "width": 162,
+                    "height": 162,
+                    "enableFadeFrames": 10,
+                    "enableFadeFromAlpha": 0.55
+                },
+                "buyBonus": {
+                    "base": "bb_yellow",
+                    "x": 0,
+                    "y": 430,
+                    "width": 194,
+                    "height": 164,
+                    "enableFadeFrames": 10,
+                    "enableFadeFromAlpha": 0.55
+                },
+                "home": {
+                    "base": "button_home",
+                    "x": 83,
+                    "y": 1030,
+                    "width": 50,
+                    "height": 50,
+                    "enableFadeFrames": 8,
+                    "enableFadeFromAlpha": 0.55
+                },
+                "autoStop": {
+                    "base": "button_autoX",
+                    "x": 1728,
+                    "y": 88,
+                    "width": 162,
+                    "height": 162,
+                    "enableFadeFrames": 10,
+                    "enableFadeFromAlpha": 0.55,
+                    "counter": {
+                        "x": 82,
+                        "y": 91,
+                        "fontSize": 44,
+                        "minFontSize": 26,
+                        "maxWidth": 118,
+                        "color": 16777215,
+                        "fontWeight": "400",
+                        "align": "center"
+                    }
+                }
+            },
+            "texts": {
+                "credit": {
+                    "x": 220,
+                    "y": 1039,
+                    "fontSize": 34,
+                    "align": "left",
+                    "labelColor": 16762368,
+                    "valueColor": 15989241
+                },
+                "totalBet": {
+                    "x": 1490,
+                    "y": 1039,
+                    "fontSize": 34,
+                    "align": "left",
+                    "labelColor": 16762368,
+                    "valueColor": 15989241
+                },
+                "status": {
+                    "x": 960,
+                    "y": 969,
+                    "fontSize": 36,
+                    "align": "center",
+                    "anchorX": 0.5
+                },
+                "winStatus": {
+                    "x": 960,
+                    "y": 990,
+                    "fontSize": 34,
+                    "align": "center",
+                    "anchorX": 0.5
+                },
+                "win": {
+                    "x": 960,
+                    "y": 953,
+                    "fontSize": 36,
+                    "align": "center",
+                    "anchorX": 0.5
+                }
+            },
+            "topBar": {
+                "logo": {
+                    "frame": "logo.png",
+                    "x": 20,
+                    "y": 6
+                },
+                "jackpots": [
+                    {
+                        "frame": "jackpot_gold_act.png",
+                        "x": 248,
+                        "y": 6,
+                        "valueX": 497.5,
+                        "valueY": 15,
+                        "valueText": "1000.00",
+                        "serverValueKey": "GRAND_JACKPOT_VALUE",
+                        "betMultiplier": 1000,
+                        "labelX": 515,
+                        "labelY": 73,
+                        "labelText": "",
+                        "valueFontSize": 48,
+                        "valueMaxWidth": 300,
+                        "valueMinFontSize": 28,
+                        "valueOffsetY": 1,
+                        "labelFontSize": 22,
+                        "valueColor": 16765440,
+                        "labelColor": 16765440
+                    },
+                    {
+                        "frame": "jackpot_silver_act.png",
+                        "x": 736,
+                        "y": 6,
+                        "valueX": 977.5,
+                        "valueY": 15,
+                        "valueText": "10.00",
+                        "serverValueKey": "MAJOR_JACKPOT_VALUE",
+                        "betMultiplier": 100,
+                        "labelX": 976,
+                        "labelY": 73,
+                        "labelText": "",
+                        "valueFontSize": 48,
+                        "valueMaxWidth": 300,
+                        "valueMinFontSize": 28,
+                        "valueOffsetY": -8,
+                        "labelFontSize": 22,
+                        "valueColor": 12246527,
+                        "labelColor": 12246527
+                    },
+                    {
+                        "frame": "jackpot_bronze_act.png",
+                        "x": 1224,
+                        "y": 6,
+                        "valueX": 1464.5,
+                        "valueY": 15,
+                        "valueText": "2.00",
+                        "serverValueKey": "MINOR_JACKPOT_VALUE",
+                        "betMultiplier": 20,
+                        "labelX": 1464,
+                        "labelY": 73,
+                        "labelText": "",
+                        "valueFontSize": 48,
+                        "valueMaxWidth": 300,
+                        "valueMinFontSize": 28,
+                        "valueOffsetY": -8,
+                        "labelFontSize": 22,
+                        "valueColor": 16547151,
+                        "labelColor": 16547151
+                    }
+                ]
+            },
+            "fonts": {
+                "primary": "Roboto",
+                "jackpot": "Roboto",
+                "creditLabel": "Roboto",
+                "creditValue": "Roboto",
+                "creditLabelBitmap": "Roboto_Condensed-Medium",
+                "creditValueBitmap": "Roboto_Condensed-Medium",
+                "totalBetLabel": "Roboto",
+                "totalBetValue": "Roboto",
+                "totalBetLabelBitmap": "Roboto_Condensed-Medium",
+                "totalBetValueBitmap": "Roboto_Condensed-Medium",
+                "status": "Roboto",
+                "winStatus": "Roboto",
+                "win": "Roboto",
+                "winStatusBitmap": "Roboto_Condensed-Medium",
+                "winBitmap": "Roboto-Black",
+                "jackpotValue": "Roboto",
+                "jackpotLabel": "Roboto"
+            },
+            "betMenu": {
+                "overlay": {
+                    "color": 0,
+                    "alpha": 0.5
+                },
+                "panel": {
+                    "frame": "bg_bet.png",
+                    "x": 846,
+                    "y": 70
+                },
+                "valueField": {
+                    "frame": "bet_value.png",
+                    "x": 1040,
+                    "y": 382
+                },
+                "title": {
+                    "x": 1293,
+                    "y": 110,
+                    "fontSize": 56,
+                    "color": 12509685
+                },
+                "totalBetLabel": {
+                    "x": 1293,
+                    "y": 324,
+                    "fontSize": 44,
+                    "color": 12509685
+                },
+                "valueText": {
+                    "x": 1293,
+                    "y": 409,
+                    "fontSize": 44,
+                    "minFontSize": 22,
+                    "maxWidth": 220,
+                    "color": 12509685
+                },
+                "lines": {
+                    "x": 1293,
+                    "y": 840,
+                    "fontSize": 42,
+                    "color": 12509685
+                },
+                "buttons": {
+                    "max": {
+                        "frame": "button_maxbet_001.png",
+                        "pressed": "button_maxbet_002.png",
+                        "x": 1142,
+                        "y": 208,
+                        "fontSize": 32,
+                        "minFontSize": 22,
+                        "maxTextWidth": 250,
+                        "textOffsetY": 0,
+                        "color": 12509685
+                    },
+                    "plus": {
+                        "frame": "plus_001.png",
+                        "pressed": "plus_002.png",
+                        "x": 1392,
+                        "y": 375
+                    },
+                    "minus": {
+                        "frame": "minus_001.png",
+                        "pressed": "minus_002.png",
+                        "x": 1058,
+                        "y": 375
+                    },
+                    "close": {
+                        "frame": "button_closesmall_001.png",
+                        "pressed": "button_closesmall_002.png",
+                        "hover": "button_close_hover.png",
+                        "x": 1520,
+                        "y": 76
+                    },
+                    "preset": {
+                        "frame": "button_digit_001.png",
+                        "pressed": "button_digit_002.png",
+                        "fontSize": 30,
+                        "minFontSize": 20,
+                        "maxTextWidth": 170,
+                        "textOffsetY": 0,
+                        "color": 12509685,
+                        "positions": [
+                            {
+                                "x": 954,
+                                "y": 540
+                            },
+                            {
+                                "x": 1188,
+                                "y": 540
+                            },
+                            {
+                                "x": 1422,
+                                "y": 540
+                            },
+                            {
+                                "x": 954,
+                                "y": 682
+                            },
+                            {
+                                "x": 1188,
+                                "y": 682
+                            },
+                            {
+                                "x": 1422,
+                                "y": 682
+                            }
+                        ]
+                    }
+                }
+            },
+            "autoPlayMenu": {
+                "overlay": {
+                    "color": 0,
+                    "alpha": 0.55
+                },
+                "panel": {
+                    "frame": "bg_auto.png",
+                    "x": 853,
+                    "y": 6
+                },
+                "title": {
+                    "x": 1300,
+                    "y": 96,
+                    "fontSize": 60,
+                    "color": 9676735,
+                    "maxWidth": 760,
+                    "minFontSize": 30
+                },
+                "autoSpinsLabel": {
+                    "x": 1300,
+                    "y": 700,
+                    "fontSize": 54,
+                    "color": 9676735,
+                    "maxWidth": 880,
+                    "minFontSize": 26
+                },
+                "infoText": {
+                    "x": 1296,
+                    "y": 312,
+                    "fontSize": 36,
+                    "color": 12174803
+                },
+                "buttons": {
+                    "close": {
+                        "frame": "button_closesmall_001.png",
+                        "pressed": "button_closesmall_002.png",
+                        "x": 1512,
+                        "y": 59
+                    },
+                    "start": {
+                        "frame": "start_autospins_001.png",
+                        "pressed": "start_autospins_002.png",
+                        "x": 901,
+                        "y": 835,
+                        "fontSize": 60,
+                        "color": 12509685,
+                        "maxTextWidth": 760,
+                        "minFontSize": 18,
+                        "textOffsetY": 0
+                    },
+                    "spin": {
+                        "frame": "button_digit_001.png",
+                        "pressed": "button_digit_002.png",
+                        "fontSize": 60,
+                        "color": 12509685,
+                        "values": [
+                            10,
+                            20,
+                            50,
+                            100,
+                            1000
+                        ],
+                        "positions": [
+                            {
+                                "x": 963,
+                                "y": 427
+                            },
+                            {
+                                "x": 1190,
+                                "y": 427
+                            },
+                            {
+                                "x": 1417,
+                                "y": 427
+                            },
+                            {
+                                "x": 1070,
+                                "y": 554
+                            },
+                            {
+                                "x": 1297,
+                                "y": 554
+                            }
+                        ]
+                    },
+                    "turbo": {
+                        "frame": "turbo_bg_001.png",
+                        "pressed": "turbo_bg_002.png",
+                        "x": 1043,
+                        "y": 212,
+                        "fontSize": 36,
+                        "color": 12174803,
+                        "textAlign": "left",
+                        "textX": 80,
+                        "textY": 53,
+                        "textOffsetY": 0
+                    },
+                    "skip": {
+                        "frame": "skipscreen_bg_001.png",
+                        "pressed": "skipscreen_bg_002.png",
+                        "x": 1043,
+                        "y": 371,
+                        "fontSize": 36,
+                        "color": 12174803,
+                        "textAlign": "left",
+                        "textX": 80,
+                        "textY": 53,
+                        "textOffsetY": 0
+                    }
+                }
+            },
+            "buyBonusMenu": {
+                "background": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 1920,
+                    "height": 1080
+                },
+                "panels": {
+                    "free": {
+                        "x": 420,
+                        "y": 190
+                    },
+                    "haw": {
+                        "x": 989,
+                        "y": 190
+                    }
+                },
+                "symbols": {
+                    "free": {
+                        "x": 493,
+                        "y": 605
+                    },
+                    "haw": {
+                        "x": 1100,
+                        "y": 590
+                    }
+                },
+                "controls": {
+                    "betBg": {
+                        "x": 703,
+                        "y": 86
+                    },
+                    "plus": {
+                        "x": 1068,
+                        "y": 78
+                    },
+                    "minus": {
+                        "x": 709,
+                        "y": 78
+                    },
+                    "close": {
+                        "x": 1711,
+                        "y": 829
+                    },
+                    "freeBuy": {
+                        "x": 552,
+                        "y": 285
+                    },
+                    "hawBuy": {
+                        "x": 1121,
+                        "y": 285
+                    }
+                },
+                "texts": {
+                    "buyButton": {
+                        "maxWidth": 180,
+                        "minFontSize": 24
+                    },
+                    "title": {
+                        "x": 960,
+                        "y": 40,
+                        "fontSize": 60,
+                        "maxWidth": 760,
+                        "minFontSize": 30
+                    },
+                    "totalBetLabel": {
+                        "x": 956,
+                        "y": 206,
+                        "fontSize": 46
+                    },
+                    "totalBetValue": {
+                        "x": 956,
+                        "y": 139,
+                        "fontSize": 46
+                    },
+                    "freeTitle": {
+                        "x": 672,
+                        "y": 560,
+                        "fontSize": 54,
+                        "maxWidth": 430,
+                        "minFontSize": 28
+                    },
+                    "hawTitle": {
+                        "x": 1241,
+                        "y": 560,
+                        "fontSize": 54,
+                        "maxWidth": 430,
+                        "minFontSize": 28
+                    },
+                    "freePrice": {
+                        "x": 672,
+                        "y": 465,
+                        "fontSize": 54
+                    },
+                    "hawPrice": {
+                        "x": 1241,
+                        "y": 465,
+                        "fontSize": 54
+                    }
+                }
+            },
+            "buyBonusConfirm": {
+                "background": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 1920,
+                    "height": 1080
+                },
+                "panel": {
+                    "x": 465,
+                    "y": 240
+                },
+                "symbols": {
+                    "free": {
+                        "x": 782,
+                        "y": 581
+                    },
+                    "haw": {
+                        "x": 811,
+                        "y": 566
+                    }
+                },
+                "buttons": {
+                    "yes": {
+                        "x": 665,
+                        "y": 331
+                    },
+                    "no": {
+                        "x": 988,
+                        "y": 331
+                    }
+                },
+                "texts": {
+                    "title": {
+                        "x": 960,
+                        "y": 345,
+                        "fontSize": 54,
+                        "wordWrapWidth": 930
+                    }
+                }
+            },
+            "bootSoundPrompt": {
+                "background": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 1920,
+                    "height": 1080,
+                    "alpha": 0.92
+                },
+                "panel": {
+                    "x": 611,
+                    "y": 297
+                },
+                "logo": {
+                    "x": 711,
+                    "y": 496
+                },
+                "buttons": {
+                    "yes": {
+                        "x": 665,
+                        "y": 341
+                    },
+                    "no": {
+                        "x": 988,
+                        "y": 341
+                    }
+                },
+                "texts": {
+                    "title": {
+                        "x": 960,
+                        "y": 250,
+                        "fontSize": 54
+                    }
+                }
+            }
+        }
+    },
+    "intro": {
+        "boot": {
+            "layoutMode": "fit-center",
+            "backgroundColor": 0,
+            "spine": {
+                "x": 960,
+                "y": 420,
+                "offsetX": -360,
+                "offsetY": 0,
+                "scale": 0.58
+            },
+            "loadingBar": {
+                "atlasPath": "assets/spine/intro/loading.json",
+                "x": 0,
+                "y": 36,
+                "width": 440,
+                "height": 10,
+                "sweepSpeed": 420,
+                "chunkFraction": 0.25
+            }
+        },
+        "gameplay": {
+            "layoutMode": "native-center-top",
+            "backgroundColor": 0,
+            "backgroundImagePath": "assets/backgrounds/bg.jpg",
+            "background": {
+                "x": 0,
+                "y": 0,
+                "width": 1920,
+                "height": 1080
+            },
+            "spine": {
+                "x": 960,
+                "y": -130,
+                "offsetX": 0,
+                "offsetY": 0,
+                "scale": 1
+            },
+            "skipPrompt": {
+                "enabled": true,
+                "text": "TAP TO CONTINUE",
+                "x": 960,
+                "y": 620,
+                "fontSize": 60,
+                "color": 16777215,
+                "delaySec": 1.2,
+                "minAlpha": 0.15,
+                "maxAlpha": 1
+            }
+        }
+    }
 }
-

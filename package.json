@@ -19,6 +19,7 @@
     "test:reel-viewport": "tsx tests/reelViewport.regression.test.mjs",
     "test:win-presentation": "tsx tests/winPresentation.regression.test.mjs",
     "test:smoke": "tsx tests/lifecycle.smoke.test.mjs",
+    "editor:manifest": "node tools/manifest-editor/server.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "keywords": [

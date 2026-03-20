@@ -95,6 +95,11 @@ export default class SymbolSpineOverlay38 {
     this.reelMask = null;
   }
 
+  setVisible(visible: boolean): void {
+    if (!this.host) return;
+    this.host.style.display = visible ? '' : 'none';
+  }
+
   private ensureApp(): void {
     if (this.app) {
       this.syncViewport();

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Manifest Editor</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.10.0/jsoneditor.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.10.0/jsoneditor.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        #editor { height: 800px; }
+        .controls { margin-bottom: 10px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        #status { margin-left: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Asset Manifest Editor</h1>
+    <div class="controls">
+        <button onclick="saveManifest()">Save Changes</button>
+        <span id="status"></span>
+    </div>
+    <div id="editor"></div>
+
+    <script>
+        const container = document.getElementById("editor");
+        const options = {
+            mode: 'tree',
+            modes: ['code', 'form', 'text', 'tree', 'view'], // allowed modes
+            onError: function (err) {
+                alert(err.toString());
+            },
+            onModeChange: function (newMode, oldMode) {
+                console.log('Mode switched from', oldMode, 'to', newMode);
+            }
+        };
+        const editor = new JSONEditor(container, options);
+
+        function loadManifest() {
+            fetch('/api/manifest')
+                .then(response => response.json())
+                .then(json => {
+                    editor.set(json);
+                    document.getElementById('status').innerText = 'Loaded manifest successfully.';
+                    setTimeout(() => document.getElementById('status').innerText = '', 3000);
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('status').innerText = 'Error loading manifest.';
+                });
+        }
+
+        function saveManifest() {
+            const json = editor.get();
+            fetch('/api/manifest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(json)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('status').innerText = 'Saved successfully!';
+                    document.getElementById('status').style.color = 'green';
+                } else {
+                    document.getElementById('status').innerText = 'Error saving.';
+                    document.getElementById('status').style.color = 'red';
+                }
+                setTimeout(() => document.getElementById('status').innerText = '', 3000);
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('status').innerText = 'Error saving.';
+            });
+        }
+
+        loadManifest();
+    </script>
+</body>
+</html>
