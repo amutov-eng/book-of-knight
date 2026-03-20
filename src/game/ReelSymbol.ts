@@ -1,7 +1,8 @@
 'use strict';
 
-import type { Container as PixiContainer, Texture } from 'pixi.js';
+import { Point, type Container as PixiContainer, type Texture } from 'pixi.js';
 import Sprite from '../ui/Sprite';
+import type { ReelSymbolAnimationContext } from '../types/reels';
 
 interface SymbolOffset {
   x: number;
@@ -12,12 +13,31 @@ interface TexturesLike {
   regions: Array<Array<Texture>>;
   symbolOffsets?: SymbolOffset[];
   symbolWinProfiles?: string[];
+  symbolSpineConfigs?: Array<Record<string, SymbolSpineClipConfig> | null>;
   symbolWinAnimations?: Record<string, { scale?: number[]; rotate?: number[] }>;
   winFrames?: Array<Texture>;
 }
 
+interface SymbolSpineClipConfig {
+  jsonPath: string;
+  atlasPath: string;
+  animationName?: string;
+  loop?: boolean;
+  scale?: number;
+  offsetX?: number;
+  offsetY?: number;
+}
+
 interface ReelGameLike {
   textures: TexturesLike;
+  symbolSpineOverlay?: {
+    play: (clip: SymbolSpineClipConfig, x: number, y: number) => {
+      stop: () => void;
+      setPosition: (x: number, y: number) => void;
+      bringToFront: () => void;
+      durationMs?: number;
+    } | null;
+  };
 }
 
 const DEFAULT_SYMBOL_ANIMATION_DT = 1 / 60;
@@ -42,6 +62,13 @@ export default class ReelSymbol extends Sprite {
   totalFrames: number;
   private winProfile: string;
   private transformFrameProgress: number;
+  private activeSpineConfig: SymbolSpineClipConfig | null;
+  private usingSpineAnimation: boolean;
+  private overlaySpineHandle: {
+    stop: () => void;
+    setPosition: (x: number, y: number) => void;
+    bringToFront: () => void;
+  } | null;
 
   constructor(game: ReelGameLike, reel: unknown, index: number) {
     super(game.textures.regions[index][0]);
@@ -63,6 +90,9 @@ export default class ReelSymbol extends Sprite {
     this.totalFrames = 0;
     this.winProfile = 'normal';
     this.transformFrameProgress = 0;
+    this.activeSpineConfig = null;
+    this.usingSpineAnimation = false;
+    this.overlaySpineHandle = null;
 
     this.anchor.set(0.5);
     this.blendMode = 'normal' as never;
@@ -84,6 +114,7 @@ export default class ReelSymbol extends Sprite {
     if (this.index === index) {
       return;
     }
+    this.hideActiveSpine();
     const prevLogicalX = this.logicalX;
     const prevLogicalY = this.logicalY;
     this.index = index;
@@ -125,9 +156,16 @@ export default class ReelSymbol extends Sprite {
       this.winOverlay.y = this.y;
       this.winOverlay.zIndex = this.y + 10000;
     }
+    if (this.usingSpineAnimation) {
+      this.applyOverlaySpinePosition();
+    }
   }
 
-  animate(animate: boolean, looping: boolean, isLong: boolean): void {
+  private getStagePosition(): Point {
+    return this.getGlobalPosition(new Point());
+  }
+
+  animate(animate: boolean, looping: boolean, isLong: boolean, context?: ReelSymbolAnimationContext): number {
     this.anim = animate;
     this.looping = looping;
     this.isLong = isLong;
@@ -137,12 +175,18 @@ export default class ReelSymbol extends Sprite {
     this.transformFrameProgress = 0;
     if (!animate) {
       this.resetWinAnimation();
+      return 0;
     } else {
+      const spineDurationMs = this.tryPlaySpineAnimation(context, looping);
+      if (spineDurationMs > 0) {
+        return spineDurationMs;
+      }
       if (this.winOverlay && this.reel && this.winOverlay.parent !== this.reel) {
         this.reel.addChild(this.winOverlay);
       }
       this.applyWinAnimationFrame(0, 0);
     }
+    return 0;
   }
 
   setBlurFrame(index: number): void {
@@ -165,10 +209,14 @@ export default class ReelSymbol extends Sprite {
     if (idx < 0) return;
     parent.children.splice(idx, 1);
     parent.children.push(this);
+    if (this.usingSpineAnimation && this.overlaySpineHandle) {
+      this.overlaySpineHandle.bringToFront();
+    }
   }
 
   act(delta?: number): void {
     if (!this.anim) return;
+    if (this.usingSpineAnimation) return;
 
     const totalFrames = this.getCurveLength();
     if (totalFrames <= 0) {
@@ -288,10 +336,69 @@ export default class ReelSymbol extends Sprite {
   }
 
   private resetWinAnimation(): void {
+    this.hideActiveSpine();
+    this.scale.set(1);
+    this.rotation = 0;
+    this.visible = true;
+    if (this.winOverlay) {
+      this.winOverlay.visible = false;
+    }
+  }
+
+  private tryPlaySpineAnimation(context: ReelSymbolAnimationContext | undefined, looping: boolean): number {
+    const clip = this.resolveSpineClip(context);
+    const overlay = this.game?.symbolSpineOverlay;
+    if (!clip || !overlay || typeof overlay.play !== 'function') {
+      this.hideActiveSpine();
+      return 0;
+    }
+
+    const stagePosition = this.getStagePosition();
+    const handle = overlay.play({
+      ...clip,
+      loop: clip.loop === true || looping
+    }, stagePosition.x, stagePosition.y);
+    if (!handle) {
+      this.hideActiveSpine();
+      return 0;
+    }
+
+    this.hideActiveSpine();
+    this.activeSpineConfig = clip;
+    this.usingSpineAnimation = true;
+    this.overlaySpineHandle = handle;
+    this.visible = false;
     this.scale.set(1);
     this.rotation = 0;
     if (this.winOverlay) {
       this.winOverlay.visible = false;
     }
+    return Number.isFinite(handle.durationMs) ? Number(handle.durationMs) : 0;
+  }
+
+  private resolveSpineClip(context?: ReelSymbolAnimationContext): SymbolSpineClipConfig | null {
+    const allConfigs = this.game?.textures?.symbolSpineConfigs;
+    const config = Array.isArray(allConfigs) ? allConfigs[this.index] : null;
+    if (!config || typeof config !== 'object') {
+      return null;
+    }
+
+    const trigger = context && typeof context.trigger === 'string' ? context.trigger : 'win';
+    return config[trigger] || config.default || (trigger !== 'win' ? config.win : null) || null;
+  }
+
+  private applyOverlaySpinePosition(): void {
+    if (!this.overlaySpineHandle) return;
+    const stagePosition = this.getStagePosition();
+    this.overlaySpineHandle.setPosition(stagePosition.x, stagePosition.y);
+  }
+
+  private hideActiveSpine(): void {
+    if (this.overlaySpineHandle) {
+      this.overlaySpineHandle.stop();
+    }
+    this.activeSpineConfig = null;
+    this.usingSpineAnimation = false;
+    this.overlaySpineHandle = null;
   }
 }

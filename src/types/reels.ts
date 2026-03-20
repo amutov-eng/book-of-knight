@@ -1,4 +1,8 @@
 export type ReelStopRow = [number, number, number];
+export type ReelSymbolAnimationTrigger = 'win' | 'scatter' | 'wild';
+export type ReelSymbolAnimationContext = {
+  trigger?: ReelSymbolAnimationTrigger;
+};
 
 export interface ReelBuildConfig {
   x: number;
@@ -10,7 +14,8 @@ export interface ReelBuildConfig {
 
 export interface ReelSymbolLike {
   alpha: number;
-  animate(active: boolean, looping: boolean, isLong: boolean): void;
+  getIndex?(): number;
+  animate(active: boolean, looping: boolean, isLong: boolean, context?: ReelSymbolAnimationContext): number;
 }
 
 export interface ReelDisplayLike {
@@ -22,7 +27,7 @@ export interface ReelDisplayLike {
   isReelStopped(): boolean;
   setReelStrip?(strip: number[]): void;
   highlightScatters(): boolean;
-  highlightSymbolAtStop(stop: number, looping: boolean, isLong: boolean): void;
+  highlightSymbolAtStop(stop: number, looping: boolean, isLong: boolean, context?: ReelSymbolAnimationContext): number;
   getReelSymbolAtStop(stop: number): ReelSymbolLike | null;
   removeHighlight(): void;
   highlight(iterations: number): void;

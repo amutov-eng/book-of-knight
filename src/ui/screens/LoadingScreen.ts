@@ -35,7 +35,7 @@ export default class LoadingScreen extends BaseScreen {
     async loadAssetResources(assetPaths) {
         return this.assetBootstrap.loadAssets(assetPaths, (progress, assetPath) => {
             this.loadProgressHandler({ progress }, { url: assetPath });
-        });
+        }, this.assetsManifest);
     }
 
     async loadWithAssets() {

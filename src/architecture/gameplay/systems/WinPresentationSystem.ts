@@ -43,13 +43,14 @@ export default class WinPresentationSystem {
     processWinAt(lineIndex) {
         const win = this.game.context.outcome.wins[lineIndex];
         if (!win) return 80;
+        let spineAnimationMs = 0;
 
         this.game.reels.unhighlightAll();
         this.game.menu.setStatus('');
 
         switch (win.type) {
             case WINTYPES.LINE:
-                this.game.reels.highlightWin(win, false, true);
+                spineAnimationMs = this.game.reels.highlightWin(win, false, true) || 0;
                 if (this.game.reels.lineRenderer) {
                     this.game.reels.lineRenderer.addLine(win.winningLine);
                 }
@@ -58,13 +59,13 @@ export default class WinPresentationSystem {
                 this.game.menu.setWinStatus(this.winningLineToText(win));
                 break;
             case WINTYPES.SCATTER:
-                this.game.reels.highlightWin(win, false, true);
+                spineAnimationMs = this.game.reels.highlightWin(win, false, true) || 0;
                 this.game.context.onscreenWinMeter += this.getWinValue(win);
                 this.game.menu.setWin(this.game.context.onscreenWinMeter);
                 this.game.menu.setWinStatus(this.winningLineToText(win));
                 break;
             case WINTYPES.NEAR_MISS_WILD:
-                this.game.reels.highlightWin(win, false, true);
+                spineAnimationMs = this.game.reels.highlightWin(win, false, true) || 0;
                 this.game.menu.setStatus('');
                 this.game.menu.setWinStatus('');
                 break;
@@ -72,7 +73,7 @@ export default class WinPresentationSystem {
                 break;
         }
 
-        return win.highlightTimeout;
+        return Math.max(win.highlightTimeout, Math.ceil(spineAnimationMs / 16.6667));
     }
 
     /**

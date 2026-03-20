@@ -1,4 +1,6 @@
 import type BaseGame from '../../core/BaseGame';
+import { Assets } from 'pixi.js';
+import '@pixi-spine/all-3.8';
 import AssetManager from '../../core/assets/AssetManager';
 import {
   getAnimationAtlases,
@@ -29,6 +31,8 @@ type RuntimeTextures = Textures & {
   symbolOffsets: Array<{ x: number; y: number }>;
   symbolWinProfiles: string[];
   symbolWinAnimations: Record<string, unknown>;
+  symbolSpineConfigs: Array<Record<string, unknown> | null>;
+  symbolSpineResources: Record<string, unknown>;
   winFrames: PixiTexture[];
 };
 
@@ -62,9 +66,12 @@ export default class LoadingAssetBootstrap {
 
   async loadAssets(
     assetPaths: string[],
-    onProgress?: (progress: number, assetPath: string) => void
+    onProgress?: (progress: number, assetPath: string) => void,
+    manifest?: unknown
   ): Promise<Record<string, AssetResource>> {
-    return this.assetManager.loadAll(assetPaths, onProgress);
+    const resources = await this.assetManager.loadAll(assetPaths, onProgress);
+    await this.preloadSymbolSpineAssets(manifest);
+    return resources;
   }
 
   async preloadPromptAssets(): Promise<Record<string, AssetResource>> {
@@ -142,6 +149,8 @@ export default class LoadingAssetBootstrap {
     textures.symbolOffsets = [];
     textures.symbolWinProfiles = [];
     textures.symbolWinAnimations = getSymbolWinAnimationProfiles(manifest);
+    textures.symbolSpineConfigs = [];
+    textures.symbolSpineResources = textures.symbolSpineResources || {};
 
     for (let i = 0; i < symbolDefs.length; i += 1) {
       const symbolDef = symbolDefs[i];
@@ -151,6 +160,7 @@ export default class LoadingAssetBootstrap {
         y: Number.isFinite(symbolDef.offsetY) ? symbolDef.offsetY : 0
       });
       textures.symbolWinProfiles.push(symbolDef.winProfile || 'normal');
+      textures.symbolSpineConfigs.push(symbolDef.spine || null);
     }
 
     textures.winFrames = textures.findFrames('frame_', 'assets/animations/win-0.json');
@@ -170,5 +180,51 @@ export default class LoadingAssetBootstrap {
     }
 
     return true;
+  }
+
+  private async preloadSymbolSpineAssets(manifest: unknown): Promise<void> {
+    if (this.game.symbolSpineOverlay && typeof this.game.symbolSpineOverlay.preloadFromManifest === 'function') {
+      await this.game.symbolSpineOverlay.preloadFromManifest(manifest);
+      return;
+    }
+
+    const symbolDefs = getSymbolFrameDefsByIndex(manifest);
+    const pending = new Map<string, { jsonPath: string; atlasPath: string }>();
+
+    for (let i = 0; i < symbolDefs.length; i += 1) {
+      const spineConfig = symbolDefs[i] && symbolDefs[i].spine ? symbolDefs[i].spine : null;
+      if (!spineConfig || typeof spineConfig !== 'object') continue;
+
+      const variantKeys = Object.keys(spineConfig);
+      for (let keyIndex = 0; keyIndex < variantKeys.length; keyIndex += 1) {
+        const key = variantKeys[keyIndex];
+        const clip = spineConfig[key];
+        if (!clip || typeof clip !== 'object') continue;
+        if (typeof clip.jsonPath !== 'string' || typeof clip.atlasPath !== 'string') continue;
+        pending.set(`${clip.jsonPath}|${clip.atlasPath}`, {
+          jsonPath: clip.jsonPath,
+          atlasPath: clip.atlasPath
+        });
+      }
+    }
+
+    const clips = [...pending.values()];
+    for (let i = 0; i < clips.length; i += 1) {
+      const clip = clips[i];
+      try {
+        const resource = await Assets.load({
+          src: clip.jsonPath,
+          data: {
+            spineAtlasFile: clip.atlasPath
+          }
+        });
+        const textures = this.game.textures as RuntimeTextures;
+        if (textures && textures.symbolSpineResources) {
+          textures.symbolSpineResources[`${clip.jsonPath}|${clip.atlasPath}`] = resource;
+        }
+      } catch (_error) {
+        warn(`LoadingAssetBootstrap::skipMissingSymbolSpine ${clip.jsonPath}`);
+      }
+    }
   }
 }

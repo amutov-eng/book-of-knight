@@ -16,6 +16,7 @@ import type GameplayEngine from '../architecture/gameplay/GameplayEngine';
 import type LocalizationService from '../localization/LocalizationService';
 import type Timers from './time/Timers';
 import type SoundSystem from '../game/systems/SoundSystem';
+import type SymbolSpineOverlay from '../game/systems/SymbolSpineOverlay';
 import type SettingsStore from '../engine/settings/SettingsStore';
 
 export default class BaseGame {
@@ -41,6 +42,7 @@ export default class BaseGame {
   localization: LocalizationService | null;
   timers: Timers | null;
   soundSystem: SoundSystem | null;
+  symbolSpineOverlay: SymbolSpineOverlay | null;
   settings: SettingsStore | null;
 
   constructor() {
@@ -66,6 +68,7 @@ export default class BaseGame {
     this.localization = null;
     this.timers = null;
     this.soundSystem = null;
+    this.symbolSpineOverlay = null;
     this.settings = null;
   }
 

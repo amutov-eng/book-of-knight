@@ -14,6 +14,7 @@ import type Timers from '../core/time/Timers';
 import type LifecycleStateMachine from '../architecture/state/LifecycleStateMachine';
 import type EventBus from '../core/events/EventBus';
 import type SoundSystem from '../game/systems/SoundSystem';
+import type SymbolSpineOverlay from '../game/systems/SymbolSpineOverlay';
 import type SettingsStore from '../engine/settings/SettingsStore';
 
 /**
@@ -40,6 +41,7 @@ export type GameRuntime = BaseGame & {
   localization: LocalizationService;
   timers: Timers;
   soundSystem: SoundSystem;
+  symbolSpineOverlay: SymbolSpineOverlay;
   settings: SettingsStore;
   screen?: RuntimeScreen;
   renderer?: Renderer;

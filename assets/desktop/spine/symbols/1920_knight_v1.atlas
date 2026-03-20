@@ -1,0 +1,167 @@
+
+1920_knight_v1.png
+size: 508,1817
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Blick
+  rotate: false
+  xy: 410, 3
+  size: 81, 70
+  orig: 81, 70
+  offset: 0, 0
+  index: -1
+Eye_blick
+  rotate: true
+  xy: 429, 433
+  size: 124, 57
+  orig: 124, 57
+  offset: 0, 0
+  index: -1
+bg
+  rotate: false
+  xy: 2, 372
+  size: 282, 267
+  orig: 282, 267
+  offset: 0, 0
+  index: -1
+body_bottom
+  rotate: true
+  xy: 2, 1394
+  size: 175, 84
+  orig: 175, 84
+  offset: 0, 0
+  index: -1
+cape_back
+  rotate: false
+  xy: 2, 1158
+  size: 489, 249
+  orig: 489, 249
+  offset: 0, 0
+  index: -1
+frame
+  rotate: false
+  xy: 182, 641
+  size: 282, 268
+  orig: 282, 268
+  offset: 0, 0
+  index: -1
+frame_top
+  rotate: true
+  xy: 286, 357
+  size: 282, 141
+  orig: 282, 141
+  offset: 0, 0
+  index: -1
+helmet_fx1
+  rotate: false
+  xy: 134, 72
+  size: 80, 96
+  orig: 80, 96
+  offset: 0, 0
+  index: -1
+helmet_fx2
+  rotate: false
+  xy: 410, 75
+  size: 70, 119
+  orig: 70, 119
+  offset: 0, 0
+  index: -1
+helmet_fx4
+  rotate: true
+  xy: 256, 196
+  size: 115, 245
+  orig: 115, 245
+  offset: 0, 0
+  index: -1
+helmet_fx5
+  rotate: false
+  xy: 2, 65
+  size: 92, 80
+  orig: 92, 80
+  offset: 0, 0
+  index: -1
+helmet_fx6
+  rotate: true
+  xy: 96, 11
+  size: 59, 102
+  orig: 59, 102
+  offset: 0, 0
+  index: -1
+helmet_fx7
+  rotate: false
+  xy: 429, 313
+  size: 66, 118
+  orig: 66, 118
+  offset: 0, 0
+  index: -1
+helmet_fx9
+  rotate: false
+  xy: 256, 67
+  size: 152, 127
+  orig: 152, 127
+  offset: 0, 0
+  index: -1
+horn_L_fx
+  rotate: false
+  xy: 2, 1604
+  size: 35, 55
+  orig: 35, 55
+  offset: 0, 0
+  index: -1
+horn_R_fx
+  rotate: false
+  xy: 429, 559
+  size: 62, 68
+  orig: 62, 68
+  offset: 0, 0
+  index: -1
+knight_body
+  rotate: false
+  xy: 2, 903
+  size: 474, 274
+  orig: 474, 274
+  offset: 0, 0
+  index: -1
+knight_glow
+  rotate: false
+  xy: 2, 1408
+  size: 503, 408
+  orig: 518, 491
+  offset: 15, 83
+  index: -1
+knight_head
+  rotate: false
+  xy: 2, 127
+  size: 253, 243
+  orig: 254, 243
+  offset: 1, 0
+  index: -1
+knight_headhair
+  rotate: false
+  xy: 2, 1334
+  size: 107, 75
+  orig: 111, 78
+  offset: 2, 1
+  index: -1
+knight_part_top
+  rotate: true
+  xy: 408, 912
+  size: 114, 81
+  orig: 114, 85
+  offset: 0, 0
+  index: -1
+knight_tarp_R
+  rotate: false
+  xy: 2, 1779
+  size: 38, 36
+  orig: 38, 36
+  offset: 0, 0
+  index: -1
+knight_tarp_l
+  rotate: false
+  xy: 42, 1785
+  size: 29, 30
+  orig: 29, 30
+  offset: 0, 0
+  index: -1

@@ -12,7 +12,7 @@ import { getAssetsManifest, getIsLandscape, getTextureCache } from '../core/Runt
 import { GAME_RULES } from '../config/gameRules';
 import { SOUND_IDS } from '../config/soundConfig';
 import type BaseGame from '../core/BaseGame';
-import type { ReelStopRow } from '../types/reels';
+import type { ReelStopRow, ReelSymbolAnimationContext } from '../types/reels';
 
 type Matrix3xN = number[][];
 
@@ -21,6 +21,7 @@ interface WinLike {
   type: number;
   cnt: number;
   symbol: number;
+  hasWild?: boolean;
 }
 
 export default class Reels extends Container {
@@ -314,27 +315,54 @@ export default class Reels extends Container {
 
     for (let row = 0; row < this.VISIBLE_ROWS; row++) {
       if (win.highlight[row][reelIndex] === 1) {
-        this.highlightSymbol(reelIndex, row, false, true);
+        this.highlightSymbol(reelIndex, row, false, true, { trigger: 'scatter' });
       }
     }
   }
 
-  highlightSymbol(reel: number, stop: number, looping: boolean, isLong: boolean): void {
+  highlightSymbol(reel: number, stop: number, looping: boolean, isLong: boolean, context?: ReelSymbolAnimationContext): number {
     const reelController = this.getReelController(reel);
-    if (!reelController) return;
-    reelController.highlightSymbolAtStop(stop, looping, isLong);
+    if (!reelController) return 0;
+    return reelController.highlightSymbolAtStop(stop, looping, isLong, context) || 0;
   }
 
-  highlightWin(win: WinLike, looping: boolean, _overlay: unknown): void {
+  highlightWin(win: WinLike, looping: boolean, _overlay: unknown): number {
+    let maxAnimationMs = 0;
     for (let row = 0; row < this.VISIBLE_ROWS; row++) {
       for (let reel = 0; reel < this.NUMBER_OF_REELS; reel++) {
         if (win.highlight[row][reel] === 1) {
-          this.highlightSymbol(reel, row, looping, (win.cnt > 3 || win.symbol === 0));
+          const animationMs = this.highlightSymbol(
+            reel,
+            row,
+            looping,
+            (win.cnt > 3 || win.symbol === 0),
+            this.resolveAnimationContext(win, reel, row)
+          );
+          if (animationMs > maxAnimationMs) {
+            maxAnimationMs = animationMs;
+          }
         } else if (win.type !== WINTYPES.NEAR_MISS && win.type !== WINTYPES.NEAR_MISS_WILD) {
           this.dimSymbol(reel, row, 0.20);
         }
       }
     }
+    return maxAnimationMs;
+  }
+
+  private resolveAnimationContext(win: WinLike, reelIndex: number, rowIndex: number): ReelSymbolAnimationContext {
+    const reelController = this.getReelController(reelIndex);
+    const symbol = reelController ? reelController.getSymbolAtStop(rowIndex) : null;
+    const symbolIndex = symbol && typeof symbol.getIndex === 'function' ? symbol.getIndex() : -1;
+
+    if (win.type === WINTYPES.SCATTER && symbolIndex === 0) {
+      return { trigger: 'scatter' };
+    }
+
+    if (symbolIndex === 0 && win.hasWild) {
+      return { trigger: 'wild' };
+    }
+
+    return { trigger: 'win' };
   }
 
   private dimSymbol(reel: number, stop: number, alpha: number): void {

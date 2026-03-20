@@ -74,6 +74,17 @@ Boot flow before gameplay:
 Critical rule:
 Business logic should not trigger arbitrary render calls or browser timers from inside the reel path.
 
+### Symbol Spine Runtime Selection
+
+Symbol Spine clips are configured under `manifest.symbols.frames[].spine`.
+Each clip may declare `runtime: "3.8"` or `runtime: "4.2"`.
+
+- Use `"3.8"` for legacy exports from older slot projects.
+- Use `"4.2"` for new Pixi 8 compatible Spine exports.
+- When omitted, the runtime defaults to `"3.8"` to keep older games stable.
+
+The boot pipeline preloads only the runtime families referenced by the active manifest, and `ReelSymbol` delegates playback to the matching overlay runtime.
+
 ## Spin Lifecycle
 
 1. `idle`

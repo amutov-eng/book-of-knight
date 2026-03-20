@@ -1,4 +1,4 @@
-import type { ReelDisplayLike, ReelViewLike, ReelStopRow, ReelSymbolLike } from '../../types/reels';
+import type { ReelDisplayLike, ReelViewLike, ReelStopRow, ReelSymbolAnimationContext, ReelSymbolLike } from '../../types/reels';
 
 export default class ReelController {
   private readonly reelView: ReelViewLike;
@@ -49,8 +49,8 @@ export default class ReelController {
     this.reel.highlightScatters();
   }
 
-  highlightSymbolAtStop(stop: number, looping: boolean, isLong: boolean): void {
-    this.reel.highlightSymbolAtStop(stop, looping, isLong);
+  highlightSymbolAtStop(stop: number, looping: boolean, isLong: boolean, context?: ReelSymbolAnimationContext): number {
+    return this.reel.highlightSymbolAtStop(stop, looping, isLong, context);
   }
 
   getSymbolAtStop(stop: number): ReelSymbolLike | null {

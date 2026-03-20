@@ -8,6 +8,7 @@ import Context from '../game/Context';
 import Messages from '../ui/Messages';
 import GsLink from '../net/GsLink';
 import SoundSystem from '../game/systems/SoundSystem';
+import SymbolSpineOverlay from '../game/systems/SymbolSpineOverlay';
 import SettingsStore from '../engine/settings/SettingsStore';
 import type { AppRuntimeServices, GameRuntime } from './types';
 
@@ -26,6 +27,7 @@ export function wireGameModules(baseGame: BaseGame, services: AppRuntimeServices
   game.context = new Context();
   game.meters = new Meters();
   game.soundSystem = new SoundSystem();
+  game.symbolSpineOverlay = new SymbolSpineOverlay(game);
   game.settings = new SettingsStore({ audioEnabled: true }, 'book-of-knight.settings');
   game.controller = new Controller(game);
   game.gsLink = new GsLink(game);

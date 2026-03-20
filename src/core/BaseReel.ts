@@ -85,21 +85,35 @@ export default class Reel extends PIXI.Container {
         this.reelStrip = strip;
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
+        this.reelWidthPx = width;
+        this.reelHeightPx = height;
         this.sortableChildren = true;
+        this.maskHorizontalOverflow = Math.max(120, Math.round(this.symbolWidth * 0.55));
+        this.maskVerticalOverflow = Math.max(36, Math.round(Math.max(0, this.symbolHeight - this.pitch) * 0.5) + 24);
 
         //this.mask = new Graphics();
         /** @type {PixiGraphics} */
         this.reelMaskNormal = new PIXI.Graphics();
-        this.reelMaskNormal.rect(0, 0, width, height).fill(0xFF0000);
+        this.reelMaskNormal
+            .rect(
+                -this.maskHorizontalOverflow,
+                -this.maskVerticalOverflow,
+                width + this.maskHorizontalOverflow * 2,
+                height + this.maskVerticalOverflow * 2
+            )
+            .fill(0xFF0000);
         this.reelMaskNormal.alpha = 0;
         this.addChild(this.reelMaskNormal); // debug
 
         /** @type {PixiGraphics} */
         this.reelMaskSpin = new PIXI.Graphics();
         this.reelMaskSpin
-            .rect(0, -this.trimTopY, width, height + this.trimTopY + this.trimBottomY)
+            .rect(
+                -this.maskHorizontalOverflow,
+                -this.trimTopY,
+                width + this.maskHorizontalOverflow * 2,
+                height + this.trimTopY + this.trimBottomY
+            )
             .fill(0x00ff00);
         this.reelMaskSpin.alpha = 0;
         this.addChild(this.reelMaskSpin); // debug
@@ -133,7 +147,7 @@ export default class Reel extends PIXI.Container {
         //highlight.setPosition(-9, -16);
 
         let symbol;
-        let symbolX = this.width/2, symbolY = this.height/2;
+        let symbolX = this.reelWidthPx / 2, symbolY = this.reelHeightPx / 2;
         this.currentStop = 10;
 
         for (let i = 0; i < this.TOTAL_SYMBOLS; i++ ) {
@@ -154,7 +168,7 @@ export default class Reel extends PIXI.Container {
         // Keep mask renderable for Pixi masking pipeline; alpha=0 keeps it visually hidden.
         this.reelMaskNormal.visible = true;
         this.reelMaskSpin.visible = true;
-        this.trim(null);
+        this.trim(this.reelMaskNormal);
     }
 
     act(delta){
@@ -314,7 +328,7 @@ export default class Reel extends PIXI.Container {
             this.alignToGrid();
             this.stopSpinFlag = false;
             this.reelState = State.REEL_BOUNCE;
-            this.trim(null);
+            this.trim(this.reelMaskNormal);
             this.dampedIndex = 0;
             this.notifyStopped();
             log('BaseReel::act, state change REEL_STOP > REEL_BOUNCE', 'debug');
@@ -328,7 +342,7 @@ export default class Reel extends PIXI.Container {
         this.skillStopSpin = false;
         this.skillStopHelper();
         this.alignToGrid();
-        this.trim(null);
+        this.trim(this.reelMaskNormal);
         this.reelState = State.REEL_BOUNCE;
         this.dampedIndex = 0;
         this.notifyStopped();
@@ -344,7 +358,7 @@ export default class Reel extends PIXI.Container {
 
         // Ensure all reels end with the base (non-blur) frame.
         this.debounce(0);
-        this.trim(null);
+        this.trim(this.reelMaskNormal);
         this.reelState = State.REEL_IDLE;
         this.spinSpeedPxPerSec = 0;
         log('BaseReel::act, state change REEL_BOUNCE > REEL_IDLE', 'debug');
@@ -411,12 +425,13 @@ export default class Reel extends PIXI.Container {
 
         if (this.currentTrimMask !== mask) {
             for (let i = 0; i < this.visibleSymbols.length; i++) {
-                this.visibleSymbols[i].mask = mask;
+                this.visibleSymbols[i].mask = null;
             }
+            this.mask = mask || null;
             this.currentTrimMask = mask;
         }
 
-        if(mask == null) { // hide symbols on top
+        if(mask == null || mask === this.reelMaskNormal) { // hide service symbols outside the visible 3-row window
             this.hiddenTopSymbolIndex = (this.spriteOffset + 3) % this.TOTAL_SYMBOLS;
             this.hiddenBottomSymbolIndex = (this.spriteOffset + 4) % this.TOTAL_SYMBOLS;
             this.visibleSymbols[this.hiddenTopSymbolIndex].visible = false;
@@ -469,7 +484,7 @@ export default class Reel extends PIXI.Container {
 
         this.skillStopHelper();
         this.alignToGrid();
-        this.trim(null);
+        this.trim(this.reelMaskNormal);
         this.debounce(0);
 
         this.frameCnt = 0;
@@ -535,7 +550,7 @@ export default class Reel extends PIXI.Container {
         for(let i=0; i < 3; i++) {
             const symbol = this.visibleSymbols[(offset + i) % this.TOTAL_SYMBOLS];
             if(symbol.getIndex() === 0) {
-                symbol.animate(true, false, true);
+                symbol.animate(true, false, true, { trigger: 'scatter' });
                 result = true;
             }
         }
@@ -546,10 +561,10 @@ export default class Reel extends PIXI.Container {
     //    this.visibleSymbols[(spriteOffset + stop) % 5].isWinning = true;
     //}
 
-    highlightSymbolAtStop(stop, looping, isLong){
+    highlightSymbolAtStop(stop, looping, isLong, context){
         const symbol = this.visibleSymbols[(this.spriteOffset + stop) % this.TOTAL_SYMBOLS];
-        symbol.animate(true, looping, isLong);
         symbol.isWinning = true;
+        return symbol.animate(true, looping, isLong, context);
     }
 
     removeHighlight() {

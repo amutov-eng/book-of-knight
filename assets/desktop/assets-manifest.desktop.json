@@ -34,8 +34,8 @@
                                                    "pitch":  272,
                                                    "symbolWidth":  278,
                                                    "symbolHeight":  264,
-                                                   "trimTopY":  10,
-                                                   "trimBottomY":  40
+                                                   "trimTopY":  30,
+                                                   "trimBottomY":  30
                                                },
                                   "reels":  {
                                                 "strip":  [
@@ -59,7 +59,7 @@
                                    "reels":  {
                                                  "spacing":  282,
                                                  "x":  257,
-                                                 "y":  105,
+                                                 "y":  130,
                                                  "width":  278,
                                                  "height":  792
                                              }
@@ -76,7 +76,18 @@
                                        "atlas":  "symbols-0.json",
                                        "winProfile":  "normal",
                                        "offsetX":  5,
-                                       "offsetY":  0
+                                       "offsetY":  0,
+                                       "spine":  {
+                                                     "scatter":  {
+                                                                     "jsonPath":  "assets/spine/symbols/1920_book_v1.json",
+                                                                     "atlasPath":  "assets/spine/symbols/1920_book_v1.atlas",
+                                                                     "runtime":  "3.8",
+                                                                     "loop":  false,
+                                                                     "scale":  1,
+                                                                     "offsetX":  0,
+                                                                     "offsetY":  0
+                                                                 }
+                                                 }
                                    },
                                    {
                                        "prefix":  "10_blur_",
@@ -139,7 +150,18 @@
                                        "atlas":  "symbols-0.json",
                                        "winProfile":  "high",
                                        "offsetX":  0,
-                                       "offsetY":  0
+                                       "offsetY":  0,
+                                       "spine":  {
+                                                     "win":  {
+                                                                 "jsonPath":  "assets/spine/symbols/1920_knight_v1.json",
+                                                                 "atlasPath":  "assets/spine/symbols/1920_knight_v1.atlas",
+                                                                 "runtime":  "3.8",
+                                                                 "loop":  false,
+                                                                 "scale":  1,
+                                                                 "offsetX":  0,
+                                                                 "offsetY":  132
+                                                             }
+                                                 }
                                    },
                                    {
                                        "prefix":  "shield_blur_",
@@ -363,7 +385,7 @@
                                                            {
                                                                "frame":  "jackpot_bronze_act.png",
                                                                "x":  1224,
-                                                               "y":  6,
+                                                               "y":  1116,
                                                                "valueX":  1464.5,
                                                                "valueY":  15,
                                                                "valueText":  "2.00",

@@ -159,6 +159,50 @@ function isNumericArray(value) {
     return Array.isArray(value) && value.length > 0 && value.every((item) => Number.isFinite(item));
 }
 
+function isSymbolSpineClipConfig(value) {
+    return !!value
+        && typeof value === 'object'
+        && typeof value.jsonPath === 'string'
+        && value.jsonPath.length > 0
+        && typeof value.atlasPath === 'string'
+        && value.atlasPath.length > 0;
+}
+
+function normalizeSymbolSpineClipConfig(value) {
+    if (!isSymbolSpineClipConfig(value)) {
+        return null;
+    }
+
+    return {
+        jsonPath: value.jsonPath,
+        atlasPath: value.atlasPath,
+        runtime: value.runtime === '4.2' ? '4.2' : '3.8',
+        animationName: typeof value.animationName === 'string' && value.animationName.length > 0 ? value.animationName : '',
+        loop: value.loop === undefined ? false : !!value.loop,
+        scale: Number.isFinite(value.scale) ? Number(value.scale) : 1,
+        offsetX: Number.isFinite(value.offsetX) ? Number(value.offsetX) : 0,
+        offsetY: Number.isFinite(value.offsetY) ? Number(value.offsetY) : 0
+    };
+}
+
+function normalizeSymbolSpineConfig(value) {
+    if (!value || typeof value !== 'object') {
+        return null;
+    }
+
+    const result = {};
+    const variantKeys = ['default', 'win', 'scatter', 'wild'];
+    for (let i = 0; i < variantKeys.length; i++) {
+        const key = variantKeys[i];
+        const clip = normalizeSymbolSpineClipConfig(value[key]);
+        if (clip) {
+            result[key] = clip;
+        }
+    }
+
+    return Object.keys(result).length > 0 ? result : null;
+}
+
 const DEFAULT_SYMBOL_WIN_PROFILES = {
     normal: {
         scale: [100, 94.4, 88.8, 83.2, 77.6, 72, 82.8, 93.5, 104, 115, 110, 105, 100, 95, 90, 91.4, 92.9, 94, 95.7, 97, 98.6, 100, 100, 100, 100],
@@ -259,6 +303,38 @@ export function validateAssetsManifest(manifest, variant = getRuntimeVariant()) 
                     }
                     if (entry.offsetY != null && !Number.isFinite(entry.offsetY)) {
                         errors.push(`manifest.symbols.frames[${i}].offsetY must be a number when provided.`);
+                    }
+                    if (entry.spine != null && !isObject(entry.spine)) {
+                        errors.push(`manifest.symbols.frames[${i}].spine must be an object when provided.`);
+                    } else if (isObject(entry.spine)) {
+                        const variantKeys = ['default', 'win', 'scatter', 'wild'];
+                        for (let keyIndex = 0; keyIndex < variantKeys.length; keyIndex++) {
+                            const variantKey = variantKeys[keyIndex];
+                            const clip = entry.spine[variantKey];
+                            if (clip == null) continue;
+                            if (!isSymbolSpineClipConfig(clip)) {
+                                errors.push(`manifest.symbols.frames[${i}].spine.${variantKey} requires jsonPath and atlasPath.`);
+                                continue;
+                            }
+                            if (clip.animationName != null && typeof clip.animationName !== 'string') {
+                                errors.push(`manifest.symbols.frames[${i}].spine.${variantKey}.animationName must be a string when provided.`);
+                            }
+                            if (clip.runtime != null && clip.runtime !== '3.8' && clip.runtime !== '4.2') {
+                                errors.push(`manifest.symbols.frames[${i}].spine.${variantKey}.runtime must be "3.8" or "4.2" when provided.`);
+                            }
+                            if (clip.loop != null && typeof clip.loop !== 'boolean') {
+                                errors.push(`manifest.symbols.frames[${i}].spine.${variantKey}.loop must be a boolean when provided.`);
+                            }
+                            if (clip.scale != null && !Number.isFinite(clip.scale)) {
+                                errors.push(`manifest.symbols.frames[${i}].spine.${variantKey}.scale must be a number when provided.`);
+                            }
+                            if (clip.offsetX != null && !Number.isFinite(clip.offsetX)) {
+                                errors.push(`manifest.symbols.frames[${i}].spine.${variantKey}.offsetX must be a number when provided.`);
+                            }
+                            if (clip.offsetY != null && !Number.isFinite(clip.offsetY)) {
+                                errors.push(`manifest.symbols.frames[${i}].spine.${variantKey}.offsetY must be a number when provided.`);
+                            }
+                        }
                     }
                 }
             }
@@ -761,7 +837,8 @@ export function getSymbolFrameDefs(manifest) {
             atlas: entry.atlas,
             winProfile: typeof entry.winProfile === 'string' && entry.winProfile.length > 0 ? entry.winProfile : 'normal',
             offsetX: Number.isFinite(entry.offsetX) ? entry.offsetX : 0,
-            offsetY: Number.isFinite(entry.offsetY) ? entry.offsetY : 0
+            offsetY: Number.isFinite(entry.offsetY) ? entry.offsetY : 0,
+            spine: normalizeSymbolSpineConfig(entry.spine)
         }));
 }
 
@@ -781,7 +858,7 @@ export function getSymbolFrameDefsByIndex(manifest) {
         const key = normalizePrefix(prefix);
         const found = defsByPrefix.get(key);
         if (found) return found;
-        return { prefix, atlas: '', winProfile: 'normal', offsetX: 0, offsetY: 0 };
+        return { prefix, atlas: '', winProfile: 'normal', offsetX: 0, offsetY: 0, spine: null };
     });
 }
 

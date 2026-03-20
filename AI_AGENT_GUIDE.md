@@ -22,6 +22,7 @@ Preserve deterministic slot flow. Do not trade correctness for shorter code.
 - Do not mix intro flow, sound prompt flow, and asset cache population inside one screen when a boot helper can own it.
 - Do not put feature-specific timers in render-critical classes when `Timers` can be used.
 - Do not mix old and new flow abstractions in the same file without deleting the redundant path.
+- Keep symbol Spine runtime choice in the manifest, not hardcoded in reel logic.
 
 ## Naming Conventions
 
@@ -45,6 +46,12 @@ Preserve deterministic slot flow. Do not trade correctness for shorter code.
 - Avoid repeated `setTimeout`/`setInterval` in gameplay loops; prefer frame timers.
 - Avoid unnecessary container nesting and child reordering during active spins.
 - Do not trigger expensive texture/filter/mask changes every frame unless required.
+
+## Symbol Spine Rules
+
+- Configure symbol Spine clips under `symbols.frames[].spine.<variant>`.
+- Use `runtime: "3.8"` for legacy Spine 3.8 assets and `runtime: "4.2"` for newer Pixi 8 compatible exports.
+- Do not assume one Spine runtime fits all games; keep playback versioned per clip.
 
 ## How To Add A Feature Safely
 

@@ -10,6 +10,8 @@ export default class Textures {
         this.symbolOffsets = [];
         this.symbolWinProfiles = [];
         this.symbolWinAnimations = {};
+        this.symbolSpineConfigs = [];
+        this.symbolSpineResources = {};
         this.winFrames = [];
     }
 
