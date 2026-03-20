@@ -3,7 +3,12 @@ export const SOUND_IDS = {
   COINUP: 'coinup',
   COINEND: 'coinend',
   REEL_STOP: 'reelStop',
-  KNOCK: 'knock'
+  KNOCK: 'knock',
+  BEEP_STAR: 'beepStar',
+  BEEP_SUN: 'beepSun',
+  LOW_WIN: 'lowWin',
+  HIGH_WIN: 'highWin',
+  SCATTER: 'scatter'
 } as const;
 
 export type SoundId = (typeof SOUND_IDS)[keyof typeof SOUND_IDS];
@@ -19,5 +24,10 @@ export const SOUND_DEFINITIONS: ReadonlyArray<SoundDefinition> = Object.freeze([
   { id: SOUND_IDS.COINUP, path: 'assets/sounds/coinup.mp3', volume: 1 },
   { id: SOUND_IDS.COINEND, path: 'assets/sounds/coinupend.mp3', volume: 1 },
   { id: SOUND_IDS.REEL_STOP, path: 'assets/sounds/stop.mp3', volume: 1 },
-  { id: SOUND_IDS.KNOCK, path: 'assets/sounds/knock.mp3', volume: 1 }
+  { id: SOUND_IDS.KNOCK, path: 'assets/sounds/knock.mp3', volume: 1 },
+  { id: SOUND_IDS.BEEP_STAR, path: 'assets/sounds/beep_star.mp3', volume: 1 },
+  { id: SOUND_IDS.BEEP_SUN, path: 'assets/sounds/beep_sun.mp3', volume: 1 },
+  { id: SOUND_IDS.LOW_WIN, path: 'assets/sounds/lowWin.mp3', volume: 1 },
+  { id: SOUND_IDS.HIGH_WIN, path: 'assets/sounds/highWin.mp3', volume: 1 },
+  { id: SOUND_IDS.SCATTER, path: 'assets/sounds/scatter.mp3', volume: 1 }
 ]);

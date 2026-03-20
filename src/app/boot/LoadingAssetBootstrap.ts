@@ -90,7 +90,12 @@ export default class LoadingAssetBootstrap {
       SOUND_IDS.COINUP,
       SOUND_IDS.COINEND,
       SOUND_IDS.REEL_STOP,
-      SOUND_IDS.KNOCK
+      SOUND_IDS.KNOCK,
+      SOUND_IDS.BEEP_STAR,
+      SOUND_IDS.BEEP_SUN,
+      SOUND_IDS.LOW_WIN,
+      SOUND_IDS.HIGH_WIN,
+      SOUND_IDS.SCATTER
     ]);
   }
 

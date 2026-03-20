@@ -3,6 +3,7 @@
 import { Point, type Container as PixiContainer, type Texture } from 'pixi.js';
 import Sprite from '../ui/Sprite';
 import type { ReelSymbolAnimationContext } from '../types/reels';
+import { NEAR_MISS_CURVE_KEY_TIMES, NEAR_MISS_SCALE_CURVE, NEAR_MISS_TOTAL_DURATION_SEC } from './reels/nearMissRules';
 
 interface SymbolOffset {
   x: number;
@@ -69,6 +70,9 @@ export default class ReelSymbol extends Sprite {
     setPosition: (x: number, y: number) => void;
     bringToFront: () => void;
   } | null;
+  private nearMissActive: boolean;
+  private nearMissFrame: number;
+  private nearMissElapsedSec: number;
 
   constructor(game: ReelGameLike, reel: unknown, index: number) {
     super(game.textures.regions[index][0]);
@@ -93,6 +97,9 @@ export default class ReelSymbol extends Sprite {
     this.activeSpineConfig = null;
     this.usingSpineAnimation = false;
     this.overlaySpineHandle = null;
+    this.nearMissActive = false;
+    this.nearMissFrame = 0;
+    this.nearMissElapsedSec = 0;
 
     this.anchor.set(0.5);
     this.blendMode = 'normal' as never;
@@ -115,6 +122,7 @@ export default class ReelSymbol extends Sprite {
       return;
     }
     this.hideActiveSpine();
+    this.stopNearMiss();
     const prevLogicalX = this.logicalX;
     const prevLogicalY = this.logicalY;
     this.index = index;
@@ -166,6 +174,7 @@ export default class ReelSymbol extends Sprite {
   }
 
   animate(animate: boolean, looping: boolean, isLong: boolean, context?: ReelSymbolAnimationContext): number {
+    this.stopNearMiss();
     this.anim = animate;
     this.looping = looping;
     this.isLong = isLong;
@@ -185,8 +194,8 @@ export default class ReelSymbol extends Sprite {
         this.reel.addChild(this.winOverlay);
       }
       this.applyWinAnimationFrame(0, 0);
+      return this.getOverlayAnimationDurationMs(looping);
     }
-    return 0;
   }
 
   setBlurFrame(index: number): void {
@@ -215,7 +224,10 @@ export default class ReelSymbol extends Sprite {
   }
 
   act(delta?: number): void {
-    if (!this.anim) return;
+    if (!this.anim) {
+      this.advanceNearMiss(delta);
+      return;
+    }
     if (this.usingSpineAnimation) return;
 
     const totalFrames = this.getCurveLength();
@@ -255,6 +267,20 @@ export default class ReelSymbol extends Sprite {
     this.transformFrameProgress = 0;
     this.delayAnimation = 0;
     this.resetWinAnimation();
+  }
+
+  playNearMiss(): void {
+    this.hideActiveSpine();
+    this.anim = false;
+    this.nearMissActive = true;
+    this.nearMissFrame = 0;
+    this.nearMissElapsedSec = 0;
+    this.rotation = 0;
+    this.visible = true;
+    if (this.winOverlay) {
+      this.winOverlay.visible = false;
+    }
+    this.scale.set(NEAR_MISS_SCALE_CURVE[0] || 1);
   }
 
   private updateWinProfile(index: number): void {
@@ -303,6 +329,19 @@ export default class ReelSymbol extends Sprite {
     return this.getWinAnimationProfile().scale.length;
   }
 
+  private getOverlayAnimationDurationMs(looping: boolean): number {
+    if (looping) {
+      return 0;
+    }
+
+    const totalFrames = this.getCurveLength();
+    if (totalFrames <= 0) {
+      return 0;
+    }
+
+    return Math.ceil(totalFrames * OVERLAY_FRAME_STEP_SEC * 1000);
+  }
+
   private applyWinAnimationFrame(frameIndex: number, transformFrameProgress: number): void {
     const winFrames = this.getWinFrames();
     if (this.winOverlay && winFrames.length > 0) {
@@ -321,7 +360,7 @@ export default class ReelSymbol extends Sprite {
     this.rotation = rotation * (Math.PI / 180);
   }
 
-  private sampleCurve(curve: number[], frameProgress: number): number {
+  private sampleCurve(curve: readonly number[], frameProgress: number): number {
     if (!Array.isArray(curve) || curve.length === 0) {
       return 0;
     }
@@ -335,8 +374,24 @@ export default class ReelSymbol extends Sprite {
     return left + (right - left) * mix;
   }
 
+  private sampleCurveSmooth(curve: readonly number[], frameProgress: number): number {
+    if (!Array.isArray(curve) || curve.length === 0) {
+      return 0;
+    }
+
+    const clamped = Math.max(0, Math.min(frameProgress, curve.length - 1));
+    const leftIndex = Math.floor(clamped);
+    const rightIndex = Math.min(leftIndex + 1, curve.length - 1);
+    const localMix = clamped - leftIndex;
+    const easedMix = localMix * localMix * (3 - 2 * localMix);
+    const left = Number(curve[leftIndex] ?? curve[0] ?? 0);
+    const right = Number(curve[rightIndex] ?? left);
+    return left + (right - left) * easedMix;
+  }
+
   private resetWinAnimation(): void {
     this.hideActiveSpine();
+    this.stopNearMiss();
     this.scale.set(1);
     this.rotation = 0;
     this.visible = true;
@@ -400,5 +455,66 @@ export default class ReelSymbol extends Sprite {
     this.activeSpineConfig = null;
     this.usingSpineAnimation = false;
     this.overlaySpineHandle = null;
+  }
+
+  private advanceNearMiss(delta?: number): void {
+    if (!this.nearMissActive) {
+      return;
+    }
+
+    const dt = Number.isFinite(delta) && Number(delta) > 0 ? Number(delta) : DEFAULT_SYMBOL_ANIMATION_DT;
+    this.nearMissElapsedSec += dt;
+
+    const progress = Math.min(this.nearMissElapsedSec / NEAR_MISS_TOTAL_DURATION_SEC, 1);
+    const scale = Number(this.sampleTimedCurveSmooth(NEAR_MISS_SCALE_CURVE, NEAR_MISS_CURVE_KEY_TIMES, progress) ?? 1);
+    this.scale.set(scale);
+    this.rotation = 0;
+    this.nearMissFrame = Math.floor(progress * Math.max(0, NEAR_MISS_SCALE_CURVE.length - 1));
+
+    if (progress >= 1) {
+      this.stopNearMiss();
+    }
+  }
+
+  private stopNearMiss(): void {
+    this.nearMissActive = false;
+    this.nearMissFrame = 0;
+    this.nearMissElapsedSec = 0;
+    if (!this.anim && !this.usingSpineAnimation) {
+      this.scale.set(1);
+      this.rotation = 0;
+    }
+  }
+
+  private sampleTimedCurveSmooth(
+    values: readonly number[],
+    times: readonly number[],
+    progress: number
+  ): number {
+    if (!Array.isArray(values) || values.length === 0) {
+      return 0;
+    }
+
+    if (!Array.isArray(times) || times.length !== values.length) {
+      return this.sampleCurveSmooth(values, progress * Math.max(0, values.length - 1));
+    }
+
+    const clampedProgress = Math.max(0, Math.min(progress, 1));
+    for (let index = 0; index < times.length - 1; index += 1) {
+      const leftTime = Number(times[index] ?? 0);
+      const rightTime = Number(times[index + 1] ?? leftTime);
+      if (clampedProgress > rightTime) {
+        continue;
+      }
+
+      const span = Math.max(0.0001, rightTime - leftTime);
+      const localMix = (clampedProgress - leftTime) / span;
+      const easedMix = localMix * localMix * (3 - 2 * localMix);
+      const leftValue = Number(values[index] ?? values[0] ?? 0);
+      const rightValue = Number(values[index + 1] ?? leftValue);
+      return leftValue + (rightValue - leftValue) * easedMix;
+    }
+
+    return Number(values[values.length - 1] ?? values[0] ?? 0);
   }
 }

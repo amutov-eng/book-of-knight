@@ -16,8 +16,9 @@ export interface ReelSymbolLike {
   alpha: number;
   getIndex?(): number;
   animate(active: boolean, looping: boolean, isLong: boolean, context?: ReelSymbolAnimationContext): number;
+  playNearMiss?(): void;
 }
-
+ 
 export interface ReelDisplayLike {
   stopSymbols: ReelStopRow;
   startSpin(): void;
@@ -28,6 +29,7 @@ export interface ReelDisplayLike {
   setReelStrip?(strip: number[]): void;
   highlightScatters(): boolean;
   highlightSymbolAtStop(stop: number, looping: boolean, isLong: boolean, context?: ReelSymbolAnimationContext): number;
+  playNearMissAtStop?(stop: number): void;
   getReelSymbolAtStop(stop: number): ReelSymbolLike | null;
   removeHighlight(): void;
   highlight(iterations: number): void;

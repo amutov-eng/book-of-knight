@@ -115,8 +115,8 @@ const PAYTABLE_BY_SYMBOL = (() => {
  */
 const MATRIX_INPUT = [
   [1, 2, 3, 4, 0],
-  [9, 9, 9, 4, 5],
-  [1, 2, 3, 4, 5]
+  [1, 0, 1, 4, 5],
+  [9, 9, 9, 4, 5]
 ];
 
 const FIXED_OUTCOME_TEMPLATE = {

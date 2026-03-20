@@ -10,6 +10,17 @@
       "takeWinTimeout": 100,
       "showLastWinsLoopDelay": 16,
       "winToCreditStep": 200
+    },
+    "sounds": {
+      "wins": {
+        "line": {
+          "default": "lowWin",
+          "bySymbol": {
+            "9": "highWin"
+          }
+        },
+        "scatter": "scatter"
+      }
     }
   },
   "animations": {

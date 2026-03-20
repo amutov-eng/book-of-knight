@@ -1,3 +1,5 @@
+import type { SoundId } from '../config/soundConfig';
+
 export interface WinLike {
   winningLine: number;
   bet: number;
@@ -6,6 +8,7 @@ export interface WinLike {
   mult: number;
   hasWild: boolean;
   type: number;
+  sound?: SoundId;
   highlightTimeout?: number;
   highlight: number[][];
 }

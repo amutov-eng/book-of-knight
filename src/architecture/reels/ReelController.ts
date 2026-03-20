@@ -53,6 +53,12 @@ export default class ReelController {
     return this.reel.highlightSymbolAtStop(stop, looping, isLong, context);
   }
 
+  playNearMissAtStop(stop: number): void {
+    if (typeof this.reel.playNearMissAtStop === 'function') {
+      this.reel.playNearMissAtStop(stop);
+    }
+  }
+ 
   getSymbolAtStop(stop: number): ReelSymbolLike | null {
     return this.reel.getReelSymbolAtStop(stop);
   }

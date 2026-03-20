@@ -151,6 +151,7 @@ GameplayState.IDLE = createState('IDLE', {
 
 GameplayState.START_SPIN = createState('START_SPIN', {
   process: (controller) => {
+    controller.reelsStoppedTimeout = 0;
     if (controller.startSpin()) {
       return toState(controller, GameplayState.REELS_SPINNING);
     }
@@ -193,7 +194,8 @@ GameplayState.REELS_STOPPING = createState('REELS_STOPPING', {
     if (controller.reelStopped()) {
       const stoppedReel = controller.lastReelStopped;
       if (stoppedReel >= 0) {
-        controller.game.reels.highlightScattersOnReel(stoppedReel, null);
+        const nearMissDelay = controller.game.reels.playNearMissOnReel(stoppedReel);
+        controller.reelsStoppedTimeout = Math.max(controller.reelsStoppedTimeout, nearMissDelay);
       }
       const nextReel = stoppedReel + 1;
       if (nextReel >= 0 && nextReel < controller.game.reels.NUMBER_OF_REELS) {
@@ -202,7 +204,6 @@ GameplayState.REELS_STOPPING = createState('REELS_STOPPING', {
     }
 
     if (controller.reelsStopped()) {
-      controller.reelsStoppedTimeout = 0;
       toState(controller, GameplayState.REELS_STOPPED);
     }
   }

@@ -15,6 +15,7 @@
     "mock:server": "node --watch scripts/mock-server.js",
     "localization:build": "node scripts/convert-lang-xml.js",
     "test:config": "tsx tests/assetsConfig.test.mjs",
+    "test:near-miss": "tsx tests/nearMissRules.regression.test.mjs",
     "test:reel-viewport": "tsx tests/reelViewport.regression.test.mjs",
     "test:win-presentation": "tsx tests/winPresentation.regression.test.mjs",
     "test:smoke": "tsx tests/lifecycle.smoke.test.mjs",

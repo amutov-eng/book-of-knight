@@ -518,6 +518,14 @@ export default class Reel extends PIXI.Container {
         return symbol.animate(true, looping, isLong, context);
     }
 
+    playNearMissAtStop(stop) {
+        const symbol = this.visibleSymbols[(this.spriteOffset + stop) % this.TOTAL_SYMBOLS];
+        if (!symbol || typeof symbol.playNearMiss !== 'function') {
+            return;
+        }
+        symbol.playNearMiss();
+    }
+ 
     removeHighlight() {
         for( let i = 0; i < this.TOTAL_SYMBOLS; i++ ) {
             this.visibleSymbols[i].animate(false, false, false);

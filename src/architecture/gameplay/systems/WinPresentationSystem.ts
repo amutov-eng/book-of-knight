@@ -47,6 +47,7 @@ export default class WinPresentationSystem {
 
         this.game.reels.unhighlightAll();
         this.game.menu.setStatus('');
+        this.playWinSound(win);
 
         switch (win.type) {
             case WINTYPES.LINE:
@@ -130,7 +131,14 @@ export default class WinPresentationSystem {
 
     resolveHighlightDelayFrames(win, spineAnimationMs) {
         const baseFrames = win && Number.isFinite(win.highlightTimeout) ? Number(win.highlightTimeout) : 80;
-        return Math.max(baseFrames, Math.ceil((Number(spineAnimationMs) || 0) / 16.6667));
+        const animationFrames = Math.ceil((Number(spineAnimationMs) || 0) / 16.6667);
+        return animationFrames > 0 ? animationFrames : baseFrames;
+    }
+
+    playWinSound(win) {
+        const soundId = win && typeof win.sound === 'string' ? win.sound : '';
+        if (!soundId) return;
+        this.game.soundSystem?.play(soundId);
     }
 }
 

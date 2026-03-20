@@ -21,6 +21,7 @@ export default class Controller {
   lastReelStopped = 0;
   event: number = Event.NONE;
   w2cSpeed = 1;
+  w2cFramesRemaining = 0;
   forceStopRequested = false;
   reelsStoppedTimeout = 0;
 

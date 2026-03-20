@@ -33,6 +33,12 @@ function createGameStub(spineAnimationMs = 0) {
       setWinStatus: () => undefined,
       setWin: () => undefined
     },
+    soundSystem: {
+      played: [],
+      play(id) {
+        this.played.push(id);
+      }
+    },
     context: {
       onscreenWinMeter: 0,
       outcome: {
@@ -60,13 +66,35 @@ function createGameStub(spineAnimationMs = 0) {
 {
   const system = new WinPresentationSystem(createGameStub(1200));
   const frames = system.processWinAt(0);
-  assert.equal(frames, 72, '1200ms spine win should extend highlight timing beyond the legacy timeout');
+  assert.equal(frames, 72, 'win presentation should wait for the returned animation duration');
 }
 
 {
   const system = new WinPresentationSystem(createGameStub(0));
   const frames = system.showWinAt(0);
-  assert.equal(frames, 40, 'non-spine win should keep the configured highlight timeout');
+  assert.equal(frames, 40, 'wins without an animation duration should fall back to the configured highlight timeout');
+}
+
+{
+  const system = new WinPresentationSystem(createGameStub(417));
+  const frames = system.showWinAt(0);
+  assert.equal(frames, 26, 'standard win animations should switch lines as soon as the animation finishes');
+}
+
+{
+  const game = createGameStub(0);
+  game.context.outcome.wins[0].sound = 'scatter';
+  const system = new WinPresentationSystem(game);
+  system.processWinAt(0);
+  assert.deepEqual(game.soundSystem.played, ['scatter'], 'configured win sound should play with the win presentation');
+}
+
+{
+  const game = createGameStub(0);
+  game.context.outcome.wins[0].sound = 'scatter';
+  const system = new WinPresentationSystem(game);
+  system.showWinAt(0);
+  assert.deepEqual(game.soundSystem.played, [], 'last wins replay should not trigger the win sound again');
 }
 
 console.log('win presentation regressions: OK');

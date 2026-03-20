@@ -13,6 +13,7 @@ import { GAME_RULES } from '../config/gameRules';
 import { SOUND_IDS } from '../config/soundConfig';
 import type BaseGame from '../core/BaseGame';
 import type { ReelStopRow, ReelSymbolAnimationContext } from '../types/reels';
+import { getNearMissDurationFrames, resolveNearMissSoundId, shouldAnimateNearMissSymbol } from './reels/nearMissRules';
 
 type Matrix3xN = number[][];
 
@@ -302,6 +303,42 @@ export default class Reels extends Container {
     const reelController = this.getReelController(index);
     if (!reelController) return;
     reelController.stop();
+  }
+
+  playNearMissOnReel(reelIndex: number): number {
+    const reelController = this.getReelController(reelIndex);
+    const context = this.game?.context as Record<string, any> | null;
+    const outcome = context && context.outcome ? context.outcome : null;
+    const server = context && context.server ? context.server : null;
+    const previousHoldAndWin = Array.isArray(server?.prevMatrixHoldAndWin) ? server.prevMatrixHoldAndWin : [];
+    let maxDelayFrames = 0;
+    if (!reelController || !outcome) {
+      return 0;
+    }
+
+    for (let row = 0; row < this.VISIBLE_ROWS; row++) {
+      const symbolIndex = Number(this.matrix?.[row]?.[reelIndex] ?? -1);
+      const previousHoldAndWinValue = Number(previousHoldAndWin?.[row]?.[reelIndex] ?? 0);
+      const evaluation = {
+        symbolIndex,
+        outcomeHasWin: !!outcome.hasWin,
+        outcomeHasWild: !!outcome.hasWild,
+        previousHoldAndWinValue
+      };
+
+      if (!shouldAnimateNearMissSymbol(evaluation)) {
+        continue;
+      }
+
+      reelController.playNearMissAtStop(row);
+      maxDelayFrames = Math.max(maxDelayFrames, getNearMissDurationFrames());
+      const soundId = resolveNearMissSoundId(evaluation);
+      if (soundId) {
+        this.game.soundSystem?.play(soundId);
+      }
+    }
+
+    return maxDelayFrames;
   }
 
   highlightScattersOnReel(reelIndex: number, win: WinLike | null): void {

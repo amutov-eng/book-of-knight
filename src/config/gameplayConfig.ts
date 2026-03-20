@@ -1,4 +1,5 @@
 import { getAssetsManifest } from '../core/RuntimeContext';
+import { SOUND_IDS, type SoundId } from './soundConfig';
 
 export interface GameplayConfig {
   spinTimeout: number;
@@ -12,6 +13,12 @@ export interface GameplayConfig {
   winToCreditStep: number;
 }
 
+export interface GameplayWinSoundConfig {
+  lineDefault: SoundId;
+  lineBySymbol: Record<number, SoundId>;
+  scatter: SoundId;
+}
+
 const DEFAULT_GAMEPLAY_CONFIG = Object.freeze({
   spinTimeout: 11,
   showAllLinesStartDelay: 8,
@@ -22,6 +29,14 @@ const DEFAULT_GAMEPLAY_CONFIG = Object.freeze({
   takeWinTimeout: 100,
   showLastWinsLoopDelay: 16,
   winToCreditStep: 200
+});
+
+const DEFAULT_WIN_SOUND_CONFIG: GameplayWinSoundConfig = Object.freeze({
+  lineDefault: SOUND_IDS.LOW_WIN,
+  lineBySymbol: Object.freeze({
+    9: SOUND_IDS.HIGH_WIN
+  }),
+  scatter: SOUND_IDS.SCATTER
 });
 
 function asFiniteNumber(value: unknown, fallback: number): number {
@@ -51,5 +66,36 @@ export function getGameplayConfig(): GameplayConfig {
     takeWinTimeout: asFiniteNumber(timings.takeWinTimeout, DEFAULT_GAMEPLAY_CONFIG.takeWinTimeout),
     showLastWinsLoopDelay: asFiniteNumber(timings.showLastWinsLoopDelay, DEFAULT_GAMEPLAY_CONFIG.showLastWinsLoopDelay),
     winToCreditStep: asFiniteNumber(timings.winToCreditStep, DEFAULT_GAMEPLAY_CONFIG.winToCreditStep)
+  };
+}
+
+function asSoundId(value: unknown, fallback: SoundId): SoundId {
+  return typeof value === 'string' && value.length > 0 ? value as SoundId : fallback;
+}
+
+export function getGameplayWinSoundConfig(): GameplayWinSoundConfig {
+  const manifest = getAssetsManifest<any>();
+  const gameplay = manifest && typeof manifest === 'object' && manifest.gameplay && typeof manifest.gameplay === 'object'
+    ? manifest.gameplay
+    : {};
+  const sounds = gameplay.sounds && typeof gameplay.sounds === 'object' ? gameplay.sounds : {};
+  const wins = sounds.wins && typeof sounds.wins === 'object' ? sounds.wins : {};
+  const line = wins.line && typeof wins.line === 'object' ? wins.line : {};
+  const lineBySymbolSource = line.bySymbol && typeof line.bySymbol === 'object' ? line.bySymbol : {};
+  const lineBySymbol: Record<number, SoundId> = {};
+
+  for (const [symbol, soundId] of Object.entries(lineBySymbolSource)) {
+    const symbolIndex = Number(symbol);
+    if (!Number.isInteger(symbolIndex)) continue;
+    lineBySymbol[symbolIndex] = asSoundId(soundId, DEFAULT_WIN_SOUND_CONFIG.lineDefault);
+  }
+
+  return {
+    lineDefault: asSoundId(line.default, DEFAULT_WIN_SOUND_CONFIG.lineDefault),
+    lineBySymbol: {
+      ...DEFAULT_WIN_SOUND_CONFIG.lineBySymbol,
+      ...lineBySymbol
+    },
+    scatter: asSoundId(wins.scatter, DEFAULT_WIN_SOUND_CONFIG.scatter)
   };
 }

@@ -4,6 +4,7 @@
  */
 
 import { createGameOutcome, type GameOutcomeShape, type WinLike } from '../game/GameOutcome';
+import { getGameplayWinSoundConfig } from '../config/gameplayConfig';
 import { Win, WINTYPES } from '../game/Win';
 import { getDefaultNumberPattern } from '../utils/numberFormat';
 import Pool from '../core/utils/Pool';
@@ -151,6 +152,7 @@ function resetPooledWin(win: WinLike): void {
   win.mult = 0;
   win.hasWild = false;
   win.type = WINTYPES.NEAR_MISS;
+  win.sound = undefined;
   win.highlightTimeout = 0;
   win.highlight = [
     [0, 0, 0, 0, 0],
@@ -183,6 +185,20 @@ function toBoolFlag(value: unknown, fallback = false): boolean {
   if (value === 1 || value === '1') return true;
   if (value === 0 || value === '0') return false;
   return fallback;
+}
+
+function resolveWinSound(win: WinLike): WinLike['sound'] {
+  const config = getGameplayWinSoundConfig();
+
+  if (win.type === WINTYPES.SCATTER) {
+    return config.scatter;
+  }
+
+  if (win.type === WINTYPES.LINE) {
+    return config.lineBySymbol[win.symbol] || config.lineDefault;
+  }
+
+  return undefined;
 }
 
 function readRuntimeNumericGlobal(name: string, fallback: number): number {
@@ -636,6 +652,7 @@ export default class GsLink {
       win.hasWild = !!serverWin.hasWild;
       win.highlightTimeout = 100;
       win.type = mapServerWinType(toInt(serverWin.type, 0));
+      win.sound = resolveWinSound(win);
 
       if (win.type === WINTYPES.LINE) {
         win.highlightTimeout = win.hasWild ? 140 : (win.cnt > 3 ? 120 : 50);
@@ -660,6 +677,13 @@ export default class GsLink {
 
     this.activePooledWins = mappedOutcome.wins.slice() as WinLike[];
     this.game.context.outcome = mappedOutcome;
+    const previousServer = this.game.context.server && typeof this.game.context.server === 'object'
+      ? this.game.context.server
+      : {};
+    const previousHoldAndWin = Array.isArray((previousServer as any).matrixHoldAndWin)
+      ? normalizeMatrix((previousServer as any).matrixHoldAndWin, 3, 5)
+      : normalizeMatrix((previousServer as any).prevMatrixHoldAndWin, 3, 5);
+
     this.game.context.server = {
       mode: serverOutcome.mode,
       roundId: serverOutcome.roundId,
@@ -669,6 +693,7 @@ export default class GsLink {
       hasHoldAndWin: serverOutcome.hasHoldAndWin,
       holdAndWinCnt: serverOutcome.holdAndWinCnt,
       holdAndWinWin: serverOutcome.holdAndWinWin,
+      prevMatrixHoldAndWin: previousHoldAndWin,
       matrixHoldAndWin: serverOutcome.matrixHoldAndWin,
       matrixHoldAndWinValues: serverOutcome.matrixHoldAndWinValues,
       buyFreeGamesMult: serverOutcome.buyFreeGamesMult,

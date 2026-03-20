@@ -40,6 +40,11 @@ let Win = {
     hasWild : false,
 
     /**
+     * Sound id triggered when this win is presented.
+     */
+    sound : null,
+
+    /**
      * Timeout variable used in Controller to determine duration of the highlighting animation.
      */
     highlightTimeout : 0
