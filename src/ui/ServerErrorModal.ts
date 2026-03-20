@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { APP_FONT_FAMILY, APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
+
 export default class ServerErrorModal extends PIXI.Container {
     constructor(onReload) {
         super();
@@ -33,8 +35,8 @@ export default class ServerErrorModal extends PIXI.Container {
             style: {
                 fill: 0xf2ecff,
                 fontSize: 42,
-                fontFamily: 'Arial',
-                fontWeight: '600'
+                fontFamily: APP_FONT_FAMILY,
+                fontWeight: APP_FONT_WEIGHT_REGULAR
             }
         });
         title.anchor.set(0.5, 0);
@@ -46,8 +48,8 @@ export default class ServerErrorModal extends PIXI.Container {
             style: {
                 fill: 0xffffff,
                 fontSize: 28,
-                fontFamily: 'Arial',
-                fontWeight: '600',
+                fontFamily: APP_FONT_FAMILY,
+                fontWeight: APP_FONT_WEIGHT_REGULAR,
                 align: 'center'
             }
         });
@@ -70,8 +72,8 @@ export default class ServerErrorModal extends PIXI.Container {
             style: {
                 fill: 0xffffff,
                 fontSize: 36,
-                fontFamily: 'Arial',
-                fontWeight: '700'
+                fontFamily: APP_FONT_FAMILY,
+                fontWeight: APP_FONT_WEIGHT_REGULAR
             }
         });
         buttonLabel.anchor.set(0.5);

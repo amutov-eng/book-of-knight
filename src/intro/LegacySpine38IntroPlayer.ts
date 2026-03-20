@@ -4,6 +4,8 @@ import type { SpineIntroConfig } from '../config/introConfig';
 import type { IntroPlayer } from './types';
 import DisplayManager from '../core/display/DisplayManager';
 import { getRuntimeVariant } from '../config/runtimeConfig';
+import { APP_FONT_FAMILY, APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
+import { warn } from '../core/utils/logger';
 
 type SpineResource = {
   spineData?: {
@@ -277,11 +279,11 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     this.skipPromptLabel = new Text(
       prompt.text || 'TAP TO CONTINUE',
       new TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: APP_FONT_FAMILY,
         fontSize: Number.isFinite(prompt.fontSize) ? Number(prompt.fontSize) : 60,
         fill: Number.isFinite(prompt.color) ? Number(prompt.color) : 0xffffff,
         align: 'center',
-        fontWeight: '700'
+        fontWeight: APP_FONT_WEIGHT_REGULAR
       })
     );
     this.skipPromptLabel.anchor.set(0.5, 0.5);
@@ -300,10 +302,17 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     const atlasPath = this.config.viewport?.loadingBar?.atlasPath;
     if (!atlasPath) return;
 
-    const resource = await Assets.load(atlasPath) as { textures?: Record<string, Texture> };
+    let resource: { textures?: Record<string, Texture> } | null = null;
+    try {
+      resource = await Assets.load(atlasPath) as { textures?: Record<string, Texture> };
+    } catch (error) {
+      warn(`LegacySpine38IntroPlayer::skipLoadingBar ${error instanceof Error ? error.message : String(error)}`);
+      return;
+    }
+
     const textures = resource && resource.textures ? resource.textures : null;
-    const emptyTexture = textures?.['loading_empty.png'] || Texture.from('loading_empty.png');
-    const fillTexture = textures?.['loading_full.png'] || Texture.from('loading_full.png');
+    const emptyTexture = textures?.['loading_empty.png'] || this.tryGetTexture('loading_empty.png');
+    const fillTexture = textures?.['loading_full.png'] || this.tryGetTexture('loading_full.png');
 
     if (!emptyTexture || !fillTexture) return;
 
@@ -321,6 +330,15 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     this.loadingFillBar.mask = this.loadingFillMask;
 
     this.layoutLoadingBar();
+  }
+
+  private tryGetTexture(frameName: string): Texture | null {
+    try {
+      const texture = Texture.from(frameName);
+      return texture && texture !== Texture.EMPTY ? texture : null;
+    } catch {
+      return null;
+    }
   }
 
   private layoutLoadingBar(): void {

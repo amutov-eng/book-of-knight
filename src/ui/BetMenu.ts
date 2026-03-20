@@ -1,5 +1,6 @@
 import { Container, Graphics, Rectangle, Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import type BaseGame from '../core/BaseGame';
+import { APP_FONT_WEIGHT_LIGHT, APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
 import { formatCentsByPattern, getDefaultNumberPattern } from '../utils/numberFormat';
 
 type TextButton = {
@@ -117,6 +118,7 @@ export default class BetMenu extends Container {
       fontFamily: primaryFont,
       fontSize: toNumber(this.get('title.fontSize'), 60),
       fill: toNumber(this.get('title.color'), 0x93a7bf),
+      fontWeight: APP_FONT_WEIGHT_REGULAR,
       align: 'center',
       anchorX: 0.5
     });
@@ -125,6 +127,7 @@ export default class BetMenu extends Container {
       fontFamily: primaryFont,
       fontSize: toNumber(this.get('totalBetLabel.fontSize'), 46),
       fill: toNumber(this.get('totalBetLabel.color'), 0xbee1f5),
+      fontWeight: APP_FONT_WEIGHT_LIGHT,
       align: 'center',
       anchorX: 0.5
     });
@@ -133,6 +136,7 @@ export default class BetMenu extends Container {
       fontFamily: primaryFont,
       fontSize: toNumber(this.get('valueText.fontSize'), 46),
       fill: toNumber(this.get('valueText.color'), 0xbee1f5),
+      fontWeight: APP_FONT_WEIGHT_LIGHT,
       align: 'center',
       anchorX: 0.5
     });
@@ -141,6 +145,7 @@ export default class BetMenu extends Container {
       fontFamily: primaryFont,
       fontSize: toNumber(this.get('lines.fontSize'), 36),
       fill: toNumber(this.get('lines.color'), 0xbee1f5),
+      fontWeight: APP_FONT_WEIGHT_REGULAR,
       align: 'center',
       anchorX: 0.5
     });
@@ -385,7 +390,7 @@ export default class BetMenu extends Container {
         fontFamily: styleOptions.fontFamily,
         fontSize: styleOptions.fontSize,
         fill: styleOptions.fill,
-        fontWeight: '600',
+        fontWeight: APP_FONT_WEIGHT_REGULAR,
         align: styleOptions.align
       })
     });
@@ -516,6 +521,7 @@ export default class BetMenu extends Container {
       fill: number;
       align: 'left' | 'center' | 'right';
       anchorX: number;
+      fontWeight: any;
     }
   ): Text {
     const text = new Text({
@@ -524,7 +530,7 @@ export default class BetMenu extends Container {
         fontFamily: styleOptions.fontFamily,
         fontSize: styleOptions.fontSize,
         fill: styleOptions.fill,
-        fontWeight: '600',
+        fontWeight: styleOptions.fontWeight,
         align: styleOptions.align
       })
     });

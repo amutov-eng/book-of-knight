@@ -1,5 +1,6 @@
 import { Assets, Cache, Container, Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import type BaseGame from '../core/BaseGame';
+import { APP_FONT_FAMILY, APP_FONT_WEIGHT_LIGHT, APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
 import { formatMoneyByGame, getGameCurrency, getLocalizedText } from './uiTextFormat';
 
 type BuyType = 0 | 1;
@@ -72,10 +73,10 @@ export default class BuyBonusMenu extends Container {
     this.hawPanelActive = this.createSprite('b_bg_active.png', toNumber(this.config.panels?.haw?.x, 989), toNumber(this.config.panels?.haw?.y, 190));
 
     this.titleText = this.createText('', toNumber(this.config.texts?.title?.x, 960), toNumber(this.config.texts?.title?.y, 40), {
-      fontFamily: 'Arial',
+      fontFamily: APP_FONT_FAMILY,
       fontSize: toNumber(this.config.texts?.title?.fontSize, 60),
       fill: 0x93a7bf,
-      fontWeight: '700',
+      fontWeight: APP_FONT_WEIGHT_REGULAR,
       align: 'center',
       anchorX: 0.5,
       anchorY: 0
@@ -85,40 +86,40 @@ export default class BuyBonusMenu extends Container {
     this.hawSymbol = this.createSprite('mega_blur_01.png', toNumber(this.config.symbols?.haw?.x, 1100), toNumber(this.config.symbols?.haw?.y, 590));
 
     this.freeTitle = this.createText('', toNumber(this.config.texts?.freeTitle?.x, 672), toNumber(this.config.texts?.freeTitle?.y, 560), {
-      fontFamily: 'Arial',
+      fontFamily: APP_FONT_FAMILY,
       fontSize: toNumber(this.config.texts?.freeTitle?.fontSize, 54),
       fill: 0xff9d2d,
-      fontWeight: '700',
+      fontWeight: APP_FONT_WEIGHT_REGULAR,
       align: 'center',
       anchorX: 0.5,
       anchorY: 0
     });
 
     this.hawTitle = this.createText('', toNumber(this.config.texts?.hawTitle?.x, 1241), toNumber(this.config.texts?.hawTitle?.y, 560), {
-      fontFamily: 'Arial',
+      fontFamily: APP_FONT_FAMILY,
       fontSize: toNumber(this.config.texts?.hawTitle?.fontSize, 54),
       fill: 0xff9d2d,
-      fontWeight: '700',
+      fontWeight: APP_FONT_WEIGHT_REGULAR,
       align: 'center',
       anchorX: 0.5,
       anchorY: 0
     });
 
     this.freePrice = this.createText('', toNumber(this.config.texts?.freePrice?.x, 672), toNumber(this.config.texts?.freePrice?.y, 465), {
-      fontFamily: 'Arial',
+      fontFamily: APP_FONT_FAMILY,
       fontSize: toNumber(this.config.texts?.freePrice?.fontSize, 54),
       fill: 0x93a7bf,
-      fontWeight: '700',
+      fontWeight: APP_FONT_WEIGHT_REGULAR,
       align: 'center',
       anchorX: 0.5,
       anchorY: 0
     });
 
     this.hawPrice = this.createText('', toNumber(this.config.texts?.hawPrice?.x, 1241), toNumber(this.config.texts?.hawPrice?.y, 465), {
-      fontFamily: 'Arial',
+      fontFamily: APP_FONT_FAMILY,
       fontSize: toNumber(this.config.texts?.hawPrice?.fontSize, 54),
       fill: 0x93a7bf,
-      fontWeight: '700',
+      fontWeight: APP_FONT_WEIGHT_LIGHT,
       align: 'center',
       anchorX: 0.5,
       anchorY: 0
@@ -128,20 +129,20 @@ export default class BuyBonusMenu extends Container {
     if (betBg) this.addChild(betBg);
 
     this.totalBetLabel = this.createText('', toNumber(this.config.texts?.totalBetLabel?.x, 956), toNumber(this.config.texts?.totalBetLabel?.y, 206), {
-      fontFamily: 'Arial',
+      fontFamily: APP_FONT_FAMILY,
       fontSize: toNumber(this.config.texts?.totalBetLabel?.fontSize, 46),
       fill: 0xbee1f5,
-      fontWeight: '700',
+      fontWeight: APP_FONT_WEIGHT_LIGHT,
       align: 'center',
       anchorX: 0.5,
       anchorY: 0.5
     });
 
     this.totalBetValue = this.createText('', toNumber(this.config.texts?.totalBetValue?.x, 956), toNumber(this.config.texts?.totalBetValue?.y, 139), {
-      fontFamily: 'Arial',
+      fontFamily: APP_FONT_FAMILY,
       fontSize: toNumber(this.config.texts?.totalBetValue?.fontSize, 46),
       fill: 0xbee1f5,
-      fontWeight: '700',
+      fontWeight: APP_FONT_WEIGHT_LIGHT,
       align: 'center',
       anchorX: 0.5,
       anchorY: 0.5
@@ -306,10 +307,10 @@ export default class BuyBonusMenu extends Container {
     const text = new Text({
       text: getLocalizedText(this.game, 'buyTxt', 'BUY'),
       style: new TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: APP_FONT_FAMILY,
         fontSize: 60,
         fill: type === 0 ? 0xffff00 : 0xffff00,
-        fontWeight: '700',
+        fontWeight: APP_FONT_WEIGHT_REGULAR,
         align: 'center'
       })
     });

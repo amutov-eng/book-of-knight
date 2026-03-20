@@ -2,6 +2,11 @@ import { getRuntimeVariant } from './runtimeConfig';
 import { GAME_RULES } from './gameRules';
 import { STRIPS_CONFIG } from './stripsConfig';
 import { SYMBOL_INDEX_PREFIX_ORDER } from './symbolConfig';
+import { APP_FONT_FAMILY, APP_FONT_WEIGHT_REGULAR } from './fontConfig';
+import {
+    BITMAP_FONT_ROBOTO_BLACK,
+    BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM
+} from './bitmapFontConfig';
 
 /**
  * Manifest readers used during boot and by UI/layout modules at runtime.
@@ -404,17 +409,23 @@ export function getUiAtlases(manifest) {
 export function getUiHudConfig(manifest) {
     const fallback = {
         fonts: {
-            primary: 'Arial',
-            jackpot: 'Arial',
-            creditLabel: 'Arial',
-            creditValue: 'Arial',
-            totalBetLabel: 'Arial',
-            totalBetValue: 'Arial',
-            status: 'Arial',
-            winStatus: 'Arial',
-            win: 'Arial',
-            jackpotValue: 'Arial',
-            jackpotLabel: 'Arial'
+            primary: APP_FONT_FAMILY,
+            jackpot: APP_FONT_FAMILY,
+            creditLabel: APP_FONT_FAMILY,
+            creditValue: APP_FONT_FAMILY,
+            creditLabelBitmap: BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM,
+            creditValueBitmap: BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM,
+            totalBetLabel: APP_FONT_FAMILY,
+            totalBetValue: APP_FONT_FAMILY,
+            totalBetLabelBitmap: BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM,
+            totalBetValueBitmap: BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM,
+            status: APP_FONT_FAMILY,
+            winStatus: APP_FONT_FAMILY,
+            win: APP_FONT_FAMILY,
+            winStatusBitmap: BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM,
+            winBitmap: BITMAP_FONT_ROBOTO_BLACK,
+            jackpotValue: APP_FONT_FAMILY,
+            jackpotLabel: APP_FONT_FAMILY
         },
         backgrounds: {
             bottom: { frame: 'bottom_bg.png', x: 0, y: 1034 },
@@ -424,7 +435,7 @@ export function getUiHudConfig(manifest) {
             start: { base: 'button_start', x: 1616, y: 368, width: 300, height: 300, enableFadeFrames: 12, enableFadeFromAlpha: 0.55 },
             stop: { base: 'button_stop', x: 1616, y: 368, width: 300, height: 300, enableFadeFrames: 12, enableFadeFromAlpha: 0.55 },
             auto: { base: 'button_autoplay', x: 1728, y: 88, width: 162, height: 162, enableFadeFrames: 10, enableFadeFromAlpha: 0.55 },
-            autoStop: { base: 'button_autoX', x: 1728, y: 88, width: 162, height: 162, enableFadeFrames: 10, enableFadeFromAlpha: 0.55, counter: { x: 82, y: 78, fontSize: 54, minFontSize: 26, maxWidth: 118, color: 0xffffff, fontWeight: '700', align: 'center' } },
+            autoStop: { base: 'button_autoX', x: 1728, y: 88, width: 162, height: 162, enableFadeFrames: 10, enableFadeFromAlpha: 0.55, counter: { x: 82, y: 78, fontSize: 54, minFontSize: 26, maxWidth: 118, color: 0xffffff, fontWeight: APP_FONT_WEIGHT_REGULAR, align: 'center' } },
             bet: { base: 'button_bet', x: 1728, y: 820, width: 162, height: 162, enableFadeFrames: 10, enableFadeFromAlpha: 0.55 },
             settings: { base: 'button_settings', x: 30, y: 820, width: 162, height: 162, enableFadeFrames: 10, enableFadeFromAlpha: 0.55 },
             buyBonus: { base: 'bb_yellow', x: 0, y: 430, width: 194, height: 164, enableFadeFrames: 10, enableFadeFromAlpha: 0.55 },

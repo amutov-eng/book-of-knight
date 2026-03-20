@@ -269,7 +269,7 @@
                                                                             "minFontSize":  26,
                                                                             "maxWidth":  118,
                                                                             "color":  16777215,
-                                                                            "fontWeight":  "700",
+                                                                            "fontWeight": "400",
                                                                             "align":  "center"
                                                                         }
                                                         }
@@ -368,17 +368,23 @@
                                                        ]
                                       },
                            "fonts":  {
-                                         "primary":  "Arial",
-                                         "jackpot":  "Arial",
-                                         "creditLabel":  "Arial",
-                                         "creditValue":  "Arial",
-                                         "totalBetLabel":  "Arial",
-                                         "totalBetValue":  "Arial",
-                                         "status":  "Arial",
-                                         "winStatus":  "Arial",
-                                         "win":  "Arial",
-                                         "jackpotValue":  "Arial",
-                                         "jackpotLabel":  "Arial"
+                                         "primary":  "Roboto",
+                                         "jackpot":  "Roboto",
+                                         "creditLabel":  "Roboto",
+                                         "creditValue":  "Roboto",
+                                         "creditLabelBitmap":  "Roboto_Condensed-Medium",
+                                         "creditValueBitmap":  "Roboto_Condensed-Medium",
+                                         "totalBetLabel":  "Roboto",
+                                         "totalBetValue":  "Roboto",
+                                         "totalBetLabelBitmap":  "Roboto_Condensed-Medium",
+                                         "totalBetValueBitmap":  "Roboto_Condensed-Medium",
+                                         "status":  "Roboto",
+                                         "winStatus":  "Roboto",
+                                         "win":  "Roboto",
+                                         "winStatusBitmap":  "Roboto_Condensed-Medium",
+                                         "winBitmap":  "Roboto-Black",
+                                         "jackpotValue":  "Roboto",
+                                         "jackpotLabel":  "Roboto"
                                      },
                            "betMenu":  {
                                            "overlay":  {

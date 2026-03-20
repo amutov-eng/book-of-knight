@@ -1,5 +1,6 @@
 import { Container, Graphics, Rectangle, Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import type BaseGame from '../core/BaseGame';
+import { APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
 
 function toNumber(value: unknown, fallback = 0): number {
   return Number.isFinite(value) ? Number(value) : fallback;
@@ -99,7 +100,7 @@ export default class AutoPlayMenu extends Container {
       fill: toNumber(this.get('title.color'), 0x93a7bf),
       anchorX: 0.5,
       align: 'center',
-      fontWeight: '700'
+      fontWeight: APP_FONT_WEIGHT_REGULAR
     });
 
     this.autoSpinsLabelText = this.createText('', this.getPointX('autoSpinsLabel.x', 1293), this.getPointY('autoSpinsLabel.y', 500), {
@@ -108,7 +109,7 @@ export default class AutoPlayMenu extends Container {
       fill: toNumber(this.get('autoSpinsLabel.color'), 0x93a7bf),
       anchorX: 0.5,
       align: 'center',
-      fontWeight: '700'
+      fontWeight: APP_FONT_WEIGHT_REGULAR
     });
 
     this.infoText = this.createText('', this.getPointX('infoText.x', 1293), this.getPointY('infoText.y', 312), {
@@ -117,7 +118,7 @@ export default class AutoPlayMenu extends Container {
       fill: toNumber(this.get('infoText.color'), 0xb9c5d3),
       anchorX: 0.5,
       align: 'center',
-      fontWeight: '600'
+      fontWeight: APP_FONT_WEIGHT_REGULAR
     });
 
     this.closeButton = this.createPushButton(
@@ -170,7 +171,7 @@ export default class AutoPlayMenu extends Container {
           fontFamily: titleFont,
           fontSize: spinFontSize,
           fill: spinColor,
-          fontWeight: '600',
+          fontWeight: APP_FONT_WEIGHT_REGULAR,
           align: 'center'
         })
       });
@@ -318,7 +319,7 @@ export default class AutoPlayMenu extends Container {
         fontFamily: this.getFontFamily('primary'),
         fontSize: toNumber(this.get(`${configRoot}.fontSize`), 36),
         fill: toNumber(this.get(`${configRoot}.color`), 0xb9c5d3),
-        fontWeight: '600',
+        fontWeight: APP_FONT_WEIGHT_REGULAR,
         align: String(this.get(`${configRoot}.textAlign`) || 'left') as 'left' | 'center' | 'right'
       })
     });
@@ -363,7 +364,7 @@ export default class AutoPlayMenu extends Container {
         fontFamily: styleOptions.fontFamily,
         fontSize: styleOptions.fontSize,
         fill: styleOptions.fill,
-        fontWeight: '700',
+        fontWeight: APP_FONT_WEIGHT_REGULAR,
         align: 'center'
       })
     });

@@ -27,6 +27,7 @@
   "devDependencies": {
     "@types/node": "^24.3.0",
     "cross-env": "^7.0.3",
+    "msdf-bmfont-xml": "^2.8.0",
     "pixi-spine": "4.0.6",
     "pixi.js": "^8.9.2",
     "pixi7": "npm:pixi.js@7.4.3",
@@ -35,5 +36,8 @@
     "vite": "^6.3.5",
     "ws": "^8.18.3"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@fontsource/roboto": "^5.2.10"
+  }
 }

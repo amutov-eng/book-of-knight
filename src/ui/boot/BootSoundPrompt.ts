@@ -11,7 +11,9 @@ import {
 import type BaseGame from '../../core/BaseGame';
 import { SOUND_IDS } from '../../config/soundConfig';
 import { getUiHudConfig } from '../../config/assetsConfig';
+import { APP_FONT_FAMILY, APP_FONT_WEIGHT_REGULAR } from '../../config/fontConfig';
 import { getAssetsManifest } from '../../core/RuntimeContext';
+import { getAssetManager, getTextureCache } from '../../core/RuntimeContext';
 import { getLocalizedText } from '../uiTextFormat';
 
 type PromptSelection = 'yes' | 'no' | 'outside';
@@ -66,10 +68,10 @@ export default class BootSoundPrompt extends Container {
     this.title = new Text({
       text: getLocalizedText(this.game, 'soundTitle', 'PLAY SOUND'),
       style: new TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: APP_FONT_FAMILY,
         fontSize: this.toNumber(this.config.texts?.title?.fontSize, 54),
         fill: 0x93a7bf,
-        fontWeight: '700',
+        fontWeight: APP_FONT_WEIGHT_REGULAR,
         align: 'center'
       })
     });
@@ -185,10 +187,10 @@ export default class BootSoundPrompt extends Container {
     const text = new Text({
       text: label,
       style: new TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: APP_FONT_FAMILY,
         fontSize: 44,
         fill: 0xbee1f5,
-        fontWeight: '700',
+        fontWeight: APP_FONT_WEIGHT_REGULAR,
         align: 'center'
       })
     });
@@ -244,8 +246,13 @@ export default class BootSoundPrompt extends Container {
   }
 
   private getTexture(frameName: string): Texture | null {
+    const manager = getAssetManager();
+    const cachedTexture = manager?.getTexture(frameName) || getTextureCache()[frameName] || null;
+    if (cachedTexture) return cachedTexture;
+
     try {
-      return Texture.from(frameName);
+      const texture = Texture.from(frameName);
+      return texture && texture !== Texture.EMPTY ? texture : null;
     } catch {
       return null;
     }

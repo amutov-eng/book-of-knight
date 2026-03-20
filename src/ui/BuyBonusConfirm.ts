@@ -1,6 +1,7 @@
 import { Assets, Cache, Container, Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import { GameplayEvent } from '../architecture/gameplay/GameplayStateMachine';
 import type BaseGame from '../core/BaseGame';
+import { APP_FONT_FAMILY, APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
 import { formatMoneyByGame, getGameCurrency, getLocalizedText } from './uiTextFormat';
 
 function toNumber(value: unknown, fallback = 0): number {
@@ -52,10 +53,10 @@ export default class BuyBonusConfirm extends Container {
     this.title = new Text({
       text: '',
       style: new TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: APP_FONT_FAMILY,
         fontSize: toNumber(this.config.texts?.title?.fontSize, 54),
         fill: 0xbee1f5,
-        fontWeight: '700',
+        fontWeight: APP_FONT_WEIGHT_REGULAR,
         align: 'center',
         wordWrap: true,
         wordWrapWidth: toNumber(this.config.texts?.title?.wordWrapWidth, 930)
@@ -133,10 +134,10 @@ export default class BuyBonusConfirm extends Container {
     const text = new Text({
       text: value,
       style: new TextStyle({
-        fontFamily: 'Arial',
+        fontFamily: APP_FONT_FAMILY,
         fontSize: 60,
         fill: 0xbee1f5,
-        fontWeight: '700',
+        fontWeight: APP_FONT_WEIGHT_REGULAR,
         align: 'center'
       })
     });

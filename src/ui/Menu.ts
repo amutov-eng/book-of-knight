@@ -1,6 +1,17 @@
 // @ts-nocheck
 import { GameplayEvent } from '../architecture/gameplay/GameplayStateMachine';
 import { getUiHudConfig } from '../config/assetsConfig';
+import {
+    BITMAP_FONT_ROBOTO_BLACK,
+    BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM
+} from '../config/bitmapFontConfig';
+import {
+    APP_FONT_FAMILY,
+    APP_FONT_WEIGHT_BLACK,
+    APP_FONT_WEIGHT_LIGHT,
+    APP_FONT_WEIGHT_MEDIUM,
+    APP_FONT_WEIGHT_REGULAR
+} from '../config/fontConfig';
 import { GAME_RULES } from '../config/gameRules';
 import { getAssetsManifest } from '../core/RuntimeContext';
 import { formatCentsByPattern, getDefaultNumberPattern } from '../utils/numberFormat';
@@ -36,6 +47,18 @@ function hasTextureInCache(textureId) {
     }
 
     return false;
+}
+
+function createBitmapText(text, fontFamily, fontSize, fill, align = 'left') {
+    return new PIXI.BitmapText({
+        text,
+        style: {
+            fontFamily,
+            fontSize,
+            fill,
+            align
+        }
+    });
 }
 
 function getNumberPattern(game) {
@@ -202,8 +225,8 @@ export default class Menu extends PIXI.Container {
     buildTopBar() {
         const topBar = this.hudConfig && this.hudConfig.topBar ? this.hudConfig.topBar : {};
         const fontCfg = this.hudConfig && this.hudConfig.fonts ? this.hudConfig.fonts : {};
-        const jackpotValueFont = String(fontCfg.jackpotValue || fontCfg.jackpot || fontCfg.primary || 'Arial');
-        const jackpotLabelFont = String(fontCfg.jackpotLabel || fontCfg.jackpot || fontCfg.primary || 'Arial');
+        const jackpotValueFont = String(fontCfg.jackpotValue || fontCfg.jackpot || fontCfg.primary || APP_FONT_FAMILY);
+        const jackpotLabelFont = String(fontCfg.jackpotLabel || fontCfg.jackpot || fontCfg.primary || APP_FONT_FAMILY);
         const logoCfg = topBar.logo || {};
         const jackpots = Array.isArray(topBar.jackpots) ? topBar.jackpots : [];
         this.jackpotValueEntries = [];
@@ -233,7 +256,7 @@ export default class Menu extends PIXI.Container {
                 style: new PIXI.TextStyle({
                     fontFamily: jackpotValueFont,
                     fontSize: toNumber(cfg.valueFontSize, 56),
-                    fontWeight: '700',
+                    fontWeight: APP_FONT_WEIGHT_REGULAR,
                     fill: toNumber(cfg.valueColor, 0xffcc00),
                     align: 'center'
                 })
@@ -249,7 +272,7 @@ export default class Menu extends PIXI.Container {
                     style: new PIXI.TextStyle({
                         fontFamily: jackpotLabelFont,
                         fontSize: toNumber(cfg.labelFontSize, 22),
-                        fontWeight: '700',
+                        fontWeight: APP_FONT_WEIGHT_REGULAR,
                         fill: toNumber(cfg.labelColor, 0xffcc00),
                         align: 'center'
                     })
@@ -264,14 +287,16 @@ export default class Menu extends PIXI.Container {
     buildTexts() {
         const textCfg = this.hudConfig && this.hudConfig.texts ? this.hudConfig.texts : {};
         const fontCfg = this.hudConfig && this.hudConfig.fonts ? this.hudConfig.fonts : {};
-        const primaryFont = String(fontCfg.primary || 'Arial');
-        const creditLabelFont = String(fontCfg.creditLabel || primaryFont);
-        const creditValueFont = String(fontCfg.creditValue || primaryFont);
+        const primaryFont = String(fontCfg.primary || APP_FONT_FAMILY);
+        const creditLabelBitmapFont = String(fontCfg.creditLabelBitmap || BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM);
+        const creditValueBitmapFont = String(fontCfg.creditValueBitmap || BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM);
+        const totalBetLabelBitmapFont = String(fontCfg.totalBetLabelBitmap || BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM);
+        const totalBetValueBitmapFont = String(fontCfg.totalBetValueBitmap || BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM);
         const totalBetLabelFont = String(fontCfg.totalBetLabel || primaryFont);
         const totalBetValueFont = String(fontCfg.totalBetValue || primaryFont);
         const statusFont = String(fontCfg.status || primaryFont);
-        const winStatusFont = String(fontCfg.winStatus || primaryFont);
-        const winFont = String(fontCfg.win || primaryFont);
+        const winStatusBitmapFont = String(fontCfg.winStatusBitmap || BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM);
+        const winBitmapFont = String(fontCfg.winBitmap || BITMAP_FONT_ROBOTO_BLACK);
         const creditCfg = textCfg.credit || {};
         const totalBetCfg = textCfg.totalBet || {};
         const statusCfg = textCfg.status || {};
@@ -281,26 +306,10 @@ export default class Menu extends PIXI.Container {
         const white = 0xf3f9f9;
         const yellow = 0xffc600;
 
-        const creditLabelStyle = new PIXI.TextStyle({
-            fontFamily: creditLabelFont,
-            fontSize: toNumber(creditCfg.fontSize, 34),
-            fontWeight: '700',
-            fill: toNumber(creditCfg.labelColor, 0xffc600),
-            align: String(creditCfg.align || 'left')
-        });
-
-        const creditValueStyle = new PIXI.TextStyle({
-            fontFamily: creditValueFont,
-            fontSize: toNumber(creditCfg.fontSize, 34),
-            fontWeight: '700',
-            fill: toNumber(creditCfg.valueColor, white),
-            align: String(creditCfg.align || 'left')
-        });
-
         const totalBetLabelStyle = new PIXI.TextStyle({
             fontFamily: totalBetLabelFont,
             fontSize: toNumber(totalBetCfg.fontSize, 34),
-            fontWeight: '700',
+            fontWeight: APP_FONT_WEIGHT_LIGHT,
             fill: toNumber(totalBetCfg.labelColor, 0xffc600),
             align: String(totalBetCfg.align || 'left')
         });
@@ -308,7 +317,7 @@ export default class Menu extends PIXI.Container {
         const totalBetValueStyle = new PIXI.TextStyle({
             fontFamily: totalBetValueFont,
             fontSize: toNumber(totalBetCfg.fontSize, 34),
-            fontWeight: '700',
+            fontWeight: APP_FONT_WEIGHT_LIGHT,
             fill: toNumber(totalBetCfg.valueColor, white),
             align: String(totalBetCfg.align || 'left')
         });
@@ -316,46 +325,66 @@ export default class Menu extends PIXI.Container {
         const statusStyle = new PIXI.TextStyle({
             fontFamily: statusFont,
             fontSize: toNumber(statusCfg.fontSize, 36),
-            fontWeight: '700',
+            fontWeight: APP_FONT_WEIGHT_REGULAR,
             fill: white,
             align: String(statusCfg.align || 'center')
         });
 
-        const winStatusStyle = new PIXI.TextStyle({
-            fontFamily: winStatusFont,
-            fontSize: toNumber(winStatusCfg.fontSize, 34),
-            fontWeight: '700',
-            fill: white,
-            align: String(winStatusCfg.align || 'center')
-        });
-
-        const winStyle = new PIXI.TextStyle({
-            fontFamily: winFont,
-            fontSize: toNumber(winCfg.fontSize, 36),
-            fontWeight: '800',
-            fill: yellow,
-            align: String(winCfg.align || 'center')
-        });
-
-        this.creditLabelText = new PIXI.Text({ text: '', style: creditLabelStyle });
+        this.creditLabelText = createBitmapText(
+            '',
+            creditLabelBitmapFont,
+            toNumber(creditCfg.fontSize, 34),
+            toNumber(creditCfg.labelColor, 0xffc600),
+            String(creditCfg.align || 'left')
+        );
         this.creditLabelText.position.set(toNumber(creditCfg.x, 220), toNumber(creditCfg.y, 1039));
-        this.creditValueText = new PIXI.Text({ text: '', style: creditValueStyle });
+        this.creditValueText = createBitmapText(
+            '',
+            creditValueBitmapFont,
+            toNumber(creditCfg.fontSize, 34),
+            toNumber(creditCfg.valueColor, white),
+            String(creditCfg.align || 'left')
+        );
         this.creditValueText.position.set(toNumber(creditCfg.x, 220), toNumber(creditCfg.y, 1039));
 
-        this.totalBetLabelText = new PIXI.Text({ text: '', style: totalBetLabelStyle });
+        this.totalBetLabelText = createBitmapText(
+            '',
+            totalBetLabelBitmapFont,
+            toNumber(totalBetCfg.fontSize, 34),
+            toNumber(totalBetCfg.labelColor, 0xffc600),
+            String(totalBetCfg.align || 'left')
+        );
         this.totalBetLabelText.position.set(toNumber(totalBetCfg.x, 1490), toNumber(totalBetCfg.y, 1039));
-        this.totalBetValueText = new PIXI.Text({ text: '', style: totalBetValueStyle });
+        this.totalBetValueText = createBitmapText(
+            '',
+            totalBetValueBitmapFont,
+            toNumber(totalBetCfg.fontSize, 34),
+            toNumber(totalBetCfg.valueColor, white),
+            String(totalBetCfg.align || 'left')
+        );
         this.totalBetValueText.position.set(toNumber(totalBetCfg.x, 1490), toNumber(totalBetCfg.y, 1039));
 
         this.statusText = new PIXI.Text({ text: '', style: statusStyle });
         this.statusText.anchor.set(toNumber(statusCfg.anchorX, 0.5), 0);
         this.statusText.position.set(toNumber(statusCfg.x, VIRTUAL_WIDTH / 2), toNumber(statusCfg.y, 969));
 
-        this.winStatusText = new PIXI.Text({ text: '', style: winStatusStyle });
+        this.winStatusText = createBitmapText(
+            '',
+            winStatusBitmapFont,
+            toNumber(winStatusCfg.fontSize, 34),
+            white,
+            String(winStatusCfg.align || 'center')
+        );
         this.winStatusText.anchor.set(toNumber(winStatusCfg.anchorX, 0.5), 0);
         this.winStatusText.position.set(toNumber(winStatusCfg.x, VIRTUAL_WIDTH / 2), toNumber(winStatusCfg.y, 990));
 
-        this.winText = new PIXI.Text({ text: '', style: winStyle });
+        this.winText = createBitmapText(
+            '',
+            winBitmapFont,
+            toNumber(winCfg.fontSize, 36),
+            yellow,
+            String(winCfg.align || 'center')
+        );
         this.winText.anchor.set(toNumber(winCfg.anchorX, 0.5), 0);
         this.winText.position.set(toNumber(winCfg.x, VIRTUAL_WIDTH / 2), toNumber(winCfg.y, 953));
 
@@ -872,14 +901,14 @@ export default class Menu extends PIXI.Container {
             minFontSize: toNumber(counterCfg.minFontSize, 26),
             maxWidth: toNumber(counterCfg.maxWidth, 118),
             color: toNumber(counterCfg.color, 0xffffff),
-            fontWeight: String(counterCfg.fontWeight || '700'),
+            fontWeight: String(counterCfg.fontWeight || APP_FONT_WEIGHT_REGULAR),
             align: String(counterCfg.align || 'center')
         };
 
         this.autoStopCounterText = new PIXI.Text({
             text: '',
             style: new PIXI.TextStyle({
-                fontFamily: this.hudConfig && this.hudConfig.fonts && this.hudConfig.fonts.primary ? String(this.hudConfig.fonts.primary) : 'Arial',
+                fontFamily: this.hudConfig && this.hudConfig.fonts && this.hudConfig.fonts.primary ? String(this.hudConfig.fonts.primary) : APP_FONT_FAMILY,
                 fontSize: this.autoStopCounterCfg.fontSize,
                 fill: this.autoStopCounterCfg.color,
                 fontWeight: this.autoStopCounterCfg.fontWeight,

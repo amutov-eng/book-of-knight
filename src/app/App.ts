@@ -13,6 +13,8 @@ import { getAppRuntimeConfig, type AppRuntimeConfig } from './runtimeConfig';
 import { debug, warn } from '../core/utils/logger';
 import type { AppRuntimeServices, GameRuntime } from './types';
 import wireGameModules from './wireGameModules';
+import { preloadBitmapFonts } from '../config/bitmapFontConfig';
+import { preloadAppFonts } from '../config/fontConfig';
 
 const URL_LANG_TO_LOCALE: Record<string, string> = {
   ENG: 'en',
@@ -91,6 +93,7 @@ export default class App {
   async init(): Promise<void> {
     this.transition(LifecycleState.PRELOAD);
 
+    await Promise.all([preloadAppFonts(), preloadBitmapFonts()]);
     await createRenderer(this.baseGame);
     await this.initLocalization();
 
