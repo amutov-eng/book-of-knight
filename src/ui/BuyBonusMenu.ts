@@ -2,6 +2,7 @@ import { Assets, Cache, Container, Sprite, Text, TextStyle, Texture } from 'pixi
 import type BaseGame from '../core/BaseGame';
 import { APP_FONT_FAMILY, APP_FONT_WEIGHT_LIGHT, APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
 import { formatMoneyByGame, getGameCurrency, getLocalizedText } from './uiTextFormat';
+import { fitPixiTextToBounds } from './utils/fitText';
 
 type BuyType = 0 | 1;
 
@@ -249,6 +250,13 @@ export default class BuyBonusMenu extends Container {
     this.hawTitle.text = hawTitle;
     this.freePrice.text = `${formatMoneyByGame(freeCost, this.game)}\n${currency}`;
     this.hawPrice.text = `${formatMoneyByGame(hawCost, this.game)}\n${currency}`;
+    this.fitConfiguredText(this.titleText, this.config.texts?.title, 760, 30);
+    this.fitConfiguredText(this.freeTitle, this.config.texts?.freeTitle, 430, 28);
+    this.fitConfiguredText(this.hawTitle, this.config.texts?.hawTitle, 430, 28);
+    this.freeBuyLabel.text = getLocalizedText(this.game, 'buyTxt', 'BUY');
+    this.hawBuyLabel.text = getLocalizedText(this.game, 'buyTxt', 'BUY');
+    this.fitBuyLabel(this.freeBuyLabel);
+    this.fitBuyLabel(this.hawBuyLabel);
 
     if (this.freeBuyButton) {
       this.freeBuyButton.setEnabled(freeEnabled);
@@ -315,7 +323,24 @@ export default class BuyBonusMenu extends Container {
       })
     });
     text.anchor.set(0.5, 0.5);
+    this.fitBuyLabel(text);
     return text;
+  }
+
+  private fitBuyLabel(label: Text): void {
+    fitPixiTextToBounds(label, {
+      maxWidth: toNumber(this.config.texts?.buyButton?.maxWidth, 180),
+      maxHeight: toNumber(this.config.texts?.buyButton?.maxHeight, 0),
+      minFontSize: toNumber(this.config.texts?.buyButton?.minFontSize, 24)
+    });
+  }
+
+  private fitConfiguredText(label: Text, config: any, fallbackMaxWidth: number, fallbackMinFontSize: number): void {
+    fitPixiTextToBounds(label, {
+      maxWidth: toNumber(config?.maxWidth, fallbackMaxWidth),
+      maxHeight: toNumber(config?.maxHeight, 0),
+      minFontSize: toNumber(config?.minFontSize, fallbackMinFontSize)
+    });
   }
 
   private createText(

@@ -5,6 +5,12 @@ interface ServerErrorState {
   message: string;
 }
 
+interface JackpotMultiplierState {
+  GRAND_JACKPOT_VALUE: number;
+  MAJOR_JACKPOT_VALUE: number;
+  MINOR_JACKPOT_VALUE: number;
+}
+
 export default class Context {
   outcome: ReturnType<typeof createGameOutcome>;
 
@@ -66,6 +72,8 @@ export default class Context {
 
   serverError: ServerErrorState;
 
+  jackpotMultipliers: JackpotMultiplierState;
+
   constructor() {
     this.outcome = createGameOutcome();
     this.autoplay = false;
@@ -104,6 +112,12 @@ export default class Context {
     this.serverError = {
       visible: false,
       message: ''
+    };
+
+    this.jackpotMultipliers = {
+      GRAND_JACKPOT_VALUE: 1000,
+      MAJOR_JACKPOT_VALUE: 100,
+      MINOR_JACKPOT_VALUE: 20
     };
   }
 }

@@ -1,6 +1,7 @@
 import { Container, Graphics, Rectangle, Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import type BaseGame from '../core/BaseGame';
 import { APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
+import { fitPixiTextToBounds } from './utils/fitText';
 
 function toNumber(value: unknown, fallback = 0): number {
   return Number.isFinite(value) ? Number(value) : fallback;
@@ -142,7 +143,7 @@ export default class AutoPlayMenu extends Container {
         fontSize: toNumber(this.get('buttons.start.fontSize'), 60),
         fill: toNumber(this.get('buttons.start.color'), 0xbee1f5),
         maxTextWidth: toNumber(this.get('buttons.start.maxTextWidth'), 390),
-        minFontSize: toNumber(this.get('buttons.start.minFontSize'), 20),
+        minFontSize: toNumber(this.get('buttons.start.minFontSize'), 18),
         textOffsetY: toNumber(this.get('buttons.start.textOffsetY'), 0)
       }
     );
@@ -298,11 +299,21 @@ export default class AutoPlayMenu extends Container {
     this.titleText.text = title;
     this.autoSpinsLabelText.text = autoSpinsLabel;
     this.infoText.text = info;
+    this.fitStaticText(this.titleText, 'title', 760, 30);
+    this.fitStaticText(this.autoSpinsLabelText, 'autoSpinsLabel', 880, 26);
 
     if (this.startButton) {
       const startPrefix = getLocalized(this.game, 'autoPlayStart', 'START AUTOPLAY');
       this.startButton.setText(`${startPrefix} (${this.selectedSpinValue})`);
     }
+  }
+
+  private fitStaticText(text: Text, configRoot: string, fallbackMaxWidth: number, fallbackMinFontSize: number): void {
+    fitPixiTextToBounds(text, {
+      maxWidth: toNumber(this.get(`${configRoot}.maxWidth`), fallbackMaxWidth),
+      maxHeight: toNumber(this.get(`${configRoot}.maxHeight`), 0),
+      minFontSize: toNumber(this.get(`${configRoot}.minFontSize`), fallbackMinFontSize)
+    });
   }
 
   private attachToggleLabel(

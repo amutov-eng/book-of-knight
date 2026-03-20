@@ -264,8 +264,8 @@
                                                             "enableFadeFromAlpha":  0.55,
                                                             "counter":  {
                                                                             "x":  82,
-                                                                            "y":  78,
-                                                                            "fontSize":  54,
+                                                                            "y":  91,
+                                                                            "fontSize":  44,
                                                                             "minFontSize":  26,
                                                                             "maxWidth":  118,
                                                                             "color":  16777215,
@@ -324,13 +324,18 @@
                                                                "frame":  "jackpot_gold_act.png",
                                                                "x":  248,
                                                                "y":  6,
-                                                               "valueX":  488,
-                                                               "valueY":  18,
+                                                               "valueX":  497.5,
+                                                               "valueY":  15,
                                                                "valueText":  "1000.00",
-                                                               "labelX":  488,
+                                                               "serverValueKey":  "GRAND_JACKPOT_VALUE",
+                                                               "betMultiplier":  1000,
+                                                               "labelX":  515,
                                                                "labelY":  73,
                                                                "labelText":  "",
-                                                               "valueFontSize":  56,
+                                                               "valueFontSize":  48,
+                                                               "valueMaxWidth":  300,
+                                                               "valueMinFontSize":  28,
+                                                               "valueOffsetY":  1,
                                                                "labelFontSize":  22,
                                                                "valueColor":  16765440,
                                                                "labelColor":  16765440
@@ -339,13 +344,18 @@
                                                                "frame":  "jackpot_silver_act.png",
                                                                "x":  736,
                                                                "y":  6,
-                                                               "valueX":  976,
-                                                               "valueY":  18,
+                                                               "valueX":  977.5,
+                                                               "valueY":  15,
                                                                "valueText":  "10.00",
+                                                               "serverValueKey":  "MAJOR_JACKPOT_VALUE",
+                                                               "betMultiplier":  100,
                                                                "labelX":  976,
                                                                "labelY":  73,
                                                                "labelText":  "",
-                                                               "valueFontSize":  56,
+                                                               "valueFontSize":  48,
+                                                               "valueMaxWidth":  300,
+                                                               "valueMinFontSize":  28,
+                                                               "valueOffsetY":  -8,
                                                                "labelFontSize":  22,
                                                                "valueColor":  12246527,
                                                                "labelColor":  12246527
@@ -354,13 +364,18 @@
                                                                "frame":  "jackpot_bronze_act.png",
                                                                "x":  1224,
                                                                "y":  6,
-                                                               "valueX":  1464,
-                                                               "valueY":  18,
+                                                               "valueX":  1464.5,
+                                                               "valueY":  15,
                                                                "valueText":  "2.00",
+                                                               "serverValueKey":  "MINOR_JACKPOT_VALUE",
+                                                               "betMultiplier":  20,
                                                                "labelX":  1464,
                                                                "labelY":  73,
                                                                "labelText":  "",
-                                                               "valueFontSize":  56,
+                                                               "valueFontSize":  48,
+                                                               "valueMaxWidth":  300,
+                                                               "valueMinFontSize":  28,
+                                                               "valueOffsetY":  -8,
                                                                "labelFontSize":  22,
                                                                "valueColor":  16547151,
                                                                "labelColor":  16547151
@@ -509,13 +524,17 @@
                                                               "x":  1300,
                                                               "y":  96,
                                                               "fontSize":  60,
-                                                              "color":  9676735
+                                                              "color":  9676735,
+                                                              "maxWidth":  760,
+                                                              "minFontSize":  30
                                                           },
                                                 "autoSpinsLabel":  {
                                                                        "x":  1300,
-                                                                       "y":  500,
+                                                                       "y":  700,
                                                                        "fontSize":  54,
-                                                                       "color":  9676735
+                                                                       "color":  9676735,
+                                                                       "maxWidth":  880,
+                                                                       "minFontSize":  26
                                                                    },
                                                 "infoText":  {
                                                                  "x":  1296,
@@ -538,7 +557,7 @@
                                                                               "fontSize":  60,
                                                                               "color":  12509685,
                                                                               "maxTextWidth":  760,
-                                                                              "minFontSize":  26,
+                                                                              "minFontSize":  18,
                                                                               "textOffsetY":  0
                                                                           },
                                                                 "spin":  {
@@ -655,11 +674,17 @@
                                                                                 "y":  285
                                                                             }
                                                              },
-                                                "texts":  {
+                                              "texts":  {
+                                                              "buyButton":  {
+                                                                                "maxWidth":  180,
+                                                                                "minFontSize":  24
+                                                                            },
                                                               "title":  {
                                                                             "x":  960,
                                                                             "y":  40,
-                                                                            "fontSize":  60
+                                                                            "fontSize":  60,
+                                                                            "maxWidth":  760,
+                                                                            "minFontSize":  30
                                                                         },
                                                               "totalBetLabel":  {
                                                                                     "x":  956,
@@ -672,15 +697,19 @@
                                                                                     "fontSize":  46
                                                                                 },
                                                               "freeTitle":  {
-                                                                               "x":  672,
-                                                                               "y":  560,
-                                                                               "fontSize":  54
-                                                                           },
+                                                                                 "x":  672,
+                                                                                 "y":  560,
+                                                                                 "fontSize":  54,
+                                                                                 "maxWidth":  430,
+                                                                                 "minFontSize":  28
+                                                                             },
                                                               "hawTitle":  {
-                                                                              "x":  1241,
-                                                                              "y":  560,
-                                                                              "fontSize":  54
-                                                                          },
+                                                                                "x":  1241,
+                                                                                "y":  560,
+                                                                                "fontSize":  54,
+                                                                                "maxWidth":  430,
+                                                                                "minFontSize":  28
+                                                                            },
                                                               "freePrice":  {
                                                                                "x":  672,
                                                                                "y":  465,

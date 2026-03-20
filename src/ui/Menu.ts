@@ -15,6 +15,7 @@ import {
 import { GAME_RULES } from '../config/gameRules';
 import { getAssetsManifest } from '../core/RuntimeContext';
 import { formatCentsByPattern, getDefaultNumberPattern } from '../utils/numberFormat';
+import { fitPixiTextToBounds } from './utils/fitText';
 import BetMenu from './BetMenu';
 import AutoPlayMenu from './AutoPlayMenu';
 import BuyBonusMenu from './BuyBonusMenu';
@@ -90,6 +91,42 @@ function tryFormatJackpotValue(rawValueText, game) {
 
     const cents = Math.round(amount * 100);
     return formatMoney(cents, game);
+}
+
+function parseJackpotAmount(rawValueText) {
+    const value = String(rawValueText || '').trim();
+    if (!/^[0-9]+([.,][0-9]+)?$/.test(value)) {
+        return null;
+    }
+
+    const normalized = value.replace(',', '.');
+    const amount = Number.parseFloat(normalized);
+    if (!Number.isFinite(amount)) {
+        return null;
+    }
+
+    return Math.round(amount * 100);
+}
+
+function resolveJackpotMultiplier(game, serverValueKey, fallbackMultiplier = 0) {
+    const key = String(serverValueKey || '').trim();
+    const contextMultipliers = game && game.context && game.context.jackpotMultipliers
+        ? game.context.jackpotMultipliers
+        : null;
+
+    if (key && contextMultipliers && Number.isFinite(contextMultipliers[key])) {
+        return Number(contextMultipliers[key]);
+    }
+
+    if (key && typeof window !== 'undefined') {
+        const rawValue = window[key];
+        const parsed = Number(rawValue);
+        if (Number.isFinite(parsed)) {
+            return parsed;
+        }
+    }
+
+    return Number.isFinite(fallbackMultiplier) ? Number(fallbackMultiplier) : 0;
 }
 
 function getLocalized(game, key, fallback) {
@@ -241,10 +278,11 @@ export default class Menu extends PIXI.Container {
             const valueTextRaw = String(cfg.valueText || '');
             const valueText = tryFormatJackpotValue(valueTextRaw, this.game);
             const labelText = String(cfg.labelText || '');
+            let panel = null;
 
             if (frame) {
                 const panelTexture = this.getTexture(frame);
-                const panel = panelTexture ? new PIXI.Sprite(panelTexture) : null;
+                panel = panelTexture ? new PIXI.Sprite(panelTexture) : null;
                 if (panel) {
                     panel.position.set(toNumber(cfg.x, 0), toNumber(cfg.y, 0));
                     this.topJackpotLayer.addChild(panel);
@@ -255,16 +293,41 @@ export default class Menu extends PIXI.Container {
                 text: valueText,
                 style: new PIXI.TextStyle({
                     fontFamily: jackpotValueFont,
-                    fontSize: toNumber(cfg.valueFontSize, 56),
-                    fontWeight: APP_FONT_WEIGHT_REGULAR,
+                    fontSize: toNumber(cfg.valueFontSize, 48),
+                    fontWeight: '700',
                     fill: toNumber(cfg.valueColor, 0xffcc00),
                     align: 'center'
                 })
             });
-            valueLabel.anchor.set(0.5, 0);
-            valueLabel.position.set(toNumber(cfg.valueX, 0), toNumber(cfg.valueY, 0));
+            valueLabel.anchor.set(0.5, 0.5);
+            if (panel) {
+                const valueCenterX = Number.isFinite(cfg.valueCenterX)
+                    ? Number(cfg.valueCenterX)
+                    : toNumber(cfg.labelX, panel.x + panel.width * 0.5);
+                const valueOffsetX = toNumber(cfg.valueOffsetX, 0);
+                const valueOffsetY = toNumber(cfg.valueOffsetY, -8);
+                valueLabel.position.set(
+                    valueCenterX + valueOffsetX,
+                    panel.y + panel.height * 0.5 + valueOffsetY
+                );
+            } else {
+                valueLabel.position.set(toNumber(cfg.valueX, 0), toNumber(cfg.valueY, 0));
+            }
             this.topJackpotLayer.addChild(valueLabel);
-            this.jackpotValueEntries.push({ label: valueLabel, rawValueText: valueTextRaw });
+            this.jackpotValueEntries.push({
+                label: valueLabel,
+                rawValueText: valueTextRaw,
+                betMultiplier: Number.isFinite(cfg.betMultiplier) ? Number(cfg.betMultiplier) : null,
+                serverValueKey: String(cfg.serverValueKey || ''),
+                maxWidth: toNumber(cfg.valueMaxWidth, panel ? Math.max(0, panel.width - 160) : 0),
+                maxHeight: toNumber(cfg.valueMaxHeight, 0),
+                minFontSize: toNumber(cfg.valueMinFontSize, Math.max(18, toNumber(cfg.valueFontSize, 48) - 18))
+            });
+            fitPixiTextToBounds(valueLabel, {
+                maxWidth: toNumber(cfg.valueMaxWidth, panel ? Math.max(0, panel.width - 160) : 0),
+                maxHeight: toNumber(cfg.valueMaxHeight, 0),
+                minFontSize: toNumber(cfg.valueMinFontSize, Math.max(18, toNumber(cfg.valueFontSize, 48) - 18))
+            });
 
             if (labelText.trim().length > 0) {
                 const nameLabel = new PIXI.Text({
@@ -1063,10 +1126,32 @@ export default class Menu extends PIXI.Container {
 
     refreshJackpotValues() {
         if (!Array.isArray(this.jackpotValueEntries) || this.jackpotValueEntries.length === 0) return;
+        const totalBet = this.game && this.game.meters && typeof this.game.meters.getTotalBet === 'function'
+            ? toNumber(this.game.meters.getTotalBet(), 0)
+            : 0;
         for (let i = 0; i < this.jackpotValueEntries.length; i++) {
             const entry = this.jackpotValueEntries[i];
             if (!entry || !entry.label) continue;
-            entry.label.text = tryFormatJackpotValue(entry.rawValueText, this.game);
+            const activeMultiplier = resolveJackpotMultiplier(this.game, entry.serverValueKey, entry.betMultiplier);
+            if (Number.isFinite(activeMultiplier) && activeMultiplier > 0) {
+                entry.label.text = formatMoney(Math.round(totalBet * activeMultiplier), this.game);
+                fitPixiTextToBounds(entry.label, {
+                    maxWidth: toNumber(entry.maxWidth, 0),
+                    maxHeight: toNumber(entry.maxHeight, 0),
+                    minFontSize: toNumber(entry.minFontSize, 18)
+                });
+                continue;
+            }
+
+            const parsedAmount = parseJackpotAmount(entry.rawValueText);
+            entry.label.text = parsedAmount != null
+                ? formatMoney(parsedAmount, this.game)
+                : tryFormatJackpotValue(entry.rawValueText, this.game);
+            fitPixiTextToBounds(entry.label, {
+                maxWidth: toNumber(entry.maxWidth, 0),
+                maxHeight: toNumber(entry.maxHeight, 0),
+                minFontSize: toNumber(entry.minFontSize, 18)
+            });
         }
     }
 

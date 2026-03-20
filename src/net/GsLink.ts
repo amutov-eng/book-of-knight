@@ -51,6 +51,12 @@ type LoginParams = {
   gamePercentBuyHold?: number;
   buyFreeGamesMult?: number;
   buyHoldAndWinMult?: number;
+  GRAND_JACKPOT_VALUE?: number;
+  MAJOR_JACKPOT_VALUE?: number;
+  MINOR_JACKPOT_VALUE?: number;
+  grandJackpotValue?: number;
+  majorJackpotValue?: number;
+  minorJackpotValue?: number;
   pattern?: string;
   sessionUID?: string;
 };
@@ -176,6 +182,29 @@ function toBoolFlag(value: unknown, fallback = false): boolean {
   if (typeof value === 'boolean') return value;
   if (value === 1 || value === '1') return true;
   if (value === 0 || value === '0') return false;
+  return fallback;
+}
+
+function readRuntimeNumericGlobal(name: string, fallback: number): number {
+  if (typeof window === 'undefined') return fallback;
+  const runtimeGlobals = window as unknown as Record<string, unknown>;
+  const rawValue = runtimeGlobals[name];
+  const parsed = Number(rawValue);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function resolveJackpotMultiplierParam(
+  params: Record<string, unknown>,
+  names: string[],
+  fallback: number
+): number {
+  for (let i = 0; i < names.length; i += 1) {
+    const value = Number(params[names[i]]);
+    if (Number.isFinite(value)) {
+      return value;
+    }
+  }
+
   return fallback;
 }
 function normalizeWsAddress(rawValue: string): string {
@@ -385,7 +414,7 @@ export default class GsLink {
   private applyLoginParams(rawParams: unknown): void {
     if (!rawParams || typeof rawParams !== 'object') return;
 
-    const params = rawParams as LoginParams;
+    const params = rawParams as LoginParams & Record<string, unknown>;
 
     const meters = this.game?.meters;
     if (meters) {
@@ -427,6 +456,22 @@ export default class GsLink {
 
       context.buyFreeGamesMult = toInt(params.buyFreeGamesMult, context.buyFreeGamesMult || 0);
       context.buyHoldAndWinMult = toInt(params.buyHoldAndWinMult, context.buyHoldAndWinMult || 0);
+
+      context.jackpotMultipliers.GRAND_JACKPOT_VALUE = resolveJackpotMultiplierParam(
+        params,
+        ['GRAND_JACKPOT_VALUE', 'grandJackpotValue'],
+        readRuntimeNumericGlobal('GRAND_JACKPOT_VALUE', context.jackpotMultipliers.GRAND_JACKPOT_VALUE || 1000)
+      );
+      context.jackpotMultipliers.MAJOR_JACKPOT_VALUE = resolveJackpotMultiplierParam(
+        params,
+        ['MAJOR_JACKPOT_VALUE', 'majorJackpotValue'],
+        readRuntimeNumericGlobal('MAJOR_JACKPOT_VALUE', context.jackpotMultipliers.MAJOR_JACKPOT_VALUE || 100)
+      );
+      context.jackpotMultipliers.MINOR_JACKPOT_VALUE = resolveJackpotMultiplierParam(
+        params,
+        ['MINOR_JACKPOT_VALUE', 'minorJackpotValue'],
+        readRuntimeNumericGlobal('MINOR_JACKPOT_VALUE', context.jackpotMultipliers.MINOR_JACKPOT_VALUE || 20)
+      );
     }
 
     if (typeof params.sessionUID === 'string' && params.sessionUID.trim().length > 0) {
