@@ -73,7 +73,7 @@ export default class WinPresentationSystem {
                 break;
         }
 
-        return Math.max(win.highlightTimeout, Math.ceil(spineAnimationMs / 16.6667));
+        return this.resolveHighlightDelayFrames(win, spineAnimationMs);
     }
 
     /**
@@ -81,7 +81,8 @@ export default class WinPresentationSystem {
      */
     showWinAt(lineIndex) {
         const win = this.game.context.outcome.wins[lineIndex];
-        if (!win) return;
+        if (!win) return 80;
+        let spineAnimationMs = 0;
 
         this.game.reels.unhighlightAll();
         this.game.menu.setStatus('');
@@ -89,17 +90,19 @@ export default class WinPresentationSystem {
         switch (win.type) {
             case WINTYPES.LINE:
             case WINTYPES.SCATTER:
-                this.game.reels.highlightWin(win, false, true);
+                spineAnimationMs = this.game.reels.highlightWin(win, false, true) || 0;
                 this.game.menu.setWinStatus(this.winningLineToText(win));
                 break;
             case WINTYPES.NEAR_MISS:
-                this.game.reels.highlightWin(win, false, true);
+                spineAnimationMs = this.game.reels.highlightWin(win, false, true) || 0;
                 this.game.menu.setStatus('');
                 this.game.menu.setWinStatus('');
                 break;
             default:
                 break;
         }
+
+        return this.resolveHighlightDelayFrames(win, spineAnimationMs);
     }
 
     showAllWinningLines() {
@@ -123,6 +126,11 @@ export default class WinPresentationSystem {
         if (this.game.reels.lineRenderer && this.game.reels.lineRenderer.clear) {
             this.game.reels.lineRenderer.clear();
         }
+    }
+
+    resolveHighlightDelayFrames(win, spineAnimationMs) {
+        const baseFrames = win && Number.isFinite(win.highlightTimeout) ? Number(win.highlightTimeout) : 80;
+        return Math.max(baseFrames, Math.ceil((Number(spineAnimationMs) || 0) / 16.6667));
     }
 }
 

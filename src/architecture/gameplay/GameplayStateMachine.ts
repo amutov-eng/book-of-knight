@@ -52,7 +52,6 @@ type ControllerLike = {
   idleTimerCounter: number;
   lineCounter: number;
   lastReelStopped: number;
-  highlightTimeout: number;
   event: GameplayEventValue;
   forceStopRequested: boolean;
   reelsStoppedTimeout: number;
@@ -62,6 +61,8 @@ type ControllerLike = {
   showWin(): void;
   showAllWinningLines(): void;
   clearAllLines(): void;
+  resetWinPresentationDelay(): void;
+  isWinPresentationReady(): boolean;
   reelStopped(): boolean;
   reelsStopped(): boolean;
   beginWinToCredit(): boolean;
@@ -99,10 +100,6 @@ function clearEvent(controller: ControllerLike): void {
 
 function hasWins(controller: ControllerLike): boolean {
   return !!controller.game.context.outcome.hasWin;
-}
-
-function canAdvanceHighlights(controller: ControllerLike): boolean {
-  return controller.timerCounter > controller.highlightTimeout;
 }
 
 function outcomeWins(controller: ControllerLike): any[] {
@@ -237,6 +234,7 @@ GameplayState.REELS_STOPPED = createState('REELS_STOPPED', {
 GameplayState.SHOW_WINS = createState('SHOW_WINS', {
   entry: (controller) => {
     controller.game.reels.resetLineLayer();
+    controller.resetWinPresentationDelay();
     controller.lineCounter = 0;
     controller.game.context.onscreenWinMeter = 0;
     controller.game.menu.setWin(0);
@@ -259,7 +257,7 @@ GameplayState.SHOW_WINS = createState('SHOW_WINS', {
       return toState(controller, GameplayState.WIN_TO_CREDIT);
     }
 
-    if (!canAdvanceHighlights(controller)) {
+    if (!controller.isWinPresentationReady()) {
       return;
     }
 
@@ -308,6 +306,7 @@ GameplayState.SHOW_ALL_WINNING_LINES = createState('SHOW_ALL_WINNING_LINES', {
 GameplayState.SHOW_LAST_WINS = createState('SHOW_LAST_WINS', {
   entry: (controller) => {
     controller.lineCounter = 0;
+    controller.resetWinPresentationDelay();
     controller.game.menu.enableControls();
     controller.game.reels.resetLineLayer();
   },
@@ -323,7 +322,7 @@ GameplayState.SHOW_LAST_WINS = createState('SHOW_LAST_WINS', {
       return;
     }
 
-    if (!canAdvanceHighlights(controller)) {
+    if (!controller.isWinPresentationReady()) {
       return;
     }
 

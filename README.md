@@ -87,6 +87,11 @@ src/
 - `src/game/Controller.ts`: legacy gameplay coordinator with explicit state-change hooks
 - `src/game/Reels.ts`: reel aggregation, line layer, stop-symbol application
 - `src/core/BaseReel.ts`: reel motion and symbol recycling hot path
+- `src/game/reels/ReelViewportMask.ts`: reel viewport clipping and service-symbol visibility ownership
+- `src/ui/Menu.ts`: HUD/menu coordinator
+- `src/ui/hud/HudTextLayer.ts`: jackpots, meters, status, and win text rendering
+- `src/ui/hud/HudButtonLayer.ts`: HUD button rendering and button-state transitions
+- `src/architecture/gameplay/systems/WinPresentationOrchestrator.ts`: win presentation timing owner
 - `src/net/GsLink.ts`: server protocol mapping and pooled win objects
 
 ## Documentation
@@ -107,3 +112,6 @@ The latest production pass tightened the startup path:
 - asset bootstrap responsibilities live in `src/app/boot/LoadingAssetBootstrap.ts`
 - intro and boot prompt responsibilities live in `src/app/boot/IntroSequenceCoordinator.ts`
 - HUD bitmap font ownership is manifest-driven for the main production text surfaces
+- reel viewport clipping now lives in `src/game/reels/ReelViewportMask.ts` instead of being mixed into `BaseReel.ts`
+- `Menu.ts` now coordinates dedicated HUD text and HUD button modules instead of drawing everything itself
+- `WinPresentationOrchestrator` now owns line-presentation delays instead of relying on generic controller highlight counters

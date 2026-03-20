@@ -23,6 +23,9 @@ Preserve deterministic slot flow. Do not trade correctness for shorter code.
 - Do not put feature-specific timers in render-critical classes when `Timers` can be used.
 - Do not mix old and new flow abstractions in the same file without deleting the redundant path.
 - Keep symbol Spine runtime choice in the manifest, not hardcoded in reel logic.
+- Keep reel viewport/mask ownership in `src/game/reels/ReelViewportMask.ts`, not inside unrelated reel state or UI code.
+- Keep HUD drawing logic in `src/ui/hud/*` and keep `src/ui/Menu.ts` as a coordinator.
+- Keep line-presentation timing in `WinPresentationOrchestrator`, not in generic controller counters.
 
 ## Naming Conventions
 
@@ -46,6 +49,8 @@ Preserve deterministic slot flow. Do not trade correctness for shorter code.
 - Avoid repeated `setTimeout`/`setInterval` in gameplay loops; prefer frame timers.
 - Avoid unnecessary container nesting and child reordering during active spins.
 - Do not trigger expensive texture/filter/mask changes every frame unless required.
+- Treat reel mask rebuilds as expensive. Reuse mask objects and only switch viewport mode when the reel state changes.
+- Avoid scattering win-presentation delay logic across state-machine branches; centralize it in the orchestrator.
 
 ## Symbol Spine Rules
 

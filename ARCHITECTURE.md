@@ -32,16 +32,28 @@ The runtime is split into five practical layers:
   Bridges legacy `Controller` and `GsLink` into explicit lifecycle/events using subscriptions instead of runtime monkey-patching.
 - `src/architecture/gameplay/GameplayStateMachine.ts`
   Spin flow state machine.
+- `src/architecture/gameplay/systems/WinPresentationSystem.ts`
+  Applies a concrete win presentation to reels and HUD, and resolves presentation delay requirements.
+- `src/architecture/gameplay/systems/WinPresentationOrchestrator.ts`
+  Owns line-by-line win timing for `SHOW_WINS` and `SHOW_LAST_WINS`.
 - `src/game/Controller.ts`
   Frame-driven gameplay coordinator. Emits state-change and spin-start hooks.
 - `src/game/Reels.ts`
   Reel aggregate, reel-view/controller registry, line-layer ownership, stop-symbol application.
 - `src/game/reels/ReelSpinScheduler.ts`
   Frame-driven reel auto-stop scheduling built on shared app timers.
+- `src/game/reels/ReelViewportMask.ts`
+  Owns reel viewport masks, clipping rules, and service-symbol visibility outside the 3-row window.
 - `src/core/BaseReel.ts`
-  Render-critical symbol recycling, stop alignment, blur frames, trimming, and highlight plumbing.
+  Render-critical symbol recycling, stop alignment, blur frames, and highlight plumbing.
 - `src/net/GsLink.ts`
   Server outcome normalization, pooled win creation, meter updates, and result publication.
+- `src/ui/Menu.ts`
+  HUD/menu coordinator. Owns modal flow and delegates HUD rendering to child modules.
+- `src/ui/hud/HudTextLayer.ts`
+  Owns jackpots, meter readouts, idle status, and win text surfaces.
+- `src/ui/hud/HudButtonLayer.ts`
+  Owns HUD buttons, autoplay counter label, and button-state transitions.
 
 ## Data Flow
 
@@ -69,7 +81,8 @@ Boot flow before gameplay:
 2. `MainScreen.act()` updates gameplay first, then display actors.
 3. `Reels.act()` updates each reel view.
 4. `BaseReel.act()` advances reel motion, recycles symbols, updates blur/highlight state.
-5. `App` renders the active screen stage exactly once per frame.
+5. `ReelViewportMask` applies the correct viewport mask for spin vs idle/stop states.
+6. `App` renders the active screen stage exactly once per frame.
 
 Critical rule:
 Business logic should not trigger arbitrary render calls or browser timers from inside the reel path.
@@ -119,7 +132,7 @@ Use these for orchestration and debugging. Do not wire new features by monkey-pa
 - New symbol/effect behavior:
   prefer `Reels.ts`, `BaseReel.ts`, or dedicated `game/reels/*` helpers.
 - New HUD controls:
-  add in `ui/Menu.ts` or dedicated child menu components.
+  prefer `ui/hud/*` for HUD surfaces and keep `ui/Menu.ts` as the coordinator.
 - New config-driven timing/layout:
   add a config reader under `src/config/` and consume it from the owning module.
 
@@ -132,3 +145,6 @@ Use these for orchestration and debugging. Do not wire new features by monkey-pa
 - `Controller` owns gameplay-state progression.
 - `GsLink` owns server mapping, not screen rendering.
 - `Reels` owns reel display aggregation, not business decisions.
+- `ReelViewportMask` owns reel clipping and service-symbol hiding, not `BaseReel` state transitions.
+- `Menu` owns modal orchestration, not low-level HUD drawing.
+- `WinPresentationOrchestrator` owns win timing, not generic controller counters.

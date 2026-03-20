@@ -12,6 +12,7 @@
  */
 
 import ReelSymbol from '../game/ReelSymbol'
+import ReelViewportMask from '../game/reels/ReelViewportMask';
 import { getBaseReelConfig } from '../config/reelConfig';
 import { getAssetsManifest, getIsLandscape } from './RuntimeContext';
 
@@ -22,8 +23,6 @@ const State = Object.freeze({
     REEL_SKILL_STOP : 4,
     REEL_BOUNCE : 5
 });
-
-/** @typedef {import('pixi.js').Graphics} PixiGraphics */
 
 export default class Reel extends PIXI.Container {
 
@@ -88,35 +87,15 @@ export default class Reel extends PIXI.Container {
         this.reelWidthPx = width;
         this.reelHeightPx = height;
         this.sortableChildren = true;
-        this.maskHorizontalOverflow = Math.max(120, Math.round(this.symbolWidth * 0.55));
-        this.maskVerticalOverflow = Math.max(36, Math.round(Math.max(0, this.symbolHeight - this.pitch) * 0.5) + 24);
-
-        //this.mask = new Graphics();
-        /** @type {PixiGraphics} */
-        this.reelMaskNormal = new PIXI.Graphics();
-        this.reelMaskNormal
-            .rect(
-                -this.maskHorizontalOverflow,
-                -this.maskVerticalOverflow,
-                width + this.maskHorizontalOverflow * 2,
-                height + this.maskVerticalOverflow * 2
-            )
-            .fill(0xFF0000);
-        this.reelMaskNormal.alpha = 0;
-        this.addChild(this.reelMaskNormal); // debug
-
-        /** @type {PixiGraphics} */
-        this.reelMaskSpin = new PIXI.Graphics();
-        this.reelMaskSpin
-            .rect(
-                -this.maskHorizontalOverflow,
-                -this.trimTopY,
-                width + this.maskHorizontalOverflow * 2,
-                height + this.trimTopY + this.trimBottomY
-            )
-            .fill(0x00ff00);
-        this.reelMaskSpin.alpha = 0;
-        this.addChild(this.reelMaskSpin); // debug
+        this.viewportMask = new ReelViewportMask(this, {
+            width,
+            height,
+            symbolWidth: this.symbolWidth,
+            symbolHeight: this.symbolHeight,
+            pitch: this.pitch,
+            trimTopY: this.trimTopY,
+            trimBottomY: this.trimBottomY
+        });
 
         //this.reelMaskExtended = new Graphics();
         //this.reelMaskExtended.beginFill(0x0033CC);
@@ -135,9 +114,6 @@ export default class Reel extends PIXI.Container {
         this.highlight;
         this.timeElapsed = 0;
         this.lastTimeElapsed = 0;
-        this.currentTrimMask = undefined;
-        this.hiddenTopSymbolIndex = -1;
-        this.hiddenBottomSymbolIndex = -1;
         this.currentBlurFrame = 0;
 
         //
@@ -166,9 +142,7 @@ export default class Reel extends PIXI.Container {
         this.updateSymbolDepths();
 
         // Keep mask renderable for Pixi masking pipeline; alpha=0 keeps it visually hidden.
-        this.reelMaskNormal.visible = true;
-        this.reelMaskSpin.visible = true;
-        this.trim(this.reelMaskNormal);
+        this.applyNormalViewport();
     }
 
     act(delta){
@@ -282,7 +256,7 @@ export default class Reel extends PIXI.Container {
         this.spinSpeedPxPerSec = 0;
         this.motionAccumulatorSec = 0;
         this.reelState = State.REEL_SPIN;
-        this.trim(this.reelMaskSpin);
+        this.applySpinViewport();
         log('BaseReel::act, state change REEL_IDLE > REEL_SPIN', 'debug');
     }
 
@@ -328,7 +302,7 @@ export default class Reel extends PIXI.Container {
             this.alignToGrid();
             this.stopSpinFlag = false;
             this.reelState = State.REEL_BOUNCE;
-            this.trim(this.reelMaskNormal);
+            this.applyNormalViewport();
             this.dampedIndex = 0;
             this.notifyStopped();
             log('BaseReel::act, state change REEL_STOP > REEL_BOUNCE', 'debug');
@@ -342,7 +316,7 @@ export default class Reel extends PIXI.Container {
         this.skillStopSpin = false;
         this.skillStopHelper();
         this.alignToGrid();
-        this.trim(this.reelMaskNormal);
+        this.applyNormalViewport();
         this.reelState = State.REEL_BOUNCE;
         this.dampedIndex = 0;
         this.notifyStopped();
@@ -358,7 +332,7 @@ export default class Reel extends PIXI.Container {
 
         // Ensure all reels end with the base (non-blur) frame.
         this.debounce(0);
-        this.trim(this.reelMaskNormal);
+        this.applyNormalViewport();
         this.reelState = State.REEL_IDLE;
         this.spinSpeedPxPerSec = 0;
         log('BaseReel::act, state change REEL_BOUNCE > REEL_IDLE', 'debug');
@@ -408,35 +382,12 @@ export default class Reel extends PIXI.Container {
         this.updateSymbolDepths();
     }
 
-    /**
-     * Trim symbols outside reel margins
-     * @param {PixiGraphics|null} mask
-     */
-    trim(mask) {
-        if (this.hiddenTopSymbolIndex >= 0) {
-            this.visibleSymbols[this.hiddenTopSymbolIndex].visible = true;
-            this.hiddenTopSymbolIndex = -1;
-        }
+    applyNormalViewport() {
+        this.viewportMask.applyNormal(this.visibleSymbols, this.spriteOffset, this.TOTAL_SYMBOLS);
+    }
 
-        if (this.hiddenBottomSymbolIndex >= 0) {
-            this.visibleSymbols[this.hiddenBottomSymbolIndex].visible = true;
-            this.hiddenBottomSymbolIndex = -1;
-        }
-
-        if (this.currentTrimMask !== mask) {
-            for (let i = 0; i < this.visibleSymbols.length; i++) {
-                this.visibleSymbols[i].mask = null;
-            }
-            this.mask = mask || null;
-            this.currentTrimMask = mask;
-        }
-
-        if(mask == null || mask === this.reelMaskNormal) { // hide service symbols outside the visible 3-row window
-            this.hiddenTopSymbolIndex = (this.spriteOffset + 3) % this.TOTAL_SYMBOLS;
-            this.hiddenBottomSymbolIndex = (this.spriteOffset + 4) % this.TOTAL_SYMBOLS;
-            this.visibleSymbols[this.hiddenTopSymbolIndex].visible = false;
-            this.visibleSymbols[this.hiddenBottomSymbolIndex].visible = false;
-        }
+    applySpinViewport() {
+        this.viewportMask.applySpin(this.visibleSymbols);
     }
 
     debounce(index) {
@@ -484,7 +435,7 @@ export default class Reel extends PIXI.Container {
 
         this.skillStopHelper();
         this.alignToGrid();
-        this.trim(this.reelMaskNormal);
+        this.applyNormalViewport();
         this.debounce(0);
 
         this.frameCnt = 0;

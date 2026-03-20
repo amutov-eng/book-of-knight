@@ -21,6 +21,8 @@
 - Keep stop-symbol application outside the per-frame update loop.
 - Use shared frame timers or deterministic state transitions for stop orchestration.
 - Prefer direct indexed access over repeated array transforms in reel paths.
+- Keep reel viewport masks persistent and only switch between prebuilt masks on reel state changes.
+- Keep oversized-symbol clipping logic outside the motion loop when possible.
 
 ## Object Pooling Rules
 
@@ -36,6 +38,7 @@
 - Clamp long frame gaps before simulation work.
 - Keep per-frame logic branch-light and allocation-free where possible.
 - Update only the actors that actually need updates.
+- Keep win-presentation timing in a dedicated orchestrator so state-machine branches only ask whether the presentation is ready to advance.
 
 ## Anti-Patterns To Avoid
 

@@ -1,6 +1,7 @@
 import { GameplayEvent as Event, GameplayState as State } from '../architecture/gameplay/GameplayStateMachine';
 import SpinSystem from '../architecture/gameplay/systems/SpinSystem';
 import WinPresentationSystem from '../architecture/gameplay/systems/WinPresentationSystem';
+import WinPresentationOrchestrator from '../architecture/gameplay/systems/WinPresentationOrchestrator';
 import MeterTransferSystem from '../architecture/gameplay/systems/MeterTransferSystem';
 import { debug } from '../core/utils/logger';
 import type BaseGame from '../core/BaseGame';
@@ -18,7 +19,6 @@ export default class Controller {
   idleTimerCounter = 0;
   lineCounter = 0;
   lastReelStopped = 0;
-  highlightTimeout = 80;
   event: number = Event.NONE;
   w2cSpeed = 1;
   forceStopRequested = false;
@@ -26,6 +26,7 @@ export default class Controller {
 
   spinSystem: SpinSystem;
   winPresentationSystem: WinPresentationSystem;
+  winPresentationOrchestrator: WinPresentationOrchestrator;
   meterTransferSystem: MeterTransferSystem;
 
   private boundKeyDownHandler: ((event: KeyboardEvent) => void) | null;
@@ -38,6 +39,7 @@ export default class Controller {
 
     this.spinSystem = new SpinSystem(this.game);
     this.winPresentationSystem = new WinPresentationSystem(this.game);
+    this.winPresentationOrchestrator = new WinPresentationOrchestrator();
     this.meterTransferSystem = new MeterTransferSystem(this.game);
 
     this.boundKeyDownHandler = this.handleKeyDownEvent.bind(this);
@@ -80,6 +82,7 @@ export default class Controller {
 
   update(_delta?: number): void {
     this.timerCounter++;
+    this.winPresentationOrchestrator.tick(1);
     this.state.process(this);
   }
 
@@ -92,11 +95,13 @@ export default class Controller {
   }
 
   processWin(): void {
-    this.highlightTimeout = this.winPresentationSystem.processWinAt(this.lineCounter);
+    const delayFrames = this.winPresentationSystem.processWinAt(this.lineCounter);
+    this.winPresentationOrchestrator.startDelay(delayFrames);
   }
 
   showWin(): void {
-    this.winPresentationSystem.showWinAt(this.lineCounter);
+    const delayFrames = this.winPresentationSystem.showWinAt(this.lineCounter);
+    this.winPresentationOrchestrator.startDelay(delayFrames);
   }
 
   showAllWinningLines(): void {
@@ -105,6 +110,14 @@ export default class Controller {
 
   clearAllLines(): void {
     this.winPresentationSystem.clearAllLines();
+  }
+
+  resetWinPresentationDelay(): void {
+    this.winPresentationOrchestrator.reset();
+  }
+
+  isWinPresentationReady(): boolean {
+    return this.winPresentationOrchestrator.isReady();
   }
 
   reelStopped(): boolean {

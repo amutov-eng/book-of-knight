@@ -14,6 +14,7 @@
 - Reel auto-stop scheduling used raw `setTimeout`, outside the shared frame-timer pipeline.
 - Hot-path ownership was spread across `Reels`, `Controller`, and `GsLink` without explicit event contracts.
 - Legacy `BaseReel.ts` remains `ts-nocheck` and still carries old Pixi/global assumptions.
+- Reel clipping, service-symbol hiding, and viewport-mask concerns were mixed directly into `BaseReel.ts`.
 
 ### Maintainability Problems Found
 
@@ -38,6 +39,12 @@
   - `src/app/boot/IntroSequenceCoordinator.ts`
 - Reduced `LoadingScreen` to a startup orchestration shell.
 - Centralized startup manifest planning, prompt preload, intro flow, and symbol-region bootstrap behind narrower modules.
+- Extracted reel viewport mask/clipping ownership into `src/game/reels/ReelViewportMask.ts`.
+- Simplified `BaseReel.ts` so reel FSM transitions switch viewport mode instead of owning mask internals directly.
+- Split `Menu.ts` into a coordinator plus dedicated HUD modules:
+  - `src/ui/hud/HudTextLayer.ts`
+  - `src/ui/hud/HudButtonLayer.ts`
+- Extracted win-presentation delay timing into `src/architecture/gameplay/systems/WinPresentationOrchestrator.ts`.
 
 ## Why It Changed
 
@@ -45,6 +52,9 @@
 - Frame-driven timers are more predictable in slot-game flow than ad-hoc browser timers.
 - Typed event payloads reduce accidental coupling and make debugging easier.
 - Better documentation lowers onboarding cost for junior engineers and coding agents.
+- Narrower reel ownership makes clipping bugs and oversized-symbol issues easier to debug without touching reel motion logic.
+- Narrower HUD ownership makes meter/status/button work safer and easier to extend.
+- Dedicated win timing removes hidden coupling between Spine animation duration and legacy controller counters.
 
 ## Legacy Pieces Still Present
 
@@ -58,9 +68,10 @@
 
 - Strictly type `BaseReel`, `Menu`, and `LocalizationService`.
 - Split `GsLink.ts` into transport, response mapping, and session/config responsibilities.
-- Break `Menu.ts` into smaller HUD/button/panel modules.
+- Continue splitting remaining menu overlay orchestration from `Menu.ts` if UI scope grows further.
 - Move reel stop timings into manifest/config instead of local defaults.
 - Add dedicated feature modules for bonus/free-spins/hold-and-win flow.
+- Replace remaining `BaseReel` state integers with a typed reel state model.
 
 ## Recommended Next Improvements
 
@@ -73,3 +84,5 @@
    - forced stop
    - no-win resolve
    - win presentation to return-to-idle flow
+6. Add reel-viewport regression tests for oversized symbols on top and bottom rows.
+7. Add automated tests for long Spine win clips so line switching waits for animation completion.
