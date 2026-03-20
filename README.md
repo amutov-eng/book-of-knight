@@ -65,6 +65,7 @@ npm run localization:build
 ```text
 src/
   app/            bootstrap, renderer, ticker, module wiring
+    boot/         startup asset bootstrap and intro/prompt flow
   architecture/   lifecycle, gameplay orchestration, reel adapters
   config/         manifest-driven config readers and constants
   core/           base runtime primitives and shared utilities
@@ -78,6 +79,8 @@ src/
 ## Core Modules
 
 - `src/app/App.ts`: app shell, boot sequence, ticker, render loop
+- `src/app/boot/LoadingAssetBootstrap.ts`: manifest planning, startup asset loading, texture registration, symbol-region bootstrap
+- `src/app/boot/IntroSequenceCoordinator.ts`: boot intro, sound prompt, gameplay intro sequencing
 - `src/app/wireGameModules.ts`: composition root for runtime modules
 - `src/architecture/gameplay/GameplayEngine.ts`: bridges controller/gameplay states into lifecycle events
 - `src/architecture/gameplay/GameplayStateMachine.ts`: deterministic spin lifecycle state machine
@@ -95,3 +98,12 @@ src/
 - [PERFORMANCE_GUIDE.md](/home/amutov/projects/book-of-knight/trunk/PERFORMANCE_GUIDE.md)
 
 The legacy `docs/` folder is still useful for deeper background and migration history.
+
+## Current Refactor Focus
+
+The latest production pass tightened the startup path:
+
+- `LoadingScreen` is now an orchestration shell instead of a mixed asset/introduction God object
+- asset bootstrap responsibilities live in `src/app/boot/LoadingAssetBootstrap.ts`
+- intro and boot prompt responsibilities live in `src/app/boot/IntroSequenceCoordinator.ts`
+- HUD bitmap font ownership is manifest-driven for the main production text surfaces

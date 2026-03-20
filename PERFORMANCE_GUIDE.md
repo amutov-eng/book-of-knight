@@ -13,6 +13,7 @@
 - Avoid unnecessary child reordering during active spins.
 - Avoid adding extra nested containers unless they carry a clear visual/layering purpose.
 - Treat masks, alpha changes, filters, and texture swaps as expensive until proven otherwise.
+- Keep startup render calls isolated to boot presentation helpers such as the sound prompt prime step.
 
 ## Reel Rules
 
@@ -27,6 +28,7 @@
 - Reset pooled instances fully before reuse.
 - Cap pool size to realistic production limits.
 - If an effect is short-lived and frequently recreated, it should be a pooling candidate.
+- Startup helpers should cache/reuse prompt and intro surfaces where practical instead of rebuilding them repeatedly in one session.
 
 ## Animation / Update Loop Rules
 

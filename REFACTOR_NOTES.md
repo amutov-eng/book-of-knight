@@ -33,6 +33,11 @@
 - Added `ReelSpinScheduler` to move reel auto-stop scheduling onto shared frame-driven timers.
 - Added typed event payloads for gameplay/lifecycle events.
 - Added requested root-level documentation files.
+- Extracted startup responsibilities out of `LoadingScreen` into:
+  - `src/app/boot/LoadingAssetBootstrap.ts`
+  - `src/app/boot/IntroSequenceCoordinator.ts`
+- Reduced `LoadingScreen` to a startup orchestration shell.
+- Centralized startup manifest planning, prompt preload, intro flow, and symbol-region bootstrap behind narrower modules.
 
 ## Why It Changed
 
@@ -47,6 +52,7 @@
 - Several UI modules remain `ts-nocheck`.
 - The current `Controller` still drives a large part of the gameplay flow directly.
 - Feature hooks for free spins / hold-and-win exist in data but are not yet split into dedicated feature modules.
+- `src/ui/MainScreen.ts` still mixes scene composition and per-frame update ownership and is a good candidate for a future split.
 
 ## Remaining Technical Debt
 
@@ -60,8 +66,9 @@
 
 1. Replace legacy global Pixi usage inside `BaseReel.ts` with typed Pixi imports.
 2. Extract a dedicated `SpinResultPipeline` from `GsLink.ts`.
-3. Add dedicated effect pools for transient win overlays and symbol FX.
-4. Add automated tests for:
+3. Split `MainScreen.ts` into composition plus runtime presenter/update delegates.
+4. Add dedicated effect pools for transient win overlays and symbol FX.
+5. Add automated tests for:
    - failed spin start
    - forced stop
    - no-win resolve

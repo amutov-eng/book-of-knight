@@ -1,28 +1,3 @@
-import '@fontsource/roboto/latin-300.css';
-import '@fontsource/roboto/latin-ext-300.css';
-import '@fontsource/roboto/cyrillic-300.css';
-import '@fontsource/roboto/cyrillic-ext-300.css';
-import '@fontsource/roboto/greek-300.css';
-import '@fontsource/roboto/greek-ext-300.css';
-import '@fontsource/roboto/latin-400.css';
-import '@fontsource/roboto/latin-ext-400.css';
-import '@fontsource/roboto/cyrillic-400.css';
-import '@fontsource/roboto/cyrillic-ext-400.css';
-import '@fontsource/roboto/greek-400.css';
-import '@fontsource/roboto/greek-ext-400.css';
-import '@fontsource/roboto/latin-500.css';
-import '@fontsource/roboto/latin-ext-500.css';
-import '@fontsource/roboto/cyrillic-500.css';
-import '@fontsource/roboto/cyrillic-ext-500.css';
-import '@fontsource/roboto/greek-500.css';
-import '@fontsource/roboto/greek-ext-500.css';
-import '@fontsource/roboto/latin-900.css';
-import '@fontsource/roboto/latin-ext-900.css';
-import '@fontsource/roboto/cyrillic-900.css';
-import '@fontsource/roboto/cyrillic-ext-900.css';
-import '@fontsource/roboto/greek-900.css';
-import '@fontsource/roboto/greek-ext-900.css';
-
 export const APP_FONT_FAMILY = 'Roboto';
 export const APP_FONT_WEIGHT_LIGHT = '300';
 export const APP_FONT_WEIGHT_REGULAR = '400';
@@ -37,9 +12,47 @@ const PRELOAD_WEIGHTS = [
 ] as const;
 const PRELOAD_SAMPLE_TEXT = 'AÀÁČĞŻ БВГДЖЙКЛМНОПРСТУФХЦЧШЩЪЬЮЯ ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ';
 const FONT_PRELOAD_TIMEOUT_MS = 1500;
+const FONT_CSS_LOADERS = [
+  () => import('@fontsource/roboto/latin-300.css'),
+  () => import('@fontsource/roboto/latin-ext-300.css'),
+  () => import('@fontsource/roboto/cyrillic-300.css'),
+  () => import('@fontsource/roboto/cyrillic-ext-300.css'),
+  () => import('@fontsource/roboto/greek-300.css'),
+  () => import('@fontsource/roboto/greek-ext-300.css'),
+  () => import('@fontsource/roboto/latin-400.css'),
+  () => import('@fontsource/roboto/latin-ext-400.css'),
+  () => import('@fontsource/roboto/cyrillic-400.css'),
+  () => import('@fontsource/roboto/cyrillic-ext-400.css'),
+  () => import('@fontsource/roboto/greek-400.css'),
+  () => import('@fontsource/roboto/greek-ext-400.css'),
+  () => import('@fontsource/roboto/latin-500.css'),
+  () => import('@fontsource/roboto/latin-ext-500.css'),
+  () => import('@fontsource/roboto/cyrillic-500.css'),
+  () => import('@fontsource/roboto/cyrillic-ext-500.css'),
+  () => import('@fontsource/roboto/greek-500.css'),
+  () => import('@fontsource/roboto/greek-ext-500.css'),
+  () => import('@fontsource/roboto/latin-900.css'),
+  () => import('@fontsource/roboto/latin-ext-900.css'),
+  () => import('@fontsource/roboto/cyrillic-900.css'),
+  () => import('@fontsource/roboto/cyrillic-ext-900.css'),
+  () => import('@fontsource/roboto/greek-900.css'),
+  () => import('@fontsource/roboto/greek-ext-900.css')
+] as const;
+
+let fontCssReadyPromise: Promise<void> | null = null;
+
+async function ensureRuntimeFontCss(): Promise<void> {
+  if (typeof document === 'undefined') return;
+  if (fontCssReadyPromise) return fontCssReadyPromise;
+
+  fontCssReadyPromise = Promise.all(FONT_CSS_LOADERS.map((loadCss) => loadCss())).then(() => undefined);
+  await fontCssReadyPromise;
+}
 
 export async function preloadAppFonts(): Promise<void> {
   if (typeof document === 'undefined' || !document.fonts) return;
+
+  await ensureRuntimeFontCss();
 
   const preloadTask = Promise.all(
     PRELOAD_WEIGHTS.map((weight) => document.fonts.load(`${weight} 16px "${APP_FONT_FAMILY}"`, PRELOAD_SAMPLE_TEXT))

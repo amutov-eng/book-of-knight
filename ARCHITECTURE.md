@@ -6,6 +6,7 @@ The runtime is split into five practical layers:
 
 1. `app`
    Bootstraps renderer, localization, timers, ticker, and module composition.
+   The `app/boot` slice owns startup asset planning and intro/prompt sequencing.
 2. `architecture`
    Owns lifecycle state, gameplay orchestration, and reel-facing adapters.
 3. `game`
@@ -21,6 +22,10 @@ The runtime is split into five practical layers:
   Owns startup order, frame loop, renderer calls, and top-level lifecycle transitions during boot.
 - `src/app/wireGameModules.ts`
   Composition root. Instantiate new runtime modules here instead of scattering constructors across the app.
+- `src/app/boot/LoadingAssetBootstrap.ts`
+  Boot asset planning and texture bootstrap. Owns manifest load, startup asset lists, texture-cache population, and symbol-region registration.
+- `src/app/boot/IntroSequenceCoordinator.ts`
+  Boot presentation coordinator. Owns boot intro, pre-sound prompt priming, prompt presentation, and gameplay intro playback.
 - `src/architecture/state/LifecycleStateMachine.ts`
   Canonical app/game lifecycle: `boot -> preload -> intro -> idle -> spin -> resolve -> winPresentation -> return -> idle`.
 - `src/architecture/gameplay/GameplayEngine.ts`
@@ -47,6 +52,16 @@ The runtime is split into five practical layers:
 5. `GsLink` receives the server outcome, normalizes it, updates meters/context, pools win objects, and publishes result application.
 6. `GameplayEngine` receives controller and result events, then synchronizes lifecycle state and emits typed runtime events.
 7. `GameplayStateMachine` drives stop, win presentation, win-to-credit, and return-to-idle flow.
+
+Boot flow before gameplay:
+
+1. `App` enters preload and creates `LoadingScreen`.
+2. `LoadingScreen` requests a manifest plan from `LoadingAssetBootstrap`.
+3. `IntroSequenceCoordinator` starts the boot intro in parallel.
+4. Prompt assets and prompt audio are preloaded while the intro is running.
+5. The sound prompt is primed, presented, and resolved.
+6. Main gameplay assets are applied to texture cache and symbol regions.
+7. `MainScreen` becomes active and gameplay intro runs.
 
 ## Rendering Flow
 
@@ -100,6 +115,8 @@ Use these for orchestration and debugging. Do not wire new features by monkey-pa
 ## Current Architectural Boundaries
 
 - `App` owns startup and frame loop.
+- `LoadingAssetBootstrap` owns startup asset registration, not `LoadingScreen`.
+- `IntroSequenceCoordinator` owns intro/prompt presentation, not `LoadingScreen`.
 - `GameplayEngine` owns lifecycle synchronization.
 - `Controller` owns gameplay-state progression.
 - `GsLink` owns server mapping, not screen rendering.

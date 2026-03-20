@@ -16,6 +16,8 @@ If you change those areas carelessly, the game may still render but will behave 
 
 - `src/app/`
   Starts the game.
+- `src/app/boot/`
+  Loads startup assets and runs the intro/prompt sequence.
 - `src/architecture/`
   Controls high-level flow.
 - `src/game/`
@@ -29,6 +31,10 @@ If you change those areas carelessly, the game may still render but will behave 
 
 - `src/app/App.ts`
   Main app loop.
+- `src/app/boot/LoadingAssetBootstrap.ts`
+  Startup asset planner and texture bootstrapper.
+- `src/app/boot/IntroSequenceCoordinator.ts`
+  Startup intro and sound prompt flow.
 - `src/architecture/gameplay/GameplayStateMachine.ts`
   The spin flow rules.
 - `src/game/Controller.ts`
@@ -44,6 +50,7 @@ If you change those areas carelessly, the game may still render but will behave 
 
 - Do not change `Controller.state` directly. Use the existing state machine flow.
 - Do not apply server outcome data inside UI components.
+- Do not add new asset boot logic directly inside `LoadingScreen`. Put it in `src/app/boot/`.
 - Do not call `renderer.render()` from feature code.
 - Do not add raw `setTimeout()` in gameplay or reel flow unless there is no timer service available.
 - Do not create/destroy symbols every spin. Reuse existing reel symbols.
@@ -69,6 +76,7 @@ npm run test:smoke
 3. Check `src/net/GsLink.ts` to see if the outcome was applied.
 4. Check `src/game/Reels.ts` and `src/core/BaseReel.ts` if visuals do not match the result.
 5. Use `?debugOverlay=1` when you need lifecycle visibility.
+6. If the game fails before main screen, inspect `src/app/boot/` first.
 
 ## Critical Areas
 

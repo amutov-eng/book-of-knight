@@ -9,6 +9,7 @@ Preserve deterministic slot flow. Do not trade correctness for shorter code.
 - Inspect before editing. Do not assume the new architecture fully replaced the legacy one.
 - Treat `src/app/wireGameModules.ts` as the composition root.
 - Keep `App` as the only owner of the frame loop and render call.
+- Keep startup asset orchestration inside `src/app/boot/`, not inside random screens or UI components.
 - Keep `GameplayEngine` as the bridge between legacy gameplay flow and lifecycle/events.
 - Keep `GsLink` focused on transport/result mapping, not presentation.
 - Keep `Reels` focused on reel display aggregation, not business-state decisions.
@@ -18,6 +19,7 @@ Preserve deterministic slot flow. Do not trade correctness for shorter code.
 - Do not monkey-patch `Controller` or `GsLink` from random modules.
 - Do not move server outcome application into UI.
 - Do not add network logic to reel classes.
+- Do not mix intro flow, sound prompt flow, and asset cache population inside one screen when a boot helper can own it.
 - Do not put feature-specific timers in render-critical classes when `Timers` can be used.
 - Do not mix old and new flow abstractions in the same file without deleting the redundant path.
 
@@ -47,10 +49,11 @@ Preserve deterministic slot flow. Do not trade correctness for shorter code.
 ## How To Add A Feature Safely
 
 1. Map where the feature belongs: `app`, `architecture`, `game`, `ui`, or `net`.
-2. Add data/config first if the feature is configuration-driven.
-3. Extend the gameplay state machine only if lifecycle changes are required.
-4. Keep new rendering code out of server adapters.
-5. Validate with:
+2. If the feature affects startup or pre-game flow, prefer `src/app/boot/`.
+3. Add data/config first if the feature is configuration-driven.
+4. Extend the gameplay state machine only if lifecycle changes are required.
+5. Keep new rendering code out of server adapters.
+6. Validate with:
 
 ```bash
 npm run typecheck
@@ -64,5 +67,6 @@ npm run test:smoke
 - `src/net/GsLink.ts`
 - `src/architecture/gameplay/GameplayStateMachine.ts`
 - `src/ui/Menu.ts`
+- `src/ui/screens/LoadingScreen.ts`
 
 Changes there require extra care and a full spin-cycle sanity check.
