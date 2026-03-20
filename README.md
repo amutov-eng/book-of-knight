@@ -96,13 +96,16 @@ src/
 
 ## Documentation
 
-- [ARCHITECTURE.md](/home/amutov/projects/book-of-knight/trunk/ARCHITECTURE.md)
-- [JUNIOR_GUIDE.md](/home/amutov/projects/book-of-knight/trunk/JUNIOR_GUIDE.md)
-- [AI_AGENT_GUIDE.md](/home/amutov/projects/book-of-knight/trunk/AI_AGENT_GUIDE.md)
-- [REFACTOR_NOTES.md](/home/amutov/projects/book-of-knight/trunk/REFACTOR_NOTES.md)
-- [PERFORMANCE_GUIDE.md](/home/amutov/projects/book-of-knight/trunk/PERFORMANCE_GUIDE.md)
+- [docs/START_HERE.md](/home/amutov/projects/book-of-knight/trunk/docs/START_HERE.md)
+- [docs/ARCHITECTURE.md](/home/amutov/projects/book-of-knight/trunk/docs/ARCHITECTURE.md)
+- [docs/ARCHITECTURE_RUNTIME.md](/home/amutov/projects/book-of-knight/trunk/docs/ARCHITECTURE_RUNTIME.md)
+- [docs/JUNIOR_GUIDE.md](/home/amutov/projects/book-of-knight/trunk/docs/JUNIOR_GUIDE.md)
+- [docs/AI_AGENT_GUIDE.md](/home/amutov/projects/book-of-knight/trunk/docs/AI_AGENT_GUIDE.md)
+- [docs/PERFORMANCE_GUIDE.md](/home/amutov/projects/book-of-knight/trunk/docs/PERFORMANCE_GUIDE.md)
+- [docs/THIRD_PARTY_DEPENDENCIES.md](/home/amutov/projects/book-of-knight/trunk/docs/THIRD_PARTY_DEPENDENCIES.md)
+- [docs/REFACTOR_NOTES.md](/home/amutov/projects/book-of-knight/trunk/docs/REFACTOR_NOTES.md)
 
-The legacy `docs/` folder is still useful for deeper background and migration history.
+The `docs/` folder is the canonical place for project-wide guides, background, and migration history.
 
 ## Current Refactor Focus
 
