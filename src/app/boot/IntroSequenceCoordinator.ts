@@ -14,6 +14,10 @@ type IntroPlayer = {
 
 type LoadingGame = BaseGame & Record<string, any>;
 
+/**
+ * Coordinates the optional startup presentation flow around loading:
+ * boot intro, sound prompt, and gameplay intro cleanup.
+ */
 export default class IntroSequenceCoordinator {
   private readonly game: LoadingGame;
   private bootIntroPlayer: IntroPlayer | null = null;
@@ -24,6 +28,9 @@ export default class IntroSequenceCoordinator {
     this.game = game;
   }
 
+  /**
+   * Starts the boot intro animation but leaves waiting/cleanup to the caller.
+   */
   async startBootIntro(config: SpineIntroConfig): Promise<void> {
     try {
       this.bootIntroPlayer = createBootIntroPlayer(config);
@@ -34,6 +41,9 @@ export default class IntroSequenceCoordinator {
     }
   }
 
+  /**
+   * Waits for the currently running boot intro, if one was created successfully.
+   */
   async waitForBootIntro(): Promise<void> {
     if (!this.bootIntroPlayer?.waitForCompletion) return;
 
@@ -44,12 +54,18 @@ export default class IntroSequenceCoordinator {
     }
   }
 
+  /**
+   * Destroys the boot intro player once the prompt or loading flow is ready to continue.
+   */
   async destroyBootIntro(): Promise<void> {
     if (!this.bootIntroPlayer?.destroy) return;
     await this.bootIntroPlayer.destroy();
     this.bootIntroPlayer = null;
   }
 
+  /**
+   * Creates the sound prompt off the main boot path so its assets can be shown immediately.
+   */
   async primeBootSoundPrompt(stage: Container): Promise<void> {
     if (this.bootSoundPrompt) return;
 
@@ -63,6 +79,9 @@ export default class IntroSequenceCoordinator {
     }
   }
 
+  /**
+   * Presents the boot sound prompt and resolves with the user's decision.
+   */
   async presentBootSoundPrompt(stage: Container): Promise<boolean> {
     if (!this.bootSoundPrompt) {
       this.bootSoundPrompt = new BootSoundPrompt(this.game);
@@ -72,6 +91,9 @@ export default class IntroSequenceCoordinator {
     return this.bootSoundPrompt.present();
   }
 
+  /**
+   * Plays the optional post-load intro and always restores Pixi globals afterwards.
+   */
   async playGameplayIntro(config: SpineIntroConfig): Promise<void> {
     try {
       this.gameplayIntroPlayer = createBootIntroPlayer(config);
@@ -90,6 +112,9 @@ export default class IntroSequenceCoordinator {
     }
   }
 
+  /**
+   * Best-effort cleanup used when `LoadingScreen` is replaced or hidden mid-flow.
+   */
   async destroyAll(stage: Container): Promise<void> {
     if (this.bootSoundPrompt) {
       stage.removeChild(this.bootSoundPrompt);

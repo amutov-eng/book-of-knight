@@ -21,3 +21,9 @@ Runtime spin orchestration lives here.
 - `REELS_SPINNING` / `REELS_STOPPING`: `START` force-stops reels.
 - `SHOW_WINS`: `START` skips single-line enumeration and enters `SHOW_ALL_WINNING_LINES`.
 - `SHOW_ALL_WINNING_LINES`: lines are temporarily rendered above symbols, then the normal layer order is restored on exit.
+
+## Ownership Split
+
+- `GameplayStateMachine.ts` owns controller-facing state nodes and timing guards.
+- `GameplayEngine.ts` mirrors controller state changes onto lifecycle/debug events for the app shell.
+- `systems/` contains focused helpers for spin start, win presentation, and meter transfer.

@@ -1,6 +1,9 @@
 import { GAME_RULES } from '../../config/gameRules';
 import { getGameplayConfig } from '../../config/gameplayConfig';
 
+/**
+ * Fallback spin timeout used when the manifest does not provide an override.
+ */
 function spinTimeout(): number {
   return getGameplayConfig().spinTimeout || GAME_RULES.SPIN_TIMEOUT;
 }
@@ -33,6 +36,9 @@ function showLastWinsLoopDelay(): number {
   return getGameplayConfig().showLastWinsLoopDelay;
 }
 
+/**
+ * Controller events consumed by the legacy gameplay state machine.
+ */
 export const GameplayEvent = {
   NONE: 0,
   START: 1,
@@ -110,6 +116,11 @@ function toState(controller: ControllerLike, nextState: GameplayStateNode): void
   controller.setNextState(nextState);
 }
 
+/**
+ * Registry of controller-facing gameplay states.
+ *
+ * Each node owns entry/process/leave hooks and reads timing from `gameplayConfig`.
+ */
 export const GameplayState = {} as Record<string, GameplayStateNode>;
 
 GameplayState.IDLE = createState('IDLE', {

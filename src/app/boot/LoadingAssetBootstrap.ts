@@ -42,6 +42,12 @@ export type ManifestLoadResult = {
   validationErrors: string[];
 };
 
+/**
+ * Owns startup-only asset work required before `MainScreen` can take over.
+ *
+ * This class resolves the manifest, preloads startup assets, warms sound bundles,
+ * and populates the runtime texture/symbol caches consumed by the legacy game modules.
+ */
 export default class LoadingAssetBootstrap {
   private readonly game: LoadingGame;
   private readonly variant: string;
@@ -54,6 +60,9 @@ export default class LoadingAssetBootstrap {
     setAssetManager(this.assetManager);
   }
 
+  /**
+   * Loads the active assets manifest and derives the startup asset list from it.
+   */
   async loadManifestPlan(): Promise<ManifestLoadResult> {
     const manifest = await loadAssetsManifest(this.variant as any);
 
@@ -64,6 +73,9 @@ export default class LoadingAssetBootstrap {
     };
   }
 
+  /**
+   * Loads startup assets and eagerly preloads manifest-driven symbol spine clips.
+   */
   async loadAssets(
     assetPaths: string[],
     onProgress?: (progress: number, assetPath: string) => void,
@@ -74,15 +86,24 @@ export default class LoadingAssetBootstrap {
     return resources;
   }
 
+  /**
+   * Loads the minimal atlas set needed by the boot sound prompt UI.
+   */
   async preloadPromptAssets(): Promise<Record<string, AssetResource>> {
     return this.loadAssets(['assets/ui/menu_buttons-0.json']);
   }
 
+  /**
+   * Preloads only the sounds that may play before the main game screen appears.
+   */
   async preloadPromptSounds(): Promise<void> {
     if (!this.game.soundSystem) return;
     await this.game.soundSystem.preload([SOUND_IDS.SPIN_BACKGROUND, SOUND_IDS.KNOCK]);
   }
 
+  /**
+   * Preloads the main gameplay sound bundle while boot UI continues in parallel.
+   */
   async preloadGameplaySounds(): Promise<void> {
     if (!this.game.soundSystem) return;
     await this.game.soundSystem.preload([
@@ -99,6 +120,11 @@ export default class LoadingAssetBootstrap {
     ]);
   }
 
+  /**
+   * Registers loaded textures and rebuilds symbol metadata required by reels/wins.
+   *
+   * Returns `false` when the manifest is incomplete for the currently configured strips.
+   */
   applyLoadedResources(manifest: unknown, resources: Record<string, AssetResource>): boolean {
     setAssetsManifest(manifest);
     const textureCache = getTextureCache() as Record<string, PixiTexture>;
@@ -187,6 +213,12 @@ export default class LoadingAssetBootstrap {
     return true;
   }
 
+  /**
+   * Preloads optional symbol-specific Spine assets declared in the manifest.
+   *
+   * The runtime prefers delegating this to `symbolSpineOverlay` when available so the
+   * active overlay implementation can own resource format details.
+   */
   private async preloadSymbolSpineAssets(manifest: unknown): Promise<void> {
     if (this.game.symbolSpineOverlay && typeof this.game.symbolSpineOverlay.preloadFromManifest === 'function') {
       await this.game.symbolSpineOverlay.preloadFromManifest(manifest);

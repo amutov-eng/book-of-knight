@@ -21,6 +21,12 @@ const STATE_TO_LIFECYCLE = new Map<string, string>([
   [GameplayState.WIN_TO_CREDIT.title, LifecycleState.RETURN]
 ]);
 
+/**
+ * Bridges legacy controller/gameplay events into the newer app lifecycle and event bus.
+ *
+ * The engine does not own gameplay rules. It wires existing modules together so the app
+ * shell can observe spin progress, lifecycle changes, and resolved outcomes consistently.
+ */
 export default class GameplayEngine {
   private game: BaseGame;
   private bus: EventBus;
@@ -38,18 +44,30 @@ export default class GameplayEngine {
     this.bus = bus;
   }
 
+  /**
+   * Injects the legacy controller whose state changes should drive lifecycle updates.
+   */
   attachController(controller: Controller): void {
     this.controller = controller;
   }
 
+  /**
+   * Injects the transport layer used to observe when spin results are applied.
+   */
   attachGsLink(gsLink: GsLink): void {
     this.gsLink = gsLink;
   }
 
+  /**
+   * Injects the app-shell lifecycle state machine mirrored from gameplay state changes.
+   */
   attachFlow(flow: LifecycleStateMachine): void {
     this.flow = flow;
   }
 
+  /**
+   * Subscribes once to controller and server events after all dependencies are attached.
+   */
   wire(): void {
     if (this.isWired || !this.controller || !this.gsLink) return;
     this.isWired = true;
@@ -59,17 +77,26 @@ export default class GameplayEngine {
     this.bindSpinResult();
   }
 
+  /**
+   * Ticks the legacy controller from the app-level frame loop.
+   */
   update(delta: number): void {
     if (!this.controller) return;
     this.controller.update(delta);
   }
 
+  /**
+   * Requests a spin through the legacy controller event interface.
+   */
   requestSpin(): boolean {
     if (!this.controller) return false;
     this.controller.event = GameplayEvent.START;
     return true;
   }
 
+  /**
+   * Returns the controller state name for debug overlays and diagnostics.
+   */
   getStateTitle(): string {
     if (!this.controller || !this.controller.state) return 'UNKNOWN';
     return this.controller.state.title;

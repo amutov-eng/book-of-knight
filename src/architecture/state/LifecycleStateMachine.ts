@@ -1,3 +1,6 @@
+/**
+ * Coarse app-shell runtime phases used by boot, gameplay orchestration, and debug tooling.
+ */
 export const LifecycleState = {
   BOOT: 'boot',
   PRELOAD: 'preload',
@@ -24,6 +27,9 @@ const TRANSITIONS: Record<LifecycleStateValue, LifecycleStateValue[]> = {
   [LifecycleState.RETURN]: [LifecycleState.IDLE]
 };
 
+/**
+ * Guards legal transitions between coarse runtime phases.
+ */
 export default class LifecycleStateMachine {
   state: LifecycleStateValue = LifecycleState.BOOT;
 

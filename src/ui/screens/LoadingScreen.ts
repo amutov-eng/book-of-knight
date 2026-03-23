@@ -1,7 +1,4 @@
 // @ts-nocheck
-/**
- * Created by Dimitar on 2/17/2017.
- */
 import BaseScreen from "../../core/BaseScreen";
 import MainScreen from "../MainScreen";
 import { getIntroConfig } from '../../config/assetsConfig';
@@ -12,6 +9,10 @@ import { BOOT_INTRO_CONFIG, GAMEPLAY_INTRO_CONFIG } from '../../config/introConf
 import { restorePixiGlobals } from '../../core/globals';
 /** @typedef {import('../../core/BaseGame').default} BaseGame */
 
+/**
+ * Boot-time screen that keeps legacy loading behavior but delegates startup work
+ * into focused helpers for assets and intro/prompt coordination.
+ */
 export default class LoadingScreen extends BaseScreen {
 
     /**
@@ -28,6 +29,9 @@ export default class LoadingScreen extends BaseScreen {
         this.loadWithAssets();
     }
 
+    /**
+     * Legacy progress logger hook kept for compatibility with existing boot diagnostics.
+     */
     loadProgressHandler(loader, resource) {
         log('loading ' + loader.progress,'debug');
     }
@@ -38,6 +42,10 @@ export default class LoadingScreen extends BaseScreen {
         }, this.assetsManifest);
     }
 
+    /**
+     * Main startup sequence:
+     * manifest planning, boot intro, prompt preload, full asset load, then gameplay intro.
+     */
     async loadWithAssets() {
         const manifestPlanPromise = this.assetBootstrap.loadManifestPlan();
 
@@ -68,6 +76,9 @@ export default class LoadingScreen extends BaseScreen {
         await this.introFlow.playGameplayIntro(this.resolveGameplayIntroConfig());
     }
 
+    /**
+     * Applies the loaded manifest resources and hands control over to `MainScreen`.
+     */
     setup(loader) {
         const resources = loader.resources || {};
         if (!this.assetBootstrap.applyLoadedResources(this.assetsManifest, resources)) return;
@@ -80,12 +91,18 @@ export default class LoadingScreen extends BaseScreen {
         await this.introFlow.destroyAll(this.stage);
     }
 
+    /**
+     * Waits one RAF tick so prompt rendering happens after boot intro cleanup.
+     */
     waitForNextFrame() {
         return new Promise((resolve) => {
             window.requestAnimationFrame(() => resolve(undefined));
         });
     }
 
+    /**
+     * Merges manifest-provided boot intro overrides with static defaults.
+     */
     resolveBootIntroConfig() {
         const intro = getIntroConfig(this.assetsManifest);
         return {
@@ -99,6 +116,9 @@ export default class LoadingScreen extends BaseScreen {
         };
     }
 
+    /**
+     * Merges manifest/localization-driven gameplay intro overrides with static defaults.
+     */
     resolveGameplayIntroConfig() {
         const intro = getIntroConfig(this.assetsManifest);
         const skipPromptText = this.game && this.game.localization && typeof this.game.localization.t === 'function'

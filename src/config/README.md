@@ -18,8 +18,9 @@ Centralized runtime configuration readers and static defaults.
 ## Runtime Knobs
 
 - App shell URL params live in `src/app/runtimeConfig.ts`.
-  Current flag: `?debugOverlay=1`
+  Current flags: `?debugOverlay=1`, `?lang=ENG|BG|ESP|...`
 - Shared gameplay timing lives in `assets/common/assets-manifest.common.json`.
 - Variant-only layout and visual tuning stays in `assets/<variant>/assets-manifest.<variant>.json`.
+- Build-time variant selection comes from `VITE_VARIANT=desktop|mobile` with the legacy `__VARIANT__` global as fallback.
 
 Prefer adding new knobs to manifests or config helpers before introducing inline constants elsewhere.
