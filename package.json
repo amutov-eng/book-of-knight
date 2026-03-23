@@ -13,6 +13,7 @@
     "prebuild:mobile": "node scripts/prepare-assets.mjs mobile",
     "build:mobile": "cross-env VARIANT=mobile VITE_VARIANT=mobile vite build --mode production",
     "mock:server": "node --watch scripts/mock-server.js",
+    "fonts:generate": "node scripts/generate-msdf-fonts.mjs",
     "localization:build": "node scripts/convert-lang-xml.js",
     "test:config": "tsx tests/assetsConfig.test.mjs",
     "test:near-miss": "tsx tests/nearMissRules.regression.test.mjs",

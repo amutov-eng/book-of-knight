@@ -148,9 +148,31 @@ Fallback конфигурация:
 
 1. Качваш новите `.ttf` файлове в `assets/common/fonts/`
 2. Генерираш нови `.fnt` + `.png` MSDF atlas-и в `assets/common/fonts/bitmap/`
-3. Добавяш новия font в `src/config/bitmapFontConfig.ts`
-4. Сменяш името му в manifest-а
-5. Ако трябва, коригираш `fontSize` и `x/y` в manifest-а
+3. Най-лесният начин е:
+
+```bash
+npm run fonts:generate
+```
+
+Текущите параметри за генерация са:
+
+- `fontSize: 72`
+- `textureSize: 2048x1024`
+- `distanceRange: 6`
+- `padding: 2`
+- `border: 2`
+
+Скриптът е:
+
+- `scripts/generate-msdf-fonts.mjs`
+
+и ползва charset файла:
+
+- `assets/common/fonts/bitmap/charset.txt`
+
+4. Добавяш новия font в `src/config/bitmapFontConfig.ts`
+5. Сменяш името му в manifest-а
+6. Ако трябва, коригираш `fontSize` и `x/y` в manifest-а
 
 ## 10. Важно за desktop/mobile
 

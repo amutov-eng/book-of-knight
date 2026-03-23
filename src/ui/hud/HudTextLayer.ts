@@ -18,8 +18,12 @@ function toNumber(value, fallback = 0) {
     return Number.isFinite(value) ? value : fallback;
 }
 
+function snapPixel(value) {
+    return Math.round(toNumber(value, 0));
+}
+
 function createBitmapText(text, fontFamily, fontSize, fill, align = 'left') {
-    return new PIXI.BitmapText({
+    const bitmapText = new PIXI.BitmapText({
         text,
         style: {
             fontFamily,
@@ -28,6 +32,8 @@ function createBitmapText(text, fontFamily, fontSize, fill, align = 'left') {
             align
         }
     });
+    bitmapText.roundPixels = true;
+    return bitmapText;
 }
 
 function getNumberPattern(game) {
@@ -174,7 +180,7 @@ export default class HudTextLayer extends PIXI.Container {
                 const panelTexture = this.getTexture(frame);
                 panel = panelTexture ? new PIXI.Sprite(panelTexture) : null;
                 if (panel) {
-                    panel.position.set(toNumber(cfg.x, 0), toNumber(cfg.y, 0));
+                    panel.position.set(snapPixel(cfg.x), snapPixel(cfg.y));
                     this.topJackpotLayer.addChild(panel);
                 }
             }
@@ -197,11 +203,11 @@ export default class HudTextLayer extends PIXI.Container {
                 const valueOffsetX = toNumber(cfg.valueOffsetX, 0);
                 const valueOffsetY = toNumber(cfg.valueOffsetY, -8);
                 valueLabel.position.set(
-                    valueCenterX + valueOffsetX,
-                    panel.y + panel.height * 0.5 + valueOffsetY
+                    snapPixel(valueCenterX + valueOffsetX),
+                    snapPixel(panel.y + panel.height * 0.5 + valueOffsetY)
                 );
             } else {
-                valueLabel.position.set(toNumber(cfg.valueX, 0), toNumber(cfg.valueY, 0));
+                valueLabel.position.set(snapPixel(cfg.valueX), snapPixel(cfg.valueY));
             }
             this.topJackpotLayer.addChild(valueLabel);
             this.jackpotValueEntries.push({
@@ -231,7 +237,8 @@ export default class HudTextLayer extends PIXI.Container {
                     })
                 });
                 nameLabel.anchor.set(0.5, 0);
-                nameLabel.position.set(toNumber(cfg.labelX, 0), toNumber(cfg.labelY, 0));
+                nameLabel.roundPixels = true;
+                nameLabel.position.set(snapPixel(cfg.labelX), snapPixel(cfg.labelY));
                 this.topJackpotLayer.addChild(nameLabel);
             }
         }
@@ -268,26 +275,27 @@ export default class HudTextLayer extends PIXI.Container {
         });
 
         this.creditLabelText = createBitmapText('', creditLabelBitmapFont, toNumber(creditCfg.fontSize, 34), toNumber(creditCfg.labelColor, 0xffc600), String(creditCfg.align || 'left'));
-        this.creditLabelText.position.set(toNumber(creditCfg.x, 220), toNumber(creditCfg.y, 1039));
+        this.creditLabelText.position.set(snapPixel(toNumber(creditCfg.x, 220)), snapPixel(toNumber(creditCfg.y, 1039)));
         this.creditValueText = createBitmapText('', creditValueBitmapFont, toNumber(creditCfg.fontSize, 34), toNumber(creditCfg.valueColor, white), String(creditCfg.align || 'left'));
-        this.creditValueText.position.set(toNumber(creditCfg.x, 220), toNumber(creditCfg.y, 1039));
+        this.creditValueText.position.set(snapPixel(toNumber(creditCfg.x, 220)), snapPixel(toNumber(creditCfg.y, 1039)));
 
         this.totalBetLabelText = createBitmapText('', totalBetLabelBitmapFont, toNumber(totalBetCfg.fontSize, 34), toNumber(totalBetCfg.labelColor, 0xffc600), String(totalBetCfg.align || 'left'));
-        this.totalBetLabelText.position.set(toNumber(totalBetCfg.x, 1490), toNumber(totalBetCfg.y, 1039));
+        this.totalBetLabelText.position.set(snapPixel(toNumber(totalBetCfg.x, 1490)), snapPixel(toNumber(totalBetCfg.y, 1039)));
         this.totalBetValueText = createBitmapText('', totalBetValueBitmapFont, toNumber(totalBetCfg.fontSize, 34), toNumber(totalBetCfg.valueColor, white), String(totalBetCfg.align || 'left'));
-        this.totalBetValueText.position.set(toNumber(totalBetCfg.x, 1490), toNumber(totalBetCfg.y, 1039));
+        this.totalBetValueText.position.set(snapPixel(toNumber(totalBetCfg.x, 1490)), snapPixel(toNumber(totalBetCfg.y, 1039)));
 
         this.statusText = new PIXI.Text({ text: '', style: statusStyle });
+        this.statusText.roundPixels = true;
         this.statusText.anchor.set(toNumber(statusCfg.anchorX, 0.5), 0);
-        this.statusText.position.set(toNumber(statusCfg.x, VIRTUAL_WIDTH / 2), toNumber(statusCfg.y, 969));
+        this.statusText.position.set(snapPixel(toNumber(statusCfg.x, VIRTUAL_WIDTH / 2)), snapPixel(toNumber(statusCfg.y, 969)));
 
         this.winStatusText = createBitmapText('', winStatusBitmapFont, toNumber(winStatusCfg.fontSize, 34), white, String(winStatusCfg.align || 'center'));
         this.winStatusText.anchor.set(toNumber(winStatusCfg.anchorX, 0.5), 0);
-        this.winStatusText.position.set(toNumber(winStatusCfg.x, VIRTUAL_WIDTH / 2), toNumber(winStatusCfg.y, 990));
+        this.winStatusText.position.set(snapPixel(toNumber(winStatusCfg.x, VIRTUAL_WIDTH / 2)), snapPixel(toNumber(winStatusCfg.y, 990)));
 
         this.winText = createBitmapText('', winBitmapFont, toNumber(winCfg.fontSize, 36), yellow, String(winCfg.align || 'center'));
         this.winText.anchor.set(toNumber(winCfg.anchorX, 0.5), 0);
-        this.winText.position.set(toNumber(winCfg.x, VIRTUAL_WIDTH / 2), toNumber(winCfg.y, 953));
+        this.winText.position.set(snapPixel(toNumber(winCfg.x, VIRTUAL_WIDTH / 2)), snapPixel(toNumber(winCfg.y, 953)));
 
         this.addChild(this.creditLabelText);
         this.addChild(this.creditValueText);
@@ -418,15 +426,15 @@ export default class HudTextLayer extends PIXI.Container {
         if (this.creditLabelText && this.creditValueText) {
             this.creditLabelText.text = `${creditPrefix}`;
             this.creditValueText.text = ` ${formatMoney(this.pendingState.credit, this.game)} ${currency}`;
-            this.creditValueText.x = this.creditLabelText.x + this.creditLabelText.width;
-            this.creditValueText.y = this.creditLabelText.y;
+            this.creditValueText.x = snapPixel(this.creditLabelText.x + this.creditLabelText.width);
+            this.creditValueText.y = snapPixel(this.creditLabelText.y);
         }
 
         if (this.totalBetLabelText && this.totalBetValueText) {
             this.totalBetLabelText.text = `${betPrefix}`;
             this.totalBetValueText.text = ` ${formatMoney(this.pendingState.totalBet, this.game)} ${currency}`;
-            this.totalBetValueText.x = this.totalBetLabelText.x + this.totalBetLabelText.width;
-            this.totalBetValueText.y = this.totalBetLabelText.y;
+            this.totalBetValueText.x = snapPixel(this.totalBetLabelText.x + this.totalBetLabelText.width);
+            this.totalBetValueText.y = snapPixel(this.totalBetLabelText.y);
         }
 
         const hasWinStatus = this.pendingState.winStatus.trim().length > 0;
