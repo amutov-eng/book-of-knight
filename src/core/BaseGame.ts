@@ -74,10 +74,14 @@ export default class BaseGame {
 
   async initRenderer(): Promise<void> {
     const { width, height } = this.displayManager.getTargetResolution();
+    const resolution = this.displayManager.getDevicePixelRatio();
     this.renderer = await autoDetectRenderer({
       width,
       height,
-      backgroundColor: 0x000000
+      backgroundColor: 0x000000,
+      antialias: true,
+      autoDensity: true,
+      resolution
     });
 
     const view = (this.renderer as any).canvas || (this.renderer as any).view;

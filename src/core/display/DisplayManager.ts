@@ -6,6 +6,20 @@ export default class DisplayManager {
         this.variant = variant || 'desktop';
     }
 
+    getDevicePixelRatio() {
+        if (typeof window === 'undefined') {
+            return 1;
+        }
+
+        const ratio = Number(window.devicePixelRatio);
+        if (!Number.isFinite(ratio) || ratio <= 0) {
+            return 1;
+        }
+
+        // Keep text crisp on high-density screens without exploding GPU cost.
+        return Math.min(ratio, 2);
+    }
+
     getTargetResolution() {
         if (this.variant !== 'mobile') {
             return DISPLAY_CONFIG.desktop.fixed;
@@ -23,6 +37,12 @@ export default class DisplayManager {
         }
 
         const { width, height } = this.getTargetResolution();
+        const resolution = this.getDevicePixelRatio();
+
+        if (renderer.resolution !== resolution) {
+            renderer.resolution = resolution;
+        }
+
         renderer.resize(width, height);
     }
 
@@ -53,6 +73,8 @@ export default class DisplayManager {
         view.style.height = `${displayHeight}px`;
         view.style.left = `${Math.floor((window.innerWidth - displayWidth) / 2)}px`;
         view.style.top = `${Math.floor((window.innerHeight - displayHeight) / 2)}px`;
+        view.style.imageRendering = 'auto';
+        view.style.transform = 'translateZ(0)';
     }
 
     attachResizeHandling(renderer) {
