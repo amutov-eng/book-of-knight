@@ -826,7 +826,7 @@
             "backgroundColor": 0,
             "spine": {
                 "x": 960,
-                "y": 420,
+                "y": 820,
                 "offsetX": -360,
                 "offsetY": 0,
                 "scale": 0.58
@@ -861,8 +861,8 @@
             "skipPrompt": {
                 "enabled": true,
                 "text": "TAP TO CONTINUE",
-                "x": 960,
-                "y": 620,
+                "x": 0,
+                "y": 400,
                 "fontSize": 60,
                 "color": 16777215,
                 "delaySec": 1.2,

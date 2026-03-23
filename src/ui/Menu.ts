@@ -7,6 +7,7 @@ import BetMenu from './BetMenu';
 import AutoPlayMenu from './AutoPlayMenu';
 import BuyBonusMenu from './BuyBonusMenu';
 import BuyBonusConfirm from './BuyBonusConfirm';
+import HelpMenu from './HelpMenu';
 import HudTextLayer from './hud/HudTextLayer';
 import HudButtonLayer from './hud/HudButtonLayer';
 
@@ -55,6 +56,7 @@ export default class Menu extends PIXI.Container {
         this.autoPlayMenu = null;
         this.buyBonusMenu = null;
         this.buyBonusConfirm = null;
+        this.helpMenu = null;
 
         this.eventMode = 'passive';
         this.interactiveChildren = true;
@@ -118,6 +120,7 @@ export default class Menu extends PIXI.Container {
         this.buildBetMenu();
         this.buildAutoPlayMenu();
         this.buildBuyBonusUi();
+        this.buildHelpMenu();
     }
 
     buildHudLayers() {
@@ -131,7 +134,7 @@ export default class Menu extends PIXI.Container {
             onAutoPressed: () => this.onAutoPressed(),
             onAutoStopPressed: () => this.onAutoStopPressed(),
             onBetPressed: () => this.toggleBetMenu(),
-            onSettingsPressed: () => this.setStatus(getLocalized(this.game, 'helpSettings', 'SETTINGS')),
+            onSettingsPressed: () => this.toggleHelpMenu(),
             onBuyBonusPressed: () => this.toggleBuyBonusMenu(),
             onLobbyPressed: () => {
                 if (this.game.gsLink && typeof this.game.gsLink.onHomeButton === 'function') {
@@ -149,6 +152,7 @@ export default class Menu extends PIXI.Container {
         if (this.isAutoPlayMenuOpen()) this.closeAutoPlayMenu();
         if (this.isBuyBonusMenuOpen()) this.closeBuyBonusMenu(false);
         if (this.isBuyBonusConfirmOpen()) this.closeBuyBonusConfirm(false);
+        if (this.isHelpMenuOpen()) this.closeHelpMenu(false);
         this.game.controller.event = GameplayEvent.START;
     }
 
@@ -209,6 +213,17 @@ export default class Menu extends PIXI.Container {
         this.addChild(this.buyBonusConfirm);
     }
 
+    buildHelpMenu() {
+        if (this.helpMenu) return;
+
+        this.helpMenu = new HelpMenu(this.game, () => {
+            this.enableControls();
+            this.setStatus('');
+        });
+        this.helpMenu.visible = false;
+        this.addChild(this.helpMenu);
+    }
+
     isBetMenuOpen() {
         return !!(this.betMenu && this.betMenu.isOpen && this.betMenu.isOpen());
     }
@@ -225,11 +240,16 @@ export default class Menu extends PIXI.Container {
         return !!(this.buyBonusConfirm && this.buyBonusConfirm.isOpen && this.buyBonusConfirm.isOpen());
     }
 
+    isHelpMenuOpen() {
+        return !!(this.helpMenu && this.helpMenu.isOpen && this.helpMenu.isOpen());
+    }
+
     openBetMenu() {
         if (!this.betMenu || this.isBetMenuOpen()) return;
         if (this.isAutoPlayMenuOpen()) this.closeAutoPlayMenu();
         if (this.isBuyBonusMenuOpen()) this.closeBuyBonusMenu(false);
         if (this.isBuyBonusConfirmOpen()) this.closeBuyBonusConfirm(false);
+        if (this.isHelpMenuOpen()) this.closeHelpMenu(false);
         this.disableControls();
         this.betMenu.show();
         this.setStatus(getLocalized(this.game, 'menuBetTitle', 'SELECT BET'));
@@ -253,6 +273,7 @@ export default class Menu extends PIXI.Container {
         if (this.isBetMenuOpen()) this.closeBetMenu();
         if (this.isBuyBonusMenuOpen()) this.closeBuyBonusMenu(false);
         if (this.isBuyBonusConfirmOpen()) this.closeBuyBonusConfirm(false);
+        if (this.isHelpMenuOpen()) this.closeHelpMenu(false);
         this.disableControls();
         this.autoPlayMenu.show();
         this.setStatus(getLocalized(this.game, 'autoStatusTxt', 'Choose number of auto spins'));
@@ -276,6 +297,7 @@ export default class Menu extends PIXI.Container {
         if (this.isBetMenuOpen()) this.closeBetMenu();
         if (this.isAutoPlayMenuOpen()) this.closeAutoPlayMenu();
         if (this.isBuyBonusConfirmOpen()) this.closeBuyBonusConfirm(false);
+        if (this.isHelpMenuOpen()) this.closeHelpMenu(false);
         this.disableControls();
         this.buyBonusMenu.refresh();
         this.buyBonusMenu.show();
@@ -300,9 +322,38 @@ export default class Menu extends PIXI.Container {
         if (this.isBuyBonusMenuOpen()) {
             this.closeBuyBonusMenu(false);
         }
+        if (this.isHelpMenuOpen()) this.closeHelpMenu(false);
         this.disableControls();
         this.buyBonusConfirm.show(type, cost);
         this.setStatus(getLocalized(this.game, 'buyTxt', 'BUY'));
+    }
+
+    openHelpMenu() {
+        if (!this.helpMenu || this.isHelpMenuOpen()) return;
+        if (this.isBetMenuOpen()) this.closeBetMenu();
+        if (this.isAutoPlayMenuOpen()) this.closeAutoPlayMenu(false);
+        if (this.isBuyBonusMenuOpen()) this.closeBuyBonusMenu(false);
+        if (this.isBuyBonusConfirmOpen()) this.closeBuyBonusConfirm(false);
+        this.disableControls();
+        this.helpMenu.show();
+        this.setStatus(getLocalized(this.game, 'helpPay', 'PAYTABLE'));
+    }
+
+    closeHelpMenu(notify = true) {
+        if (!this.helpMenu || !this.isHelpMenuOpen()) return;
+        this.helpMenu.hide(notify);
+        if (!notify) {
+            this.enableControls();
+            this.setStatus('');
+        }
+    }
+
+    toggleHelpMenu() {
+        if (this.isHelpMenuOpen()) {
+            this.closeHelpMenu();
+            return;
+        }
+        this.openHelpMenu();
     }
 
     closeBuyBonusConfirm(notify = true) {
@@ -399,7 +450,8 @@ export default class Menu extends PIXI.Container {
             autoMenuOpen: this.isAutoPlayMenuOpen(),
             buyMenuOpen: this.isBuyBonusMenuOpen(),
             buyConfirmOpen: this.isBuyBonusConfirmOpen(),
-            betMenuOpen: this.isBetMenuOpen()
+            betMenuOpen: this.isBetMenuOpen(),
+            helpMenuOpen: this.isHelpMenuOpen()
         });
     }
 
@@ -507,6 +559,7 @@ export default class Menu extends PIXI.Container {
             || this.isAutoPlayMenuOpen()
             || this.isBuyBonusMenuOpen()
             || this.isBuyBonusConfirmOpen()
+            || this.isHelpMenuOpen()
         );
 
         if (this.game?.symbolSpineOverlay && typeof this.game.symbolSpineOverlay.setVisible === 'function') {

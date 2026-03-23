@@ -28,7 +28,18 @@ export function wireGameModules(baseGame: BaseGame, services: AppRuntimeServices
   game.meters = new Meters();
   game.soundSystem = new SoundSystem();
   game.symbolSpineOverlay = new SymbolSpineOverlay(game);
-  game.settings = new SettingsStore({ audioEnabled: true }, 'book-of-knight.settings');
+  game.settings = new SettingsStore({
+    audioEnabled: true,
+    gameSoundsEnabled: true,
+    musicEnabled: true,
+    volumeStep: 5,
+    skipIntro: false
+  }, 'book-of-knight.settings');
+  game.soundSystem.setEnabled(Boolean(game.settings.get('audioEnabled', true)));
+  if (typeof game.soundSystem.setMasterVolume === 'function') {
+    const volumeStep = Number(game.settings.get('volumeStep', 5));
+    game.soundSystem.setMasterVolume(Math.max(0, Math.min(1, (Number.isFinite(volumeStep) ? volumeStep : 5) / 5)));
+  }
   game.controller = new Controller(game);
   game.gsLink = new GsLink(game);
 

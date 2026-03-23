@@ -8,6 +8,7 @@ export default class SoundSystem {
     private readonly looping: Map<SoundId, HTMLAudioElement>;
     private muted: boolean;
     private enabled: boolean;
+    private masterVolume: number;
 
     constructor() {
         this.definitions = new Map(SOUND_DEFINITIONS.map((definition) => [definition.id, definition]));
@@ -15,6 +16,7 @@ export default class SoundSystem {
         this.looping = new Map();
         this.muted = false;
         this.enabled = true;
+        this.masterVolume = 1;
     }
 
     async preload(ids?: SoundId[]): Promise<void> {
@@ -85,11 +87,21 @@ export default class SoundSystem {
         }
     }
 
+    setMasterVolume(volume: number): void {
+        this.masterVolume = Math.max(0, Math.min(1, Number.isFinite(volume) ? Number(volume) : 1));
+
+        for (const [id, audio] of this.looping.entries()) {
+            const definition = this.definitions.get(id);
+            if (!definition || !audio) continue;
+            audio.volume = definition.volume * this.masterVolume;
+        }
+    }
+
     private createAudioInstance(id: SoundId, definition: SoundDefinition): HTMLAudioElement {
         const prototype = this.prototypes.get(id);
         const audio = prototype ? prototype.cloneNode(true) as HTMLAudioElement : new Audio(definition.path);
         audio.preload = 'auto';
-        audio.volume = definition.volume;
+        audio.volume = definition.volume * this.masterVolume;
         return audio;
     }
 
