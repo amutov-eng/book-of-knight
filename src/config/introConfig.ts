@@ -37,6 +37,7 @@ export interface SpineIntroConfig {
     x?: number;
     y?: number;
     fontSize?: number;
+    maxWidth?: number;
     color?: number;
     delaySec?: number;
     minAlpha?: number;
@@ -102,6 +103,7 @@ export const GAMEPLAY_INTRO_CONFIG: SpineIntroConfig = Object.freeze({
     x: 960,
     y: 620,
     fontSize: 60,
+    maxWidth: 900,
     color: 0xffffff,
     delaySec: 1.2,
     minAlpha: 0.15,

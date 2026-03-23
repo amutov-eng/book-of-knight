@@ -4,6 +4,8 @@ import type BaseGame from '../core/BaseGame';
 import { APP_FONT_FAMILY, APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
 import { formatMoneyByGame, getGameCurrency, getLocalizedText } from './uiTextFormat';
 
+const STAGE_HEIGHT = 1080;
+
 function toNumber(value: unknown, fallback = 0): number {
   return Number.isFinite(value) ? Number(value) : fallback;
 }
@@ -18,6 +20,7 @@ export default class BuyBonusConfirm extends Container {
   private readonly onReject: () => void;
 
   private readonly title: Text;
+  private readonly panel: Sprite;
   private readonly freeSymbol: Sprite | null;
   private readonly hawSymbol: Sprite | null;
   private readonly yesButton: PushButton | null;
@@ -35,20 +38,15 @@ export default class BuyBonusConfirm extends Container {
     this.config = this.resolveConfig(hudConfig && hudConfig.buyBonusConfirm);
 
     this.createMenuBackground();
-    this.createSprite('logo.png', 20, 6);
+    this.createSprite('logo.png', 20, 6, false);
 
-    const panel = this.createSprite(
-      'assets/ui/confirmation_bg.png',
-      toNumber(this.config.panel?.x, 465),
-      toNumber(this.config.panel?.y, 240)
-    );
-    if (panel) {
-      panel.eventMode = 'static';
-      this.addChild(panel);
-    }
+    this.panel = new Sprite(Texture.EMPTY);
+    this.panel.eventMode = 'static';
+    this.addChild(this.panel);
+    void this.resolvePanelTexture();
 
-    this.freeSymbol = this.createSprite('book_blur_01.png', toNumber(this.config.symbols?.free?.x, 782), toNumber(this.config.symbols?.free?.y, 581));
-    this.hawSymbol = this.createSprite('mega_blur_01.png', toNumber(this.config.symbols?.haw?.x, 811), toNumber(this.config.symbols?.haw?.y, 566));
+    this.freeSymbol = this.createSprite('book_blur_01.png', 782, 581);
+    this.hawSymbol = this.createSprite('mega_blur_01.png', 811, 566);
 
     this.title = new Text({
       text: '',
@@ -63,11 +61,11 @@ export default class BuyBonusConfirm extends Container {
       })
     });
     this.title.anchor.set(0.5, 0);
-    this.title.position.set(toNumber(this.config.texts?.title?.x, 960), toNumber(this.config.texts?.title?.y, 345));
+    this.title.position.set(960, toNumber(this.config.texts?.title?.y, 345));
     this.addChild(this.title);
 
-    this.yesButton = this.createButton('b_yes_001.png', 'b_yes_002.png', toNumber(this.config.buttons?.yes?.x, 665), toNumber(this.config.buttons?.yes?.y, 331), () => this.accept());
-    this.noButton = this.createButton('b_no_001.png', 'b_no_002.png', toNumber(this.config.buttons?.no?.x, 988), toNumber(this.config.buttons?.no?.y, 331), () => this.reject());
+    this.yesButton = this.createButton('b_yes_001.png', 'b_yes_002.png', 665, 331, () => this.accept());
+    this.noButton = this.createButton('b_no_001.png', 'b_no_002.png', 988, 331, () => this.reject());
 
     const yesText = this.createButtonLabel(getLocalizedText(this.game, 'soundYes', 'YES'));
     const noText = this.createButtonLabel(getLocalizedText(this.game, 'soundNo', 'NO'));
@@ -102,6 +100,7 @@ export default class BuyBonusConfirm extends Container {
 
     if (this.freeSymbol) this.freeSymbol.visible = type === 0;
     if (this.hawSymbol) this.hawSymbol.visible = type === 1;
+    this.placeLegacyDisplay(this.title, 960, 585);
 
     this.visible = true;
   }
@@ -145,11 +144,15 @@ export default class BuyBonusConfirm extends Container {
     return text;
   }
 
-  private createSprite(frameName: string, x: number, y: number): Sprite | null {
+  private createSprite(frameName: string, x: number, y: number, legacyY = true): Sprite | null {
     const texture = this.getTexture(frameName);
     if (!texture) return null;
     const sprite = new Sprite(texture);
-    sprite.position.set(x, y);
+    if (legacyY) {
+      this.placeLegacyDisplay(sprite, x, y);
+    } else {
+      sprite.position.set(x, y);
+    }
     this.addChild(sprite);
     return sprite;
   }
@@ -160,7 +163,7 @@ export default class BuyBonusConfirm extends Container {
     const pressed = this.getTexture(pressedFrame) || normal;
 
     const root = new Sprite(normal);
-    root.position.set(x, y);
+    this.placeLegacyDisplay(root, x, y);
     root.eventMode = 'static';
     root.cursor = 'pointer';
 
@@ -220,6 +223,13 @@ export default class BuyBonusConfirm extends Container {
 
     if (baseName === 'bg_menu.png') {
       candidates.push('assets/ui/bg_menu.png');
+    }
+
+    if (baseName === 'confirmation_bg.png') {
+      candidates.push('assets/desktop/ui/confirmation_bg.png');
+      candidates.push('/assets/desktop/ui/confirmation_bg.png');
+      candidates.push('assets/ui/confirmation_bg.png');
+      candidates.push('/assets/ui/confirmation_bg.png');
     }
 
     for (let i = 0; i < candidates.length; i += 1) {
@@ -315,6 +325,41 @@ export default class BuyBonusConfirm extends Container {
         title: { ...fallback.texts.title, ...((cfg.texts && cfg.texts.title) || {}) }
       }
     };
+  }
+
+  private placeLegacyDisplay(target: { height: number; position: { set: (x: number, y: number) => void }; anchor?: { y: number } }, x: number, legacyBottomY: number): void {
+    const anchorY = target.anchor && Number.isFinite(target.anchor.y) ? Number(target.anchor.y) : 0;
+    const y = STAGE_HEIGHT - legacyBottomY - (target.height * (1 - anchorY));
+    target.position.set(x, y);
+  }
+
+  private async resolvePanelTexture(): Promise<void> {
+    const candidates = [
+      'assets/desktop/ui/confirmation_bg.png',
+      '/assets/desktop/ui/confirmation_bg.png',
+      'assets/ui/confirmation_bg.png',
+      '/assets/ui/confirmation_bg.png'
+    ];
+
+    for (let i = 0; i < candidates.length; i += 1) {
+      const key = candidates[i];
+      let texture = Texture.EMPTY;
+      if (Cache.has(key)) {
+        texture = Texture.from(key);
+      } else {
+        try {
+          texture = await Assets.load(key);
+        } catch (_err) {
+          texture = Texture.EMPTY;
+        }
+      }
+
+      if (texture && texture !== Texture.EMPTY) {
+        this.panel.texture = texture;
+        this.placeLegacyDisplay(this.panel, 465, 240);
+        return;
+      }
+    }
   }
 }
 

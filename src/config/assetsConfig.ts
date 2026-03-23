@@ -600,7 +600,7 @@ export function getUiHudConfig(manifest) {
                 max: { frame: 'button_maxbet_001.png', pressed: 'button_maxbet_002.png', x: 1136, y: 740, fontSize: 42, color: 0xbee1f5 },
                 plus: { frame: 'plus_001.png', pressed: 'plus_002.png', x: 1401, y: 528 },
                 minus: { frame: 'minus_001.png', pressed: 'minus_002.png', x: 1042, y: 528 },
-                close: { frame: 'button_closesmall_001.png', pressed: 'button_closesmall_002.png', x: 1505, y: 815 },
+                close: { frame: 'button_closesmall_001.png', pressed: 'button_closesmall_002.png', x: 1550, y: 815 },
                 preset: {
                     frame: 'button_digit_001.png',
                     pressed: 'button_digit_002.png',
@@ -619,13 +619,13 @@ export function getUiHudConfig(manifest) {
         },
         autoPlayMenu: {
             overlay: { color: 0x000000, alpha: 0.55 },
-            panel: { frame: 'bg_auto.png', x: 853, y: 6 },
+            panel: { frame: 'bg_auto.png', x: 853, y: 94 },
             title: { x: 1300, y: 96, fontSize: 60, color: 0x93a7bf, maxWidth: 760, minFontSize: 30 },
             autoSpinsLabel: { x: 1300, y: 500, fontSize: 54, color: 0x93a7bf, maxWidth: 880, minFontSize: 26 },
             infoText: { x: 1296, y: 312, fontSize: 36, color: 0xb9c5d3 },
             buttons: {
-                close: { frame: 'button_closesmall_001.png', pressed: 'button_closesmall_002.png', x: 1512, y: 59 },
-                start: { frame: 'start_autospins_001.png', pressed: 'start_autospins_002.png', x: 901, y: 835, fontSize: 60, color: 0xbee1f5, maxTextWidth: 760, minFontSize: 18, textOffsetY: 0 },
+                close: { frame: 'button_closesmall_001.png', pressed: 'button_closesmall_002.png', x: 1512, y: 859 },
+                start: { frame: 'start_autospins_001.png', pressed: 'start_autospins_002.png', x: 901, y: 139, fontSize: 60, color: 0xbee1f5, maxTextWidth: 760, minFontSize: 18, textOffsetY: 0 },
                 spin: {
                     frame: 'button_digit_001.png',
                     pressed: 'button_digit_002.png',
@@ -633,15 +633,15 @@ export function getUiHudConfig(manifest) {
                     color: 0xbee1f5,
                     values: [10, 20, 50, 100, 1000],
                     positions: [
-                        { x: 963, y: 427 },
-                        { x: 1190, y: 427 },
-                        { x: 1417, y: 427 },
-                        { x: 1070, y: 554 },
-                        { x: 1297, y: 554 }
+                        { x: 963, y: 403 },
+                        { x: 1190, y: 403 },
+                        { x: 1417, y: 403 },
+                        { x: 1068, y: 276 },
+                        { x: 1295, y: 276 }
                     ]
                 },
-                turbo: { frame: 'turbo_bg_001.png', pressed: 'turbo_bg_002.png', x: 1043, y: 212, fontSize: 36, color: 0xb9c5d3, textAlign: 'left', textX: 80, textY: 53, textOffsetY: 0 },
-                skip: { frame: 'skipscreen_bg_001.png', pressed: 'skipscreen_bg_002.png', x: 1043, y: 371, fontSize: 36, color: 0xb9c5d3, textAlign: 'left', textX: 80, textY: 53, textOffsetY: 0 }
+                turbo: { frame: 'turbo_bg_001.png', pressed: 'turbo_bg_002.png', x: 1043, y: 762, fontSize: 36, color: 0xb9c5d3, textAlign: 'left', textX: 80, textY: 53, textOffsetY: 0 },
+                skip: { frame: 'skipscreen_bg_001.png', pressed: 'skipscreen_bg_002.png', x: 1043, y: 603, fontSize: 36, color: 0xb9c5d3, textAlign: 'left', textX: 80, textY: 53, textOffsetY: 0 }
             }
         },
         buyBonusMenu: {
@@ -749,6 +749,7 @@ export function getIntroConfig(manifest) {
                 x: 960,
                 y: 620,
                 fontSize: 60,
+                maxWidth: 900,
                 color: 0xffffff,
                 delaySec: 1.2,
                 minAlpha: 0.15,

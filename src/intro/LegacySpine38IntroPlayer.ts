@@ -6,6 +6,7 @@ import DisplayManager from '../core/display/DisplayManager';
 import { getRuntimeVariant } from '../config/runtimeConfig';
 import { APP_FONT_FAMILY, APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
 import { warn } from '../core/utils/logger';
+import { fitPixiTextToBounds } from '../ui/utils/fitText';
 
 type SpineResource = {
   spineData?: {
@@ -293,6 +294,10 @@ export default class LegacySpine38IntroPlayer implements IntroPlayer {
     );
     this.skipPromptLabel.visible = false;
     this.skipPromptLabel.eventMode = 'none';
+    fitPixiTextToBounds(this.skipPromptLabel, {
+      maxWidth: Number.isFinite(prompt.maxWidth) ? Number(prompt.maxWidth) : 900,
+      minFontSize: 24
+    });
     this.app.stage.addChild(this.skipPromptLabel);
   }
 

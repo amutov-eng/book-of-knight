@@ -158,7 +158,7 @@ export default class BootSoundPrompt extends Container {
     if (!texture) return null;
 
     const sprite = new Sprite(texture);
-    sprite.position.set(x, y);
+    this.placeLegacyDisplay(sprite, x, y);
     sprite.eventMode = 'static';
     sprite.on('pointertap', (event) => {
       event.stopPropagation();
@@ -180,7 +180,7 @@ export default class BootSoundPrompt extends Container {
     const pressed = this.getTexture(pressedFrame) || normal;
 
     const root = new Sprite(normal);
-    root.position.set(x, y);
+    this.placeLegacyDisplay(root, x, y);
     root.eventMode = 'static';
     root.cursor = 'pointer';
 
@@ -260,5 +260,11 @@ export default class BootSoundPrompt extends Container {
 
   private toNumber(value: unknown, fallback: number): number {
     return Number.isFinite(value) ? Number(value) : fallback;
+  }
+
+  private placeLegacyDisplay(target: { height: number; position: { set: (x: number, y: number) => void }; anchor?: { y: number } }, x: number, legacyBottomY: number): void {
+    const anchorY = target.anchor && Number.isFinite(target.anchor.y) ? Number(target.anchor.y) : 0;
+    const y = SCREEN_HEIGHT - legacyBottomY - (target.height * (1 - anchorY));
+    target.position.set(x, y);
   }
 }

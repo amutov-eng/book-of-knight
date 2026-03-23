@@ -202,15 +202,15 @@ export default class HelpMenu extends Container {
       this.addChild(this.logoSprite);
     }
 
-    this.closeButton = this.createButton('button_close_001.png', 'button_close_002.png', 1711, 928, () => this.hide(), false);
-    this.prevButton = this.createButton('button_arrow_l_001.png', 'button_arrow_l_002.png', 1610, 805, () => this.changePage(-1), false);
-    this.nextButton = this.createButton('button_arrow_r_001.png', 'button_arrow_r_002.png', 1710, 805, () => this.changePage(1), false);
-    this.historyButton = this.createTabButton('button_history', 94, 768, 'helpHistory', 'HISTORY', () => undefined, false);
+    this.closeButton = this.createButton('button_close_001.png', 'button_close_002.png', 1711, 928, () => this.hide(), true);
+    this.prevButton = this.createButton('button_arrow_l_001.png', 'button_arrow_l_002.png', 1660, 150, () => this.changePage(-1), true);
+    this.nextButton = this.createButton('button_arrow_r_001.png', 'button_arrow_r_002.png', 1760, 150, () => this.changePage(1), true);
+    this.historyButton = this.createTabButton('button_history', 1394, 140, 'helpHistory', 'HISTORY', () => undefined, true);
 
     this.tabButtons = {
-      paytable: this.createTabButton('button_pay', 354, 768, 'helpPay', 'PAYTABLE', () => this.selectTab('paytable'), false),
-      settings: this.createTabButton('button_sett', 874, 768, 'helpSettings', 'SETTINGS', () => this.selectTab('settings'), false),
-      rules: this.createTabButton('button_rules', 1394, 768, 'helpRules', 'RULES', () => this.selectTab('rules'), false)
+      paytable: this.createTabButton('button_pay', 354, 140, 'helpPay', 'PAYTABLE', () => this.selectTab('paytable'), true),
+      settings: this.createTabButton('button_sett', 874, 140, 'helpSettings', 'SETTINGS', () => this.selectTab('settings'), true),
+      rules: this.createTabButton('button_rules', 1394, 140, 'helpRules', 'RULES', () => this.selectTab('rules'), true)
     };
 
     this.settingsToggles = {

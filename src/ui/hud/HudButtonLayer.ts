@@ -3,8 +3,8 @@ import { APP_FONT_FAMILY, APP_FONT_WEIGHT_REGULAR } from '../../config/fontConfi
 import { GAME_RULES } from '../../config/gameRules';
 
 const BUTTON_DISABLED_ALPHA = 0.85;
-const BUTTON_ENABLE_FROM_ALPHA = 0.85;
-const BUTTON_ENABLE_FADE_FRAMES = 10;
+const BUTTON_ENABLE_FROM_ALPHA = 1;
+const BUTTON_ENABLE_FADE_FRAMES = 0;
 
 function toNumber(value, fallback = 0) {
     return Number.isFinite(value) ? value : fallback;

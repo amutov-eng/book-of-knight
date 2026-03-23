@@ -4,6 +4,8 @@ import { APP_FONT_FAMILY, APP_FONT_WEIGHT_LIGHT, APP_FONT_WEIGHT_REGULAR } from 
 import { formatMoneyByGame, getGameCurrency, getLocalizedText } from './uiTextFormat';
 import { fitPixiTextToBounds } from './utils/fitText';
 
+const STAGE_HEIGHT = 1080;
+
 type BuyType = 0 | 1;
 
 type ButtonVisualState = 'normal' | 'pressed' | 'disabled';
@@ -66,12 +68,12 @@ export default class BuyBonusMenu extends Container {
     this.config = this.resolveConfig(hudConfig && hudConfig.buyBonusMenu);
 
     this.createMenuBackground();
-    this.createSprite('logo.png', 20, 6);
+    this.createSprite('logo.png', 20, 6, false);
 
-    this.freePanelDisabled = this.createSprite('b_bg_disable.png', toNumber(this.config.panels?.free?.x, 420), toNumber(this.config.panels?.free?.y, 190));
-    this.hawPanelDisabled = this.createSprite('b_bg_disable.png', toNumber(this.config.panels?.haw?.x, 989), toNumber(this.config.panels?.haw?.y, 190));
-    this.freePanelActive = this.createSprite('b_bg_active.png', toNumber(this.config.panels?.free?.x, 420), toNumber(this.config.panels?.free?.y, 190));
-    this.hawPanelActive = this.createSprite('b_bg_active.png', toNumber(this.config.panels?.haw?.x, 989), toNumber(this.config.panels?.haw?.y, 190));
+    this.freePanelDisabled = this.createSprite('b_bg_disable.png', 420, 190);
+    this.hawPanelDisabled = this.createSprite('b_bg_disable.png', 989, 190);
+    this.freePanelActive = this.createSprite('b_bg_active.png', 420, 190);
+    this.hawPanelActive = this.createSprite('b_bg_active.png', 989, 190);
 
     this.titleText = this.createText('', toNumber(this.config.texts?.title?.x, 960), toNumber(this.config.texts?.title?.y, 40), {
       fontFamily: APP_FONT_FAMILY,
@@ -83,8 +85,8 @@ export default class BuyBonusMenu extends Container {
       anchorY: 0
     });
 
-    this.freeSymbol = this.createSprite('book_blur_01.png', toNumber(this.config.symbols?.free?.x, 493), toNumber(this.config.symbols?.free?.y, 605));
-    this.hawSymbol = this.createSprite('mega_blur_01.png', toNumber(this.config.symbols?.haw?.x, 1100), toNumber(this.config.symbols?.haw?.y, 590));
+    this.freeSymbol = this.createSprite('book_blur_01.png', 493, 605);
+    this.hawSymbol = this.createSprite('mega_blur_01.png', 1100, 590);
 
     this.freeTitle = this.createText('', toNumber(this.config.texts?.freeTitle?.x, 672), toNumber(this.config.texts?.freeTitle?.y, 560), {
       fontFamily: APP_FONT_FAMILY,
@@ -126,7 +128,7 @@ export default class BuyBonusMenu extends Container {
       anchorY: 0
     });
 
-    const betBg = this.createSprite('bet_value.png', toNumber(this.config.controls?.betBg?.x, 703), toNumber(this.config.controls?.betBg?.y, 86));
+    const betBg = this.createSprite('bet_value.png', 703, 86);
     if (betBg) this.addChild(betBg);
 
     this.totalBetLabel = this.createText('', toNumber(this.config.texts?.totalBetLabel?.x, 956), toNumber(this.config.texts?.totalBetLabel?.y, 206), {
@@ -149,27 +151,27 @@ export default class BuyBonusMenu extends Container {
       anchorY: 0.5
     });
 
-    this.plusButton = this.createButton('plus_001.png', 'plus_002.png', '', toNumber(this.config.controls?.plus?.x, 1068), toNumber(this.config.controls?.plus?.y, 78), () => {
+    this.plusButton = this.createButton('plus_001.png', 'plus_002.png', '', 1068, 78, () => {
       if (!this.game?.meters) return;
       this.game.meters.incrementBetPerLine();
       this.onMetersChanged();
     });
 
-    this.minusButton = this.createButton('minus_001.png', 'minus_002.png', '', toNumber(this.config.controls?.minus?.x, 709), toNumber(this.config.controls?.minus?.y, 78), () => {
+    this.minusButton = this.createButton('minus_001.png', 'minus_002.png', '', 709, 78, () => {
       if (!this.game?.meters) return;
       this.game.meters.decrementBetPerLine();
       this.onMetersChanged();
     });
 
-    this.closeButton = this.createButton('button_closesmall_001.png', 'button_closesmall_002.png', 'button_close_hover.png', toNumber(this.config.controls?.close?.x, 1711), toNumber(this.config.controls?.close?.y, 829), () => {
+    this.closeButton = this.createButton('button_closesmall_001.png', 'button_closesmall_002.png', 'button_close_hover.png', 1711, 928, () => {
       this.hide();
     });
 
-    this.freeBuyButton = this.createButton('bbuy_001.png', 'bbuy_002.png', '', toNumber(this.config.controls?.freeBuy?.x, 552), toNumber(this.config.controls?.freeBuy?.y, 285), () => {
+    this.freeBuyButton = this.createButton('bbuy_001.png', 'bbuy_002.png', '', 552, 285, () => {
       this.onBuyPressed(0);
     }, 'bbuy_deact.png');
 
-    this.hawBuyButton = this.createButton('bbuy_001.png', 'bbuy_002.png', '', toNumber(this.config.controls?.hawBuy?.x, 1121), toNumber(this.config.controls?.hawBuy?.y, 285), () => {
+    this.hawBuyButton = this.createButton('bbuy_001.png', 'bbuy_002.png', '', 1121, 285, () => {
       this.onBuyPressed(1);
     }, 'bbuy_deact.png');
 
@@ -257,6 +259,12 @@ export default class BuyBonusMenu extends Container {
     this.hawBuyLabel.text = getLocalizedText(this.game, 'buyTxt', 'BUY');
     this.fitBuyLabel(this.freeBuyLabel);
     this.fitBuyLabel(this.hawBuyLabel);
+    this.placeLegacyDisplay(this.totalBetLabel, 956, 206);
+    this.placeLegacyDisplay(this.totalBetValue, 956, 139);
+    this.placeLegacyDisplay(this.freeTitle, 672, 560);
+    this.placeLegacyDisplay(this.hawTitle, 1241, 560);
+    this.placeLegacyDisplay(this.freePrice, 672, 465);
+    this.placeLegacyDisplay(this.hawPrice, 1241, 465);
 
     if (this.freeBuyButton) {
       this.freeBuyButton.setEnabled(freeEnabled);
@@ -373,11 +381,15 @@ export default class BuyBonusMenu extends Container {
     return text;
   }
 
-  private createSprite(frameName: string, x: number, y: number): Sprite | null {
+  private createSprite(frameName: string, x: number, y: number, legacyY = true): Sprite | null {
     const texture = this.getTexture(frameName);
     if (!texture) return null;
     const sprite = new Sprite(texture);
-    sprite.position.set(x, y);
+    if (legacyY) {
+      this.placeLegacyDisplay(sprite, x, y);
+    } else {
+      sprite.position.set(x, y);
+    }
     this.addChild(sprite);
     return sprite;
   }
@@ -389,7 +401,8 @@ export default class BuyBonusMenu extends Container {
     x: number,
     y: number,
     onRelease: () => void,
-    disabledFrame = ''
+    disabledFrame = '',
+    legacyY = true
   ): PushButton | null {
     const normal = this.getTexture(normalFrame);
     if (!normal) return null;
@@ -399,7 +412,11 @@ export default class BuyBonusMenu extends Container {
     const disabled = disabledFrame ? (this.getTexture(disabledFrame) || normal) : normal;
 
     const root = new Sprite(normal);
-    root.position.set(x, y);
+    if (legacyY) {
+      this.placeLegacyDisplay(root, x, y);
+    } else {
+      root.position.set(x, y);
+    }
 
     let enabled = true;
     let isDown = false;
@@ -481,6 +498,12 @@ export default class BuyBonusMenu extends Container {
     refresh();
 
     return { root, setEnabled, setLabelState };
+  }
+
+  private placeLegacyDisplay(target: { height: number; position: { set: (x: number, y: number) => void }; anchor?: { y: number } }, x: number, legacyBottomY: number): void {
+    const anchorY = target.anchor && Number.isFinite(target.anchor.y) ? Number(target.anchor.y) : 0;
+    const y = STAGE_HEIGHT - legacyBottomY - (target.height * (1 - anchorY));
+    target.position.set(x, y);
   }
 
   private getTexture(frameName: string): Texture | null {
@@ -575,7 +598,7 @@ export default class BuyBonusMenu extends Container {
         betBg: { x: 703, y: 86 },
         plus: { x: 1068, y: 78 },
         minus: { x: 709, y: 78 },
-        close: { x: 1711, y: 829 },
+        close: { x: 1711, y: 928 },
         freeBuy: { x: 552, y: 285 },
         hawBuy: { x: 1121, y: 285 }
       },

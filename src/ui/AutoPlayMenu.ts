@@ -3,6 +3,8 @@ import type BaseGame from '../core/BaseGame';
 import { APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
 import { fitPixiTextToBounds } from './utils/fitText';
 
+const STAGE_HEIGHT = 1080;
+
 function toNumber(value: unknown, fallback = 0): number {
   return Number.isFinite(value) ? Number(value) : fallback;
 }
@@ -81,8 +83,9 @@ export default class AutoPlayMenu extends Container {
 
     this.panel = this.createSprite(
       this.getFrame('panel.frame', 'bg_auto.png'),
-      this.getPointX('panel.x', 846),
-      this.getPointY('panel.y', 6)
+      853,
+      94,
+      true
     );
 
     if (this.panel) {
@@ -126,18 +129,20 @@ export default class AutoPlayMenu extends Container {
       this.getFrame('buttons.close.frame', 'button_closesmall_001.png'),
       this.getFrame('buttons.close.pressed', 'button_closesmall_002.png'),
       this.getFrame('buttons.close.hover', ''),
-      this.getPointX('buttons.close.x', 1515),
-      this.getPointY('buttons.close.y', 59),
-      () => this.hide()
+      1512,
+      859,
+      () => this.hide(),
+      true
     );
 
     this.startButton = this.createTextButton(
       this.getFrame('buttons.start.frame', 'start_autospins_001.png'),
       this.getFrame('buttons.start.pressed', 'start_autospins_002.png'),
       this.getFrame('buttons.start.hover', ''),
-      this.getPointX('buttons.start.x', 1040),
-      this.getPointY('buttons.start.y', 841),
+      901,
+      139,
       () => this.handleStartPressed(),
+      true,
       {
         fontFamily: titleFont,
         fontSize: toNumber(this.get('buttons.start.fontSize'), 60),
@@ -161,7 +166,8 @@ export default class AutoPlayMenu extends Container {
         this.getFrame('buttons.spin.hover', ''),
         position.x,
         position.y,
-        () => this.selectSpinValue(value)
+        () => this.selectSpinValue(value),
+        true
       );
 
       if (!button) continue;
@@ -187,9 +193,10 @@ export default class AutoPlayMenu extends Container {
       this.getFrame('buttons.turbo.frame', 'turbo_bg_001.png'),
       this.getFrame('buttons.turbo.pressed', 'turbo_bg_002.png'),
       this.getFrame('buttons.turbo.hover', ''),
-      this.getPointX('buttons.turbo.x', 1040),
-      this.getPointY('buttons.turbo.y', 212),
-      () => this.toggleTurbo()
+      1043,
+      762,
+      () => this.toggleTurbo(),
+      true
     );
     this.attachToggleLabel(this.turboButton, 'settingsTurboSpin', 'TURBO SPINS', 'buttons.turbo');
 
@@ -197,9 +204,10 @@ export default class AutoPlayMenu extends Container {
       this.getFrame('buttons.skip.frame', 'skipscreen_bg_001.png'),
       this.getFrame('buttons.skip.pressed', 'skipscreen_bg_002.png'),
       this.getFrame('buttons.skip.hover', ''),
-      this.getPointX('buttons.skip.x', 1040),
-      this.getPointY('buttons.skip.y', 371),
-      () => this.toggleSkipScreen()
+      1043,
+      603,
+      () => this.toggleSkipScreen(),
+      true
     );
     this.attachToggleLabel(this.skipScreenButton, 'settingsSkipScreen', 'SKIP SCREENS', 'buttons.skip');
 
@@ -357,6 +365,7 @@ export default class AutoPlayMenu extends Container {
     x: number,
     y: number,
     onRelease: () => void,
+    legacyY: boolean,
     styleOptions: {
       fontFamily: string;
       fontSize: number;
@@ -366,7 +375,7 @@ export default class AutoPlayMenu extends Container {
       textOffsetY: number;
     }
   ): TextButton | null {
-    const button = this.createPushButton(normalFrame, pressedFrame, hoverFrame, x, y, onRelease);
+    const button = this.createPushButton(normalFrame, pressedFrame, hoverFrame, x, y, onRelease, legacyY);
     if (!button) return null;
 
     const label = new Text({
@@ -416,7 +425,8 @@ export default class AutoPlayMenu extends Container {
     hoverFrame: string,
     x: number,
     y: number,
-    onRelease: () => void
+    onRelease: () => void,
+    legacyY = false
   ): ToggleControl | null {
     const normal = this.getTexture(normalFrame);
     if (!normal) return null;
@@ -425,8 +435,12 @@ export default class AutoPlayMenu extends Container {
     const hover = hoverFrame ? (this.getTexture(hoverFrame) || normal) : normal;
 
     const sprite = new Sprite(normal);
-    sprite.x = x;
-    sprite.y = y;
+    if (legacyY) {
+      this.placeLegacyDisplay(sprite, x, y);
+    } else {
+      sprite.x = x;
+      sprite.y = y;
+    }
     sprite.eventMode = 'static';
     sprite.cursor = 'pointer';
 
@@ -504,7 +518,8 @@ export default class AutoPlayMenu extends Container {
     hoverFrame: string,
     x: number,
     y: number,
-    onRelease: () => void
+    onRelease: () => void,
+    legacyY = false
   ): Sprite | null {
     const normal = this.getTexture(normalFrame);
     if (!normal) return null;
@@ -513,8 +528,12 @@ export default class AutoPlayMenu extends Container {
     const hover = hoverFrame ? (this.getTexture(hoverFrame) || normal) : normal;
 
     const sprite = new Sprite(normal);
-    sprite.x = x;
-    sprite.y = y;
+    if (legacyY) {
+      this.placeLegacyDisplay(sprite, x, y);
+    } else {
+      sprite.x = x;
+      sprite.y = y;
+    }
     sprite.eventMode = 'static';
     sprite.cursor = 'pointer';
 
@@ -553,13 +572,17 @@ export default class AutoPlayMenu extends Container {
     return sprite;
   }
 
-  private createSprite(frame: string, x: number, y: number): Sprite | null {
+  private createSprite(frame: string, x: number, y: number, legacyY = false): Sprite | null {
     const texture = this.getTexture(frame);
     if (!texture) return null;
 
     const sprite = new Sprite(texture);
-    sprite.x = x;
-    sprite.y = y;
+    if (legacyY) {
+      this.placeLegacyDisplay(sprite, x, y);
+    } else {
+      sprite.x = x;
+      sprite.y = y;
+    }
     this.addChild(sprite);
     return sprite;
   }
@@ -679,12 +702,16 @@ export default class AutoPlayMenu extends Container {
     }
 
     return [
-      { x: 963, y: 427 },
-      { x: 1190, y: 427 },
-      { x: 1417, y: 427 },
-      { x: 1070, y: 554 },
-      { x: 1297, y: 554 }
+      { x: 963, y: 403 },
+      { x: 1190, y: 403 },
+      { x: 1417, y: 403 },
+      { x: 1068, y: 276 },
+      { x: 1295, y: 276 }
     ].slice(0, count);
+  }
+
+  private placeLegacyDisplay(target: { height: number; position: { set: (x: number, y: number) => void } }, x: number, legacyBottomY: number): void {
+    target.position.set(x, STAGE_HEIGHT - legacyBottomY - target.height);
   }
 }
 

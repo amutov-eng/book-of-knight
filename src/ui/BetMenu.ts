@@ -10,6 +10,7 @@ type TextButton = {
 };
 
 const DEFAULT_BET_ARRAY = [1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 3000, 4000, 8000];
+const STAGE_HEIGHT = 1080;
 
 function toNumber(value: unknown, fallback = 0): number {
   return Number.isFinite(value) ? Number(value) : fallback;
@@ -100,8 +101,8 @@ export default class BetMenu extends Container {
     this.overlay.on('pointertap', () => this.hide());
     this.addChild(this.overlay);
 
-    this.panel = this.createSprite(this.getFrame('panel.frame', 'bg_bet.png'), this.getPointX('panel.x', 846), this.getPointY('panel.y', 86));
-    this.totalBetValueBg = this.createSprite(this.getFrame('valueField.frame', 'bet_value.png'), this.getPointX('valueField.x', 1036), this.getPointY('valueField.y', 536));
+    this.panel = this.createSprite(this.getFrame('panel.frame', 'bg_bet.png'), 846, 86, true);
+    this.totalBetValueBg = this.createSprite(this.getFrame('valueField.frame', 'bet_value.png'), 1036, 536, true);
 
     if (this.panel) {
       const panelHitArea = new Container();
@@ -154,13 +155,14 @@ export default class BetMenu extends Container {
       this.getFrame('buttons.max.frame', 'button_maxbet_001.png'),
       this.getFrame('buttons.max.pressed', 'button_maxbet_002.png'),
       this.getFrame('buttons.max.hover', ''),
-      this.getPointX('buttons.max.x', 1136),
-      this.getPointY('buttons.max.y', 740),
+      1136,
+      740,
       () => {
         if (!this.game?.meters) return;
         this.game.meters.selectMaxbet();
         this.onMetersChanged();
       },
+      true,
       {
         fontFamily: this.getFontFamily('primary'),
         fontSize: toNumber(this.get('buttons.max.fontSize'), 42),
@@ -178,35 +180,38 @@ export default class BetMenu extends Container {
       this.getFrame('buttons.plus.frame', 'plus_001.png'),
       this.getFrame('buttons.plus.pressed', 'plus_002.png'),
       this.getFrame('buttons.plus.hover', ''),
-      this.getPointX('buttons.plus.x', 1401),
-      this.getPointY('buttons.plus.y', 528),
+      1401,
+      528,
       () => {
         if (!this.game?.meters) return;
         this.game.meters.incrementBetPerLine();
         this.onMetersChanged();
-      }
+      },
+      true
     );
 
     this.minusButton = this.createButton(
       this.getFrame('buttons.minus.frame', 'minus_001.png'),
       this.getFrame('buttons.minus.pressed', 'minus_002.png'),
       this.getFrame('buttons.minus.hover', ''),
-      this.getPointX('buttons.minus.x', 1042),
-      this.getPointY('buttons.minus.y', 528),
+      1042,
+      528,
       () => {
         if (!this.game?.meters) return;
         this.game.meters.decrementBetPerLine();
         this.onMetersChanged();
-      }
+      },
+      true
     );
 
     this.closeButton = this.createButton(
       this.getFrame('buttons.close.frame', 'button_closesmall_001.png'),
       this.getFrame('buttons.close.pressed', 'button_closesmall_002.png'),
       this.getFrame('buttons.close.hover', ''),
-      this.getPointX('buttons.close.x', 1505),
-      this.getPointY('buttons.close.y', 815),
-      () => this.hide()
+      1550,
+      815,
+      () => this.hide(),
+      true
     );
 
     const presetPositions = this.getPresetPositions();
@@ -230,6 +235,7 @@ export default class BetMenu extends Container {
           }
           this.onMetersChanged();
         },
+        true,
         {
           fontFamily: this.getFontFamily('primary'),
           fontSize: toNumber(this.get('buttons.preset.fontSize'), 42),
@@ -280,6 +286,8 @@ export default class BetMenu extends Container {
     this.titleText.text = menuBetTitle;
     this.totalBetText.text = totalBetLabel;
     this.linesText.text = `${linesLabel} ${toNumber(meters.MAX_LINES, 10)}`;
+    this.placeLegacyDisplay(this.totalBetText, 1293, 641);
+    this.placeLegacyDisplay(this.linesText, 1293, 166);
 
     const totalBet = toNumber(meters.getTotalBet ? meters.getTotalBet() : meters.totalBet, 0);
     const currentBet = Math.max(1, toNumber(meters.getBetPerLine ? meters.getBetPerLine() : meters.bet, 1));
@@ -305,6 +313,7 @@ export default class BetMenu extends Container {
       toNumber(this.get('valueText.fontSize'), 46),
       toNumber(this.get('valueText.minFontSize'), 24)
     );
+    this.placeLegacyDisplay(this.totalBetValueText, 1289, 536, true);
 
     if (this.maxBetButton) {
       this.maxBetButton.setText(getLocalized(this.game, 'menuBetMaxBet', 'MAX BET'));
@@ -369,6 +378,7 @@ export default class BetMenu extends Container {
     x: number,
     y: number,
     onRelease: () => void,
+    legacyY: boolean,
     styleOptions: {
       fontFamily: string;
       fontSize: number;
@@ -381,7 +391,7 @@ export default class BetMenu extends Container {
       textOffsetY?: number;
     }
   ): TextButton | null {
-    const sprite = this.createButton(normalFrame, pressedFrame, hoverFrame, x, y, onRelease);
+    const sprite = this.createButton(normalFrame, pressedFrame, hoverFrame, x, y, onRelease, legacyY);
     if (!sprite) return null;
 
     const label = new Text({
@@ -449,7 +459,8 @@ export default class BetMenu extends Container {
     hoverFrame: string,
     x: number,
     y: number,
-    onRelease: () => void
+    onRelease: () => void,
+    legacyY = false
   ): Sprite | null {
     const normal = this.getTexture(normalFrame);
     if (!normal) return null;
@@ -457,8 +468,12 @@ export default class BetMenu extends Container {
     const down = this.getTexture(pressedFrame) || normal;
     const hover = hoverFrame ? this.getTexture(hoverFrame) : null;
     const sprite = new Sprite(normal);
-    sprite.x = x;
-    sprite.y = y;
+    if (legacyY) {
+      this.placeLegacyDisplay(sprite, x, y);
+    } else {
+      sprite.x = x;
+      sprite.y = y;
+    }
     sprite.eventMode = 'static';
     sprite.cursor = 'pointer';
 
@@ -500,13 +515,17 @@ export default class BetMenu extends Container {
     return sprite;
   }
 
-  private createSprite(frame: string, x: number, y: number): Sprite | null {
+  private createSprite(frame: string, x: number, y: number, legacyY = false): Sprite | null {
     const texture = this.getTexture(frame);
     if (!texture) return null;
 
     const sprite = new Sprite(texture);
-    sprite.x = x;
-    sprite.y = y;
+    if (legacyY) {
+      this.placeLegacyDisplay(sprite, x, y);
+    } else {
+      sprite.x = x;
+      sprite.y = y;
+    }
     this.addChild(sprite);
     return sprite;
   }
@@ -606,12 +625,23 @@ export default class BetMenu extends Container {
     }
 
     return [
-      { x: 1023, y: 584 },
-      { x: 1255, y: 584 },
-      { x: 1487, y: 584 },
-      { x: 1023, y: 726 },
-      { x: 1255, y: 726 },
-      { x: 1487, y: 726 }
+      { x: 937, y: 364 },
+      { x: 1182, y: 364 },
+      { x: 1427, y: 364 },
+      { x: 937, y: 220 },
+      { x: 1182, y: 220 },
+      { x: 1427, y: 220 }
     ];
+  }
+
+  private placeLegacyDisplay(
+    target: { height: number; position: { set: (x: number, y: number) => void }; anchor?: { y: number } },
+    x: number,
+    legacyBottomY: number,
+    useAnchor = false
+  ): void {
+    const anchorY = useAnchor && target.anchor && Number.isFinite(target.anchor.y) ? Number(target.anchor.y) : 0;
+    const y = STAGE_HEIGHT - legacyBottomY - (target.height * (1 - anchorY));
+    target.position.set(x, y);
   }
 }
