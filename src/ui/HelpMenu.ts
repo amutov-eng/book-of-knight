@@ -583,9 +583,7 @@ export default class HelpMenu extends Container {
     }
 
     const textDefaults = [
-      { x: 200, bottomY: 690, width: 1580, fontSize: 30, key: 'splashTxt' },
-      { x: 200, bottomY: 600, width: 1580, fontSize: 30, key: 'splashTxt2' },
-      { x: 200, bottomY: 450, width: 1580, fontSize: 30, key: 'splashTxt3' }
+      { x: 200, bottomY: 690, width: 1580, fontSize: 30, key: 'splashTxt' }
     ];
     const texts = Array.isArray(pageCfg.texts) && pageCfg.texts.length > 0 ? pageCfg.texts : textDefaults;
     for (let i = 0; i < texts.length; i += 1) {
@@ -634,9 +632,7 @@ export default class HelpMenu extends Container {
     }
 
     const textDefaults = [
-      { x: 210, bottomY: 568, width: 1520, fontSize: 30, key: 'splashSecTxt' },
-      { x: 210, bottomY: 484, width: 1520, fontSize: 30, key: 'splashSecTxt2' },
-      { x: 210, bottomY: 400, width: 1520, fontSize: 30, key: 'splashSecTxt3' }
+      { x: 210, bottomY: 568, width: 1520, fontSize: 30, key: 'splashSecTxt' }
     ];
     const texts = Array.isArray(pageCfg.texts) && pageCfg.texts.length > 0 ? pageCfg.texts : textDefaults;
     for (let i = 0; i < texts.length; i += 1) {
@@ -791,20 +787,11 @@ export default class HelpMenu extends Container {
     const page = new Container();
     const pageCfg = this.config.paytablePages?.paylines || {};
     const text1Cfg = pageCfg.text1 || {};
-    const text2Cfg = pageCfg.text2 || {};
     const gridCfg = pageCfg.grid || {};
     const text = this.createLegacyBodyText(getLocalized(this.game, String(text1Cfg.key || 'paylinesTxt'), ''), toNumber(text1Cfg.x, 310), toNumber(text1Cfg.bottomY, 445), toNumber(text1Cfg.width, 1300), toNumber(text1Cfg.fontSize, 28), String(text1Cfg.align || 'center') as 'center');
     text.anchor.set(0.5, 0);
     text.position.x = HelpMenu.SCREEN_WIDTH / 2;
     page.addChild(text);
-
-    const text2Value = getLocalized(this.game, String(text2Cfg.key || 'paylinesTxt2'), '');
-    if (text2Value.trim().length > 0) {
-      const text2 = this.createLegacyBodyText(text2Value, toNumber(text2Cfg.x, 310), toNumber(text2Cfg.bottomY, 365), toNumber(text2Cfg.width, 1300), toNumber(text2Cfg.fontSize, 28), String(text2Cfg.align || 'center') as 'center');
-      text2.anchor.set(0.5, 0);
-      text2.position.x = HelpMenu.SCREEN_WIDTH / 2;
-      page.addChild(text2);
-    }
 
     for (let i = 0; i < PAYLINE_PATTERNS.length; i += 1) {
       const preview = this.createPaylinePreview(PAYLINE_PATTERNS[i], i);
@@ -925,13 +912,8 @@ export default class HelpMenu extends Container {
   private buildRulesLinesPage(): Container {
     const page = new Container();
     const lines = this.createLegacyBodyText(getLocalized(this.game, 'rulesLines', ''), 220, 700, 1265, 26);
-    const lines2Value = getLocalized(this.game, 'rulesLines2', '');
     const unfinished = this.createLegacyBodyText(getLocalized(this.game, 'rulesUnfinished', ''), 220, 420, 1265, 26);
     page.addChild(lines);
-    if (lines2Value.trim().length > 0) {
-      const lines2 = this.createLegacyBodyText(lines2Value, 220, 590, 1265, 26);
-      page.addChild(lines2);
-    }
     page.addChild(unfinished);
     page.addChild(this.rulesRtpText);
     this.placeLegacy(this.rulesRtpText, 220, 330);

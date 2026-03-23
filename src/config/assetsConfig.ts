@@ -726,9 +726,7 @@ export function getUiHudConfig(manifest) {
                 holdAndWin: {
                     symbols: { frames: ['mega_blur_01.png', 'major_blur_01.png', 'mini_blur_01.png', 'shield_blur_01.png'], startX: 500, bottomY: 690, scale: 0.7, stepMultiplier: 0.7 },
                     texts: [
-                        { x: 200, bottomY: 690, width: 1580, fontSize: 30, key: 'splashTxt' },
-                        { x: 200, bottomY: 600, width: 1580, fontSize: 30, key: 'splashTxt2' },
-                        { x: 200, bottomY: 450, width: 1580, fontSize: 30, key: 'splashTxt3' }
+                        { x: 200, bottomY: 690, width: 1580, fontSize: 30, key: 'splashTxt' }
                     ]
                 },
                 freeGames: {
@@ -747,9 +745,7 @@ export function getUiHudConfig(manifest) {
                         tint: 0xffdc57
                     },
                     texts: [
-                        { x: 210, bottomY: 568, width: 1520, fontSize: 30, key: 'splashSecTxt' },
-                        { x: 210, bottomY: 484, width: 1520, fontSize: 30, key: 'splashSecTxt2' },
-                        { x: 210, bottomY: 400, width: 1520, fontSize: 30, key: 'splashSecTxt3' }
+                        { x: 210, bottomY: 568, width: 1520, fontSize: 30, key: 'splashSecTxt' }
                     ]
                 },
                 primary: {
@@ -787,7 +783,6 @@ export function getUiHudConfig(manifest) {
                 },
                 paylines: {
                     text1: { x: 310, bottomY: 445, width: 1300, fontSize: 28, key: 'paylinesTxt', align: 'center' },
-                    text2: { x: 310, bottomY: 365, width: 1300, fontSize: 28, key: 'paylinesTxt2', align: 'center' },
                     grid: { startX: 500, topRowBottomY: 800, bottomRowBottomY: 650, stepX: 260 }
                 }
             },
