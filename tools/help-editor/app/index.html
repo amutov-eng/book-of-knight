@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Menu Editor</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.10.0/jsoneditor.min.css" rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.10.0/jsoneditor.min.js"></script>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #11151b;
+            --panel: #18202a;
+            --panel-alt: #0f141a;
+            --line: #2d3946;
+            --text: #e7edf4;
+            --muted: #8fa0b2;
+            --accent: #d2a62c;
+            --good: #6bc46d;
+            --bad: #ff7070;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            border-right: 1px solid var(--line);
+            background: var(--panel-alt);
+            padding: 18px;
+            overflow: auto;
+        }
+
+        .content {
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line);
+            background: var(--panel);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .main {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 16px;
+            padding: 16px;
+            min-height: 0;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel h2 {
+            margin: 0;
+            padding: 14px 16px;
+            font-size: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        #json-editor {
+            height: calc(100vh - 180px);
+        }
+
+        .translations {
+            padding: 0;
+            overflow: auto;
+        }
+
+        .translation-tools {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .translation-list {
+            padding: 16px;
+            overflow: auto;
+        }
+
+        .translation-key {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 16px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .translation-key h3 {
+            margin: 0 0 10px 0;
+            font-size: 15px;
+            color: var(--accent);
+        }
+
+        .translation-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .translation-row {
+            display: grid;
+            grid-template-columns: 70px 1fr;
+            gap: 10px;
+            align-items: start;
+        }
+
+        .translation-row label {
+            font-size: 13px;
+            color: var(--muted);
+            padding-top: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 88px;
+            resize: vertical;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: #0d1117;
+            color: var(--text);
+            padding: 10px 12px;
+            font: inherit;
+        }
+
+        button, select, input {
+            border: 1px solid var(--line);
+            background: #10161e;
+            color: var(--text);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button.primary {
+            background: #2a313b;
+            border-color: #455161;
+        }
+
+        .status {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .status.good { color: var(--good); }
+        .status.bad { color: var(--bad); }
+
+        .group-title {
+            margin: 14px 0 8px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+        }
+
+        .page-button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 8px;
+            background: #131922;
+        }
+
+        .page-button.active {
+            border-color: var(--accent);
+            color: #fff2c4;
+            background: #1d232d;
+        }
+
+        .hint {
+            padding: 10px 16px 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <h1 style="margin-top:0;font-size:22px;">Help Menu Editor</h1>
+            <div class="group-title">Shell</div>
+            <div id="shell-pages"></div>
+            <div class="group-title">Paytable</div>
+            <div id="paytable-pages"></div>
+            <div class="group-title">Rules</div>
+            <div id="rules-pages"></div>
+        </aside>
+        <main class="content">
+            <div class="topbar">
+                <div>
+                    <div id="current-page-title" style="font-size:22px;font-weight:bold;">Loading...</div>
+                    <div id="current-page-path" class="status"></div>
+                </div>
+                <div class="toolbar">
+                    <button class="primary" id="reload-btn">Reload</button>
+                    <button class="primary" id="save-btn">Save All</button>
+                    <span id="status" class="status"></span>
+                </div>
+            </div>
+            <div class="hint">
+                Layout JSON edits the selected help section inside the desktop manifest. Translation edits update <code>assets/common/localization/translations.json</code> for all languages.
+            </div>
+            <div class="main">
+                <section class="panel">
+                    <h2>Layout Config</h2>
+                    <div id="json-editor"></div>
+                </section>
+                <section class="panel translations">
+                    <h2>Translations</h2>
+                    <div class="translation-tools">
+                        <label for="language-filter">Visible languages</label>
+                        <select id="language-filter">
+                            <option value="all">All</option>
+                            <option value="common">Common only</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <input id="custom-languages" type="text" placeholder="e.g. en,bg,de" style="min-width:220px;">
+                    </div>
+                    <div id="translation-list" class="translation-list"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const PAGE_DEFS = [
+            { id: 'shell-general', title: 'General Shell', group: 'shell', manifestPath: ['ui', 'hud', 'helpMenu'], translationKeys: ['helpPay', 'helpRules', 'helpSettings', 'helpHistory', 'helpPages'] },
+            { id: 'paytable-hold', title: 'Paytable: Hold And Win', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'holdAndWin'], translationKeys: ['splashTitle', 'splashTxt', 'splashTxt2', 'splashTxt3'] },
+            { id: 'paytable-free', title: 'Paytable: Free Games', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'freeGames'], translationKeys: ['splashSecTitle', 'splashSecTitleWild', 'splashSecTitleSpecial', 'splashSecTxt', 'splashSecTxt2', 'splashSecTxt3'] },
+            { id: 'paytable-primary', title: 'Paytable: Main Paytable', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'primary'], translationKeys: ['paytableTitle', 'paytableScatter'] },
+            { id: 'paytable-gold', title: 'Paytable: Gold Paytable', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'gold'], translationKeys: ['paytableTitle'] },
+            { id: 'paytable-lines', title: 'Paytable: Paylines', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'paylines'], translationKeys: ['paylinesTitle', 'paylinesLine', 'paylinesTxt', 'paylinesTxt2', 'paylinesTxtPort', 'paylinesTxtPort2'] },
+            { id: 'settings', title: 'Help: Settings Page', group: 'shell', manifestPath: ['ui', 'hud', 'helpMenu', 'settingsPage'], translationKeys: ['settingsTitle', 'settingsSoundOn', 'settingsGameSounds', 'settingsMusic', 'settingsVolume', 'settingsLobby', 'settingsSkipIntro', 'settingsTurboSpin', 'settingsTurboSpinTxt', 'settingsSkipScreen'] },
+            { id: 'rules-howto', title: 'Rules: How To Play', group: 'rules', manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'howTo'], translationKeys: ['rulesTitle', 'rulesMINbet', 'rulesMAXbet', 'rulesInterface', 'rulesAutoplay'] },
+            { id: 'rules-bet', title: 'Rules: Bet / Settings', group: 'rules', manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'betSettings'], translationKeys: ['rulesBetMenu', 'rulesSettings'] },
+            { id: 'rules-lines', title: 'Rules: Lines', group: 'rules', manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'lines'], translationKeys: ['rulesLines', 'rulesLines2', 'rulesUnfinished', 'rulesGamePercent'] },
+            { id: 'rules-extra', title: 'Rules: Extra', group: 'rules', manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'extra'], translationKeys: ['rulesMaxWin', 'rulesBuyBonus', 'rulesGamePercentBuyFree', 'rulesGamePercentBuyHold'] },
+            { id: 'rules-fg', title: 'Rules: Free Spins Bonus', group: 'rules', manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'addFreeGames'], translationKeys: ['rulesAddFg'] }
+        ];
+
+        const COMMON_LANGUAGES = ['en', 'bg', 'de', 'ru', 'pl', 'cs'];
+        let state = {
+            manifest: null,
+            translations: null,
+            currentPageId: PAGE_DEFS[0].id,
+            editor: null
+        };
+
+        function deepClone(value) {
+            return JSON.parse(JSON.stringify(value));
+        }
+
+        function getPageDef(id) {
+            return PAGE_DEFS.find((page) => page.id === id) || PAGE_DEFS[0];
+        }
+
+        function getByPath(root, path) {
+            let current = root;
+            for (const segment of path) {
+                if (!current || typeof current !== 'object') return {};
+                current = current[segment];
+            }
+            return current == null ? {} : current;
+        }
+
+        function setByPath(root, path, value) {
+            let current = root;
+            for (let i = 0; i < path.length - 1; i += 1) {
+                const segment = path[i];
+                if (!current[segment] || typeof current[segment] !== 'object') {
+                    current[segment] = {};
+                }
+                current = current[segment];
+            }
+            current[path[path.length - 1]] = value;
+        }
+
+        function getVisibleLanguages() {
+            const filterMode = document.getElementById('language-filter').value;
+            const allLanguages = Object.keys(state.translations?.locales || {});
+            if (filterMode === 'all') return allLanguages;
+            if (filterMode === 'common') return COMMON_LANGUAGES.filter((lang) => allLanguages.includes(lang));
+
+            const raw = document.getElementById('custom-languages').value || '';
+            return raw.split(',').map((value) => value.trim()).filter((value) => allLanguages.includes(value));
+        }
+
+        function renderSidebar() {
+            const mount = (targetId, group) => {
+                const target = document.getElementById(targetId);
+                target.innerHTML = '';
+                PAGE_DEFS.filter((page) => page.group === group).forEach((page) => {
+                    const button = document.createElement('button');
+                    button.className = `page-button${state.currentPageId === page.id ? ' active' : ''}`;
+                    button.textContent = page.title;
+                    button.onclick = () => selectPage(page.id);
+                    target.appendChild(button);
+                });
+            };
+
+            mount('shell-pages', 'shell');
+            mount('paytable-pages', 'paytable');
+            mount('rules-pages', 'rules');
+        }
+
+        function renderTranslations() {
+            const page = getPageDef(state.currentPageId);
+            const locales = state.translations?.locales || {};
+            const visibleLanguages = getVisibleLanguages();
+            const translationList = document.getElementById('translation-list');
+            translationList.innerHTML = '';
+
+            if (visibleLanguages.length === 0) {
+                translationList.innerHTML = '<div class="status">No languages selected.</div>';
+                return;
+            }
+
+            page.translationKeys.forEach((key) => {
+                const block = document.createElement('div');
+                block.className = 'translation-key';
+                const title = document.createElement('h3');
+                title.textContent = key;
+                block.appendChild(title);
+
+                const grid = document.createElement('div');
+                grid.className = 'translation-grid';
+
+                visibleLanguages.forEach((language) => {
+                    const row = document.createElement('div');
+                    row.className = 'translation-row';
+                    const label = document.createElement('label');
+                    label.textContent = language;
+                    const textarea = document.createElement('textarea');
+                    textarea.value = locales?.[language]?.[key] ?? '';
+                    textarea.oninput = (event) => {
+                        if (!state.translations.locales[language]) {
+                            state.translations.locales[language] = {};
+                        }
+                        state.translations.locales[language][key] = event.target.value;
+                    };
+
+                    row.appendChild(label);
+                    row.appendChild(textarea);
+                    grid.appendChild(row);
+                });
+
+                block.appendChild(grid);
+                translationList.appendChild(block);
+            });
+        }
+
+        function renderLayoutEditor() {
+            const page = getPageDef(state.currentPageId);
+            const node = deepClone(getByPath(state.manifest, page.manifestPath));
+            state.editor.update(node);
+            document.getElementById('current-page-title').textContent = page.title;
+            document.getElementById('current-page-path').textContent = page.manifestPath.join('.');
+        }
+
+        function selectPage(id) {
+            const previousPage = getPageDef(state.currentPageId);
+            if (state.manifest && state.editor) {
+                setByPath(state.manifest, previousPage.manifestPath, state.editor.get());
+            }
+
+            state.currentPageId = id;
+            renderSidebar();
+            renderLayoutEditor();
+            renderTranslations();
+        }
+
+        async function loadAll() {
+            setStatus('Loading...', '');
+            const response = await fetch('/api/help-data');
+            const data = await response.json();
+            state.manifest = data.manifest;
+            state.translations = data.translations;
+            renderSidebar();
+            renderLayoutEditor();
+            renderTranslations();
+            setStatus('Loaded successfully.', 'good');
+        }
+
+        async function saveAll() {
+            try {
+                const currentPage = getPageDef(state.currentPageId);
+                setByPath(state.manifest, currentPage.manifestPath, state.editor.get());
+                setStatus('Saving...', '');
+
+                const response = await fetch('/api/help-data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        manifest: state.manifest,
+                        translations: state.translations
+                    })
+                });
+
+                const payload = await response.json();
+                if (!response.ok || !payload.success) {
+                    throw new Error(payload.error || 'Save failed.');
+                }
+
+                setStatus('Saved successfully.', 'good');
+            } catch (error) {
+                setStatus(error instanceof Error ? error.message : String(error), 'bad');
+            }
+        }
+
+        function setStatus(text, variant) {
+            const status = document.getElementById('status');
+            status.textContent = text;
+            status.className = `status ${variant || ''}`.trim();
+        }
+
+        function boot() {
+            const container = document.getElementById('json-editor');
+            state.editor = new JSONEditor(container, {
+                mode: 'tree',
+                modes: ['tree', 'code', 'form', 'view'],
+                onError: (error) => alert(error.toString())
+            });
+
+            document.getElementById('reload-btn').onclick = () => loadAll().catch((error) => setStatus(error.message, 'bad'));
+            document.getElementById('save-btn').onclick = () => saveAll();
+            document.getElementById('language-filter').onchange = () => renderTranslations();
+            document.getElementById('custom-languages').oninput = () => {
+                if (document.getElementById('language-filter').value === 'custom') {
+                    renderTranslations();
+                }
+            };
+
+            loadAll().catch((error) => setStatus(error.message, 'bad'));
+        }
+
+        boot();
+    </script>
+</body>
+</html>

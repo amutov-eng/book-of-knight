@@ -895,6 +895,18 @@
                         "key": "helpRules",
                         "fallback": "RULES"
                     }
+                },
+                "settingsPage": {},
+                "paytablePages": {
+                    "holdAndWin": {},
+                    "freeGames": {},
+                    "primary": {},
+                    "gold": {},
+                    "paylines": {}
+                },
+                "rulesPages": {
+                    "howTo": {},
+                    "betSettings": {}
                 }
             },
             "bootSoundPrompt": {
