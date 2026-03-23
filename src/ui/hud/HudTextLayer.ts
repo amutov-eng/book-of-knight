@@ -10,7 +10,7 @@ import {
     APP_FONT_WEIGHT_REGULAR
 } from '../../config/fontConfig';
 import { formatCentsByPattern, getDefaultNumberPattern } from '../../utils/numberFormat';
-import { fitPixiTextToBounds } from '../utils/fitText';
+import { fitBitmapTextToBounds, fitPixiTextToBounds } from '../utils/fitText';
 
 const VIRTUAL_WIDTH = 1920;
 
@@ -141,12 +141,27 @@ export default class HudTextLayer extends PIXI.Container {
         this.statusText = null;
         this.winStatusText = null;
         this.winText = null;
+        this.footerBackgroundBounds = null;
     }
 
     build() {
+        this.captureFooterBounds();
         this.buildTopBar();
         this.buildTexts();
         this.applyPendingState();
+    }
+
+    captureFooterBounds() {
+        const backgrounds = this.hudConfig && this.hudConfig.backgrounds ? this.hudConfig.backgrounds : {};
+        const bottom = backgrounds.bottom || {};
+        const frame = String(bottom.frame || 'bottom_bg.png');
+        const texture = this.getTexture ? this.getTexture(frame) : null;
+        this.footerBackgroundBounds = {
+            x: toNumber(bottom.x, 0),
+            y: toNumber(bottom.y, 1034),
+            width: texture ? texture.width : 1920,
+            height: texture ? texture.height : 46
+        };
     }
 
     buildTopBar() {
@@ -248,10 +263,10 @@ export default class HudTextLayer extends PIXI.Container {
         const textCfg = this.hudConfig && this.hudConfig.texts ? this.hudConfig.texts : {};
         const fontCfg = this.hudConfig && this.hudConfig.fonts ? this.hudConfig.fonts : {};
         const primaryFont = String(fontCfg.primary || APP_FONT_FAMILY);
-        const creditLabelBitmapFont = String(fontCfg.creditLabelBitmap || BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM);
-        const creditValueBitmapFont = String(fontCfg.creditValueBitmap || BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM);
-        const totalBetLabelBitmapFont = String(fontCfg.totalBetLabelBitmap || BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM);
-        const totalBetValueBitmapFont = String(fontCfg.totalBetValueBitmap || BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM);
+        const creditLabelBitmapFont = BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM;
+        const creditValueBitmapFont = BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM;
+        const totalBetLabelBitmapFont = BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM;
+        const totalBetValueBitmapFont = BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM;
         const totalBetLabelFont = String(fontCfg.totalBetLabel || primaryFont);
         const totalBetValueFont = String(fontCfg.totalBetValue || primaryFont);
         const statusFont = String(fontCfg.status || primaryFont);
@@ -426,15 +441,21 @@ export default class HudTextLayer extends PIXI.Container {
         if (this.creditLabelText && this.creditValueText) {
             this.creditLabelText.text = `${creditPrefix}`;
             this.creditValueText.text = ` ${formatMoney(this.pendingState.credit, this.game)} ${currency}`;
+            fitBitmapTextToBounds(this.creditLabelText, { maxWidth: 260, maxHeight: 34, minScale: 0.7 });
+            fitBitmapTextToBounds(this.creditValueText, { maxWidth: 360, maxHeight: 34, minScale: 0.7 });
             this.creditValueText.x = snapPixel(this.creditLabelText.x + this.creditLabelText.width);
-            this.creditValueText.y = snapPixel(this.creditLabelText.y);
+            this.creditLabelText.y = this.getFooterAlignedY(this.creditLabelText);
+            this.creditValueText.y = this.getFooterAlignedY(this.creditValueText);
         }
 
         if (this.totalBetLabelText && this.totalBetValueText) {
             this.totalBetLabelText.text = `${betPrefix}`;
             this.totalBetValueText.text = ` ${formatMoney(this.pendingState.totalBet, this.game)} ${currency}`;
+            fitBitmapTextToBounds(this.totalBetLabelText, { maxWidth: 160, maxHeight: 34, minScale: 0.7 });
+            fitBitmapTextToBounds(this.totalBetValueText, { maxWidth: 260, maxHeight: 34, minScale: 0.7 });
             this.totalBetValueText.x = snapPixel(this.totalBetLabelText.x + this.totalBetLabelText.width);
-            this.totalBetValueText.y = snapPixel(this.totalBetLabelText.y);
+            this.totalBetLabelText.y = this.getFooterAlignedY(this.totalBetLabelText);
+            this.totalBetValueText.y = this.getFooterAlignedY(this.totalBetValueText);
         }
 
         const hasWinStatus = this.pendingState.winStatus.trim().length > 0;
@@ -461,5 +482,10 @@ export default class HudTextLayer extends PIXI.Container {
                 this.winText.visible = hasWinValue;
             }
         }
+    }
+
+    getFooterAlignedY(displayObject) {
+        const bounds = this.footerBackgroundBounds || { y: 1034, height: 46 };
+        return snapPixel(bounds.y + (bounds.height - toNumber(displayObject && displayObject.height, 0)) / 2);
     }
 }

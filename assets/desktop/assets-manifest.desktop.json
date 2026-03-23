@@ -784,6 +784,119 @@
                     }
                 }
             },
+            "helpMenu": {
+                "background": {
+                    "frame": "bg_menu.png",
+                    "width": 1920,
+                    "height": 1080
+                },
+                "overlay": {
+                    "color": 0,
+                    "alpha": 0.08
+                },
+                "title": {
+                    "x": 960,
+                    "y": 98,
+                    "fontSize": 58,
+                    "color": 9678783,
+                    "maxWidth": 760
+                },
+                "page": {
+                    "x": 1768,
+                    "y": 925,
+                    "fontSize": 28,
+                    "color": 16777215,
+                    "maxWidth": 180
+                },
+                "logo": {
+                    "frame": "logo.png",
+                    "x": 18,
+                    "y": 8,
+                    "scale": 0.76
+                },
+                "footer": {
+                    "background": {
+                        "frame": "bottom_bg.png",
+                        "x": 0,
+                        "y": 1034
+                    },
+                    "credit": {
+                        "x": 220,
+                        "y": 1039,
+                        "fontSize": 34,
+                        "labelColor": 16762368,
+                        "valueColor": 15989241,
+                        "labelMaxWidth": 260,
+                        "valueMaxWidth": 360
+                    },
+                    "totalBet": {
+                        "x": 1490,
+                        "y": 1039,
+                        "fontSize": 34,
+                        "labelColor": 16762368,
+                        "valueColor": 15989241,
+                        "labelMaxWidth": 160,
+                        "valueMaxWidth": 260
+                    }
+                },
+                "navigation": {
+                    "close": {
+                        "normal": "button_close_001.png",
+                        "pressed": "button_close_002.png",
+                        "x": 1711,
+                        "y": 928,
+                        "legacyY": true
+                    },
+                    "prev": {
+                        "normal": "button_arrow_l_001.png",
+                        "pressed": "button_arrow_l_002.png",
+                        "x": 1660,
+                        "y": 150,
+                        "legacyY": true
+                    },
+                    "next": {
+                        "normal": "button_arrow_r_001.png",
+                        "pressed": "button_arrow_r_002.png",
+                        "x": 1760,
+                        "y": 150,
+                        "legacyY": true
+                    }
+                },
+                "tabs": {
+                    "history": {
+                        "base": "button_history",
+                        "x": 1394,
+                        "y": 140,
+                        "legacyY": true,
+                        "key": "helpHistory",
+                        "fallback": "HISTORY"
+                    },
+                    "paytable": {
+                        "base": "button_pay",
+                        "x": 354,
+                        "y": 140,
+                        "legacyY": true,
+                        "key": "helpPay",
+                        "fallback": "PAYTABLE"
+                    },
+                    "settings": {
+                        "base": "button_sett",
+                        "x": 874,
+                        "y": 140,
+                        "legacyY": true,
+                        "key": "helpSettings",
+                        "fallback": "SETTINGS"
+                    },
+                    "rules": {
+                        "base": "button_rules",
+                        "x": 1394,
+                        "y": 140,
+                        "legacyY": true,
+                        "key": "helpRules",
+                        "fallback": "RULES"
+                    }
+                }
+            },
             "bootSoundPrompt": {
                 "background": {
                     "x": 0,

@@ -219,7 +219,7 @@ export default class Menu extends PIXI.Container {
         this.helpMenu = new HelpMenu(this.game, () => {
             this.enableControls();
             this.setStatus('');
-        });
+        }, this.hudConfig);
         this.helpMenu.visible = false;
         this.addChild(this.helpMenu);
     }

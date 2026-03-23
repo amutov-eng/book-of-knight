@@ -1,7 +1,8 @@
-import { Assets, Cache, Container, Graphics, Rectangle, Sprite, Text, TextStyle, Texture } from 'pixi.js';
+import { Assets, BitmapText, Cache, Container, Graphics, Rectangle, Sprite, Text, TextStyle, Texture } from 'pixi.js';
 import type BaseGame from '../core/BaseGame';
 import { APP_FONT_WEIGHT_LIGHT, APP_FONT_WEIGHT_REGULAR } from '../config/fontConfig';
-import { fitPixiTextToBounds } from './utils/fitText';
+import { BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM } from '../config/bitmapFontConfig';
+import { fitBitmapTextToBounds, fitPixiTextToBounds } from './utils/fitText';
 import { formatCentsByPattern, getDefaultNumberPattern } from '../utils/numberFormat';
 
 function toNumber(value: unknown, fallback = 0): number {
@@ -116,12 +117,18 @@ export default class HelpMenu extends Container {
   private static readonly SCREEN_HEIGHT = 1080;
   private readonly game: BaseGame & Record<string, any>;
   private readonly onClose: () => void;
+  private readonly config: Record<string, any>;
   private readonly textureCache = new Map<string, Texture | null>();
 
   private readonly overlay: Graphics;
   private readonly panel: Sprite | null;
   private readonly titleText: Text;
   private readonly pageText: Text;
+  private readonly footerBar: Container;
+  private readonly footerCreditLabel: BitmapText;
+  private readonly footerCreditValue: BitmapText;
+  private readonly footerBetLabel: BitmapText;
+  private readonly footerBetValue: BitmapText;
   private readonly logoSprite: Sprite | null;
   private readonly historyButton: TabButton | null;
   private readonly closeButton: PushButton | null;
@@ -159,15 +166,17 @@ export default class HelpMenu extends Container {
   private rulesPageIndex = 0;
   private lastRefreshKey = '';
 
-  constructor(game: BaseGame, onClose: () => void) {
+  constructor(game: BaseGame, onClose: () => void, hudConfig?: Record<string, any>) {
     super();
 
     this.game = game as BaseGame & Record<string, any>;
     this.onClose = onClose;
+    this.config = hudConfig && typeof hudConfig.helpMenu === 'object' ? hudConfig.helpMenu : {};
 
+    const overlayCfg = this.config.overlay || {};
     this.overlay = new Graphics()
       .rect(0, 0, HelpMenu.SCREEN_WIDTH, HelpMenu.SCREEN_HEIGHT)
-      .fill({ color: 0x000000, alpha: 0.08 });
+      .fill({ color: toNumber(overlayCfg.color, 0x000000), alpha: toNumber(overlayCfg.alpha, 0.08) });
     this.overlay.eventMode = 'static';
     this.overlay.cursor = 'default';
     this.overlay.on('pointertap', () => this.hide());
@@ -185,32 +194,60 @@ export default class HelpMenu extends Container {
       this.addChild(blocker);
     }
 
-    this.titleText = this.createText('', 960, 98, {
-      fontSize: 58,
-      fill: 0x93a7bf,
+    const titleCfg = this.config.title || {};
+    const pageCfg = this.config.page || {};
+    this.titleText = this.createText('', toNumber(titleCfg.x, 960), toNumber(titleCfg.y, 98), {
+      fontSize: toNumber(titleCfg.fontSize, 58),
+      fill: toNumber(titleCfg.color, 0x93a7bf),
       anchorX: 0.5
     });
-    this.pageText = this.createText('', 1745, 925, {
-      fontSize: 28,
-      fill: 0xffffff,
+    this.pageText = this.createText('', toNumber(pageCfg.x, 1745), toNumber(pageCfg.y, 925), {
+      fontSize: toNumber(pageCfg.fontSize, 28),
+      fill: toNumber(pageCfg.color, 0xffffff),
       anchorX: 0.5
     });
-    this.logoSprite = this.createSprite('logo.png', 18, 0);
+    this.footerBar = new Container();
+    const footerBgCfg = this.config.footer?.background || {};
+    const footerBg = this.createSprite(String(footerBgCfg.frame || 'bottom_bg.png'), toNumber(footerBgCfg.x, 0), toNumber(footerBgCfg.y, 1034));
+    if (footerBg) {
+      this.footerBar.addChild(footerBg);
+    } else {
+      const fallbackBar = new Graphics()
+        .rect(0, 1000, HelpMenu.SCREEN_WIDTH, 80)
+        .fill({ color: 0x0a0d12, alpha: 0.82 });
+      this.footerBar.addChild(fallbackBar);
+    }
+    const creditFooterCfg = this.config.footer?.credit || {};
+    const totalBetFooterCfg = this.config.footer?.totalBet || {};
+    this.footerCreditLabel = this.createBitmapLabel('', toNumber(creditFooterCfg.x, 220), toNumber(creditFooterCfg.y, 1039), toNumber(creditFooterCfg.fontSize, 34), toNumber(creditFooterCfg.labelColor, 0xffc600));
+    this.footerCreditValue = this.createBitmapLabel('', toNumber(creditFooterCfg.x, 220), toNumber(creditFooterCfg.y, 1039), toNumber(creditFooterCfg.fontSize, 34), toNumber(creditFooterCfg.valueColor, 0xf3f9f9));
+    this.footerBetLabel = this.createBitmapLabel('', toNumber(totalBetFooterCfg.x, 1490), toNumber(totalBetFooterCfg.y, 1039), toNumber(totalBetFooterCfg.fontSize, 34), toNumber(totalBetFooterCfg.labelColor, 0xffc600));
+    this.footerBetValue = this.createBitmapLabel('', toNumber(totalBetFooterCfg.x, 1490), toNumber(totalBetFooterCfg.y, 1039), toNumber(totalBetFooterCfg.fontSize, 34), toNumber(totalBetFooterCfg.valueColor, 0xf3f9f9));
+    const logoCfg = this.config.logo || {};
+    this.logoSprite = this.createSprite(String(logoCfg.frame || 'logo.png'), toNumber(logoCfg.x, 18), 0);
     if (this.logoSprite) {
-      this.logoSprite.scale.set(0.76);
-      this.logoSprite.position.set(18, 8);
+      this.logoSprite.scale.set(toNumber(logoCfg.scale, 0.76));
+      this.logoSprite.position.set(toNumber(logoCfg.x, 18), toNumber(logoCfg.y, 8));
       this.addChild(this.logoSprite);
     }
 
-    this.closeButton = this.createButton('button_close_001.png', 'button_close_002.png', 1711, 928, () => this.hide(), true);
-    this.prevButton = this.createButton('button_arrow_l_001.png', 'button_arrow_l_002.png', 1660, 150, () => this.changePage(-1), true);
-    this.nextButton = this.createButton('button_arrow_r_001.png', 'button_arrow_r_002.png', 1760, 150, () => this.changePage(1), true);
-    this.historyButton = this.createTabButton('button_history', 1394, 140, 'helpHistory', 'HISTORY', () => undefined, true);
+    const navCfg = this.config.navigation || {};
+    const closeCfg = navCfg.close || {};
+    const prevCfg = navCfg.prev || {};
+    const nextCfg = navCfg.next || {};
+    const historyCfg = this.config.tabs?.history || {};
+    this.closeButton = this.createButton(String(closeCfg.normal || 'button_close_001.png'), String(closeCfg.pressed || 'button_close_002.png'), toNumber(closeCfg.x, 1711), toNumber(closeCfg.y, 928), () => this.hide(), closeCfg.legacyY !== false);
+    this.prevButton = this.createButton(String(prevCfg.normal || 'button_arrow_l_001.png'), String(prevCfg.pressed || 'button_arrow_l_002.png'), toNumber(prevCfg.x, 1660), toNumber(prevCfg.y, 150), () => this.changePage(-1), prevCfg.legacyY !== false);
+    this.nextButton = this.createButton(String(nextCfg.normal || 'button_arrow_r_001.png'), String(nextCfg.pressed || 'button_arrow_r_002.png'), toNumber(nextCfg.x, 1760), toNumber(nextCfg.y, 150), () => this.changePage(1), nextCfg.legacyY !== false);
+    this.historyButton = this.createTabButton(String(historyCfg.base || 'button_history'), toNumber(historyCfg.x, 1394), toNumber(historyCfg.y, 140), String(historyCfg.key || 'helpHistory'), String(historyCfg.fallback || 'HISTORY'), () => undefined, historyCfg.legacyY !== false);
 
+    const payTabCfg = this.config.tabs?.paytable || {};
+    const settingsTabCfg = this.config.tabs?.settings || {};
+    const rulesTabCfg = this.config.tabs?.rules || {};
     this.tabButtons = {
-      paytable: this.createTabButton('button_pay', 354, 140, 'helpPay', 'PAYTABLE', () => this.selectTab('paytable'), true),
-      settings: this.createTabButton('button_sett', 874, 140, 'helpSettings', 'SETTINGS', () => this.selectTab('settings'), true),
-      rules: this.createTabButton('button_rules', 1394, 140, 'helpRules', 'RULES', () => this.selectTab('rules'), true)
+      paytable: this.createTabButton(String(payTabCfg.base || 'button_pay'), toNumber(payTabCfg.x, 354), toNumber(payTabCfg.y, 140), String(payTabCfg.key || 'helpPay'), String(payTabCfg.fallback || 'PAYTABLE'), () => this.selectTab('paytable'), payTabCfg.legacyY !== false),
+      settings: this.createTabButton(String(settingsTabCfg.base || 'button_sett'), toNumber(settingsTabCfg.x, 874), toNumber(settingsTabCfg.y, 140), String(settingsTabCfg.key || 'helpSettings'), String(settingsTabCfg.fallback || 'SETTINGS'), () => this.selectTab('settings'), settingsTabCfg.legacyY !== false),
+      rules: this.createTabButton(String(rulesTabCfg.base || 'button_rules'), toNumber(rulesTabCfg.x, 1394), toNumber(rulesTabCfg.y, 140), String(rulesTabCfg.key || 'helpRules'), String(rulesTabCfg.fallback || 'RULES'), () => this.selectTab('rules'), rulesTabCfg.legacyY !== false)
     };
 
     this.settingsToggles = {
@@ -248,6 +285,13 @@ export default class HelpMenu extends Container {
     this.paytableValueTexts = [];
 
     for (const tab of Object.values(this.pageContainers)) this.addChild(tab);
+    this.addChild(this.titleText);
+    this.addChild(this.pageText);
+    this.addChild(this.footerBar);
+    this.addChild(this.footerCreditLabel);
+    this.addChild(this.footerCreditValue);
+    this.addChild(this.footerBetLabel);
+    this.addChild(this.footerBetValue);
 
     this.payPages = [
       this.buildHoldAndWinPage(),
@@ -314,6 +358,8 @@ export default class HelpMenu extends Container {
       !!this.game?.context?.turboGame ? 1 : 0,
       !!this.game?.context?.turboSpinIsEnabled ? 1 : 0,
       this.getVolumeStep(),
+      this.getCreditAmount(),
+      this.getTotalBetAmount(),
       this.game?.context?.gamePercent ?? '',
       this.game?.context?.gamePercentBuyFree ?? '',
       this.game?.context?.gamePercentBuyHold ?? ''
@@ -329,6 +375,7 @@ export default class HelpMenu extends Container {
     this.refreshPaytableAmounts();
     this.refreshSettingsControls();
     this.refreshRulesFooter();
+    this.refreshFooterBar();
   }
 
   private refreshPaytableAmounts(): void {
@@ -460,6 +507,32 @@ export default class HelpMenu extends Container {
     this.rulesBuyHoldRtpText.visible = showBonusRtp && this.rulesBuyHoldRtpText.text.length > 0;
   }
 
+  private refreshFooterBar(): void {
+    const currency = this.getCurrency();
+    const creditPrefix = getLocalized(this.game, 'balanceDemo', 'DEMO PLAY :');
+    const betPrefix = getLocalized(this.game, 'bet', 'BET :');
+    const credit = this.getCreditAmount();
+    const totalBet = this.getTotalBetAmount();
+    const creditFooterCfg = this.config.footer?.credit || {};
+    const totalBetFooterCfg = this.config.footer?.totalBet || {};
+
+    this.footerCreditLabel.text = creditPrefix;
+    this.footerCreditValue.text = ` ${formatMoney(credit, this.game)} ${currency}`;
+    fitBitmapTextToBounds(this.footerCreditLabel, { maxWidth: toNumber(creditFooterCfg.labelMaxWidth, 260), maxHeight: toNumber(creditFooterCfg.fontSize, 34), minScale: 0.7 });
+    fitBitmapTextToBounds(this.footerCreditValue, { maxWidth: toNumber(creditFooterCfg.valueMaxWidth, 360), maxHeight: toNumber(creditFooterCfg.fontSize, 34), minScale: 0.7 });
+    this.footerCreditValue.position.x = this.footerCreditLabel.x + this.footerCreditLabel.width;
+    this.footerCreditLabel.position.y = this.getFooterTextY(this.footerCreditLabel);
+    this.footerCreditValue.position.y = this.getFooterTextY(this.footerCreditValue);
+
+    this.footerBetLabel.text = betPrefix;
+    this.footerBetValue.text = ` ${formatMoney(totalBet, this.game)} ${currency}`;
+    fitBitmapTextToBounds(this.footerBetLabel, { maxWidth: toNumber(totalBetFooterCfg.labelMaxWidth, 160), maxHeight: toNumber(totalBetFooterCfg.fontSize, 34), minScale: 0.7 });
+    fitBitmapTextToBounds(this.footerBetValue, { maxWidth: toNumber(totalBetFooterCfg.valueMaxWidth, 260), maxHeight: toNumber(totalBetFooterCfg.fontSize, 34), minScale: 0.7 });
+    this.footerBetValue.position.x = this.footerBetLabel.x + this.footerBetLabel.width;
+    this.footerBetLabel.position.y = this.getFooterTextY(this.footerBetLabel);
+    this.footerBetValue.position.y = this.getFooterTextY(this.footerBetValue);
+  }
+
   private normalizePercentValue(value: unknown): string {
     if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
       return `${value}%`;
@@ -496,62 +569,80 @@ export default class HelpMenu extends Container {
 
   private buildHoldAndWinPage(): Container {
     const page = new Container();
-    const shields = ['mega_blur_01.png', 'major_blur_01.png', 'mini_blur_01.png', 'shield_blur_01.png'];
+    const pageCfg = this.config.paytablePages?.holdAndWin || {};
+    const symbolCfg = pageCfg.symbols || {};
+    const shields = Array.isArray(symbolCfg.frames) && symbolCfg.frames.length > 0 ? symbolCfg.frames : ['mega_blur_01.png', 'major_blur_01.png', 'mini_blur_01.png', 'shield_blur_01.png'];
 
     for (let i = 0; i < shields.length; i += 1) {
       const sprite = this.createSprite(shields[i], 0, 0);
       if (!sprite) continue;
-      sprite.scale.set(0.7);
-      this.placeLegacy(sprite, 500 + i * sprite.texture.width * 0.7, 690);
+      const scale = toNumber(symbolCfg.scale, 0.7);
+      sprite.scale.set(scale);
+      this.placeLegacy(sprite, toNumber(symbolCfg.startX, 500) + i * sprite.texture.width * toNumber(symbolCfg.stepMultiplier, scale), toNumber(symbolCfg.bottomY, 690));
       page.addChild(sprite);
     }
 
-    const text1 = this.createLegacyBodyText(getLocalized(this.game, 'splashTxt', ''), 200, 690, 1580, 30);
-    const text2 = this.createLegacyBodyText(getLocalized(this.game, 'splashTxt2', ''), 200, 600, 1580, 30);
-    const text3 = this.createLegacyBodyText(getLocalized(this.game, 'splashTxt3', ''), 200, 450, 1580, 30);
-    page.addChild(text1);
-    page.addChild(text2);
-    page.addChild(text3);
+    const textDefaults = [
+      { x: 200, bottomY: 690, width: 1580, fontSize: 30, key: 'splashTxt' },
+      { x: 200, bottomY: 600, width: 1580, fontSize: 30, key: 'splashTxt2' },
+      { x: 200, bottomY: 450, width: 1580, fontSize: 30, key: 'splashTxt3' }
+    ];
+    const texts = Array.isArray(pageCfg.texts) && pageCfg.texts.length > 0 ? pageCfg.texts : textDefaults;
+    for (let i = 0; i < texts.length; i += 1) {
+      const textCfg = texts[i];
+      page.addChild(this.createLegacyBodyText(getLocalized(this.game, String(textCfg.key || ''), ''), toNumber(textCfg.x, 200), toNumber(textCfg.bottomY, 690), toNumber(textCfg.width, 1580), toNumber(textCfg.fontSize, 30)));
+    }
     return page;
   }
 
   private buildFreeGamesPage(): Container {
     const page = new Container();
+    const pageCfg = this.config.paytablePages?.freeGames || {};
+    const bookCfg = pageCfg.book || {};
+    const titleCfg = pageCfg.titles || {};
+    const specialCfg = pageCfg.specialSymbols || {};
 
-    const book = this.createSprite('book_blur_01.png', 0, 0);
+    const book = this.createSprite(String(bookCfg.frame || 'book_blur_01.png'), 0, 0);
     if (book) {
-      book.scale.set(0.7);
-      this.placeLegacy(book, 346, 590);
+      book.scale.set(toNumber(bookCfg.scale, 0.7));
+      this.placeLegacy(book, toNumber(bookCfg.x, 346), toNumber(bookCfg.bottomY, 590));
       page.addChild(book);
     }
 
-    const wildTitle = this.createSectionTitle(getLocalized(this.game, 'splashSecTitleWild', 'SCATTER / WILD'), 391, 0);
-    const specialTitle = this.createSectionTitle(getLocalized(this.game, 'splashSecTitleSpecial', 'SPECIAL SYMBOLS'), 1073, 0);
-    this.placeLegacy(wildTitle, 391, 870);
-    this.placeLegacy(specialTitle, 1073, 870);
+    const wildCfg = titleCfg.wild || {};
+    const specialTitleCfg = titleCfg.special || {};
+    const wildTitle = this.createSectionTitle(getLocalized(this.game, String(wildCfg.key || 'splashSecTitleWild'), String(wildCfg.fallback || 'SCATTER / WILD')), toNumber(wildCfg.x, 391), 0);
+    const specialTitle = this.createSectionTitle(getLocalized(this.game, String(specialTitleCfg.key || 'splashSecTitleSpecial'), String(specialTitleCfg.fallback || 'SPECIAL SYMBOLS')), toNumber(specialTitleCfg.x, 1073), 0);
+    this.placeLegacy(wildTitle, toNumber(wildCfg.x, 391), toNumber(wildCfg.bottomY, 870));
+    this.placeLegacy(specialTitle, toNumber(specialTitleCfg.x, 1073), toNumber(specialTitleCfg.bottomY, 870));
     page.addChild(wildTitle);
     page.addChild(specialTitle);
 
-    const specialFrames = ['10_blur_01.png', 'J_blur_01.png', 'Q_blur_01.png', 'K_blur_01.png', 'A_blur_01.png', 'torch_blur_01.png', 'axe_blur_01.png', 'chalice_blur_01.png', 'knight_blur_01.png'];
+    const specialFrames = Array.isArray(specialCfg.frames) && specialCfg.frames.length > 0 ? specialCfg.frames : ['10_blur_01.png', 'J_blur_01.png', 'Q_blur_01.png', 'K_blur_01.png', 'A_blur_01.png', 'torch_blur_01.png', 'axe_blur_01.png', 'chalice_blur_01.png', 'knight_blur_01.png'];
     for (let i = 0; i < specialFrames.length; i += 1) {
       const sprite = this.createSprite(specialFrames[i], 0, 0);
       if (!sprite) continue;
-      sprite.scale.set(0.3);
-      sprite.tint = 0xffdc57;
+      const scale = toNumber(specialCfg.scale, 0.3);
+      sprite.scale.set(scale);
+      sprite.tint = toNumber(specialCfg.tint, 0xffdc57);
       if (i < 5) {
-        this.placeLegacy(sprite, 900 + i * sprite.texture.width * 0.35, 665);
+        this.placeLegacy(sprite, toNumber(specialCfg.topRowX, 900) + i * sprite.texture.width * toNumber(specialCfg.stepMultiplier, 0.35), toNumber(specialCfg.bottomY, 665));
       } else {
-        this.placeLegacy(sprite, 900 + 48 + (i % 5) * sprite.texture.width * 0.35, 665 - sprite.texture.height * 0.35);
+        this.placeLegacy(sprite, toNumber(specialCfg.secondRowX, 948) + (i % 5) * sprite.texture.width * toNumber(specialCfg.stepMultiplier, 0.35), toNumber(specialCfg.bottomY, 665) - sprite.texture.height * toNumber(specialCfg.stepMultiplier, 0.35));
       }
       page.addChild(sprite);
     }
 
-    const text1 = this.createLegacyBodyText(getLocalized(this.game, 'splashSecTxt', ''), 210, 568, 1520, 30);
-    const text2 = this.createLegacyBodyText(getLocalized(this.game, 'splashSecTxt2', ''), 210, 484, 1520, 30);
-    const text3 = this.createLegacyBodyText(getLocalized(this.game, 'splashSecTxt3', ''), 210, 400, 1520, 30);
-    page.addChild(text1);
-    page.addChild(text2);
-    page.addChild(text3);
+    const textDefaults = [
+      { x: 210, bottomY: 568, width: 1520, fontSize: 30, key: 'splashSecTxt' },
+      { x: 210, bottomY: 484, width: 1520, fontSize: 30, key: 'splashSecTxt2' },
+      { x: 210, bottomY: 400, width: 1520, fontSize: 30, key: 'splashSecTxt3' }
+    ];
+    const texts = Array.isArray(pageCfg.texts) && pageCfg.texts.length > 0 ? pageCfg.texts : textDefaults;
+    for (let i = 0; i < texts.length; i += 1) {
+      const textCfg = texts[i];
+      page.addChild(this.createLegacyBodyText(getLocalized(this.game, String(textCfg.key || ''), ''), toNumber(textCfg.x, 210), toNumber(textCfg.bottomY, 568), toNumber(textCfg.width, 1520), toNumber(textCfg.fontSize, 30)));
+    }
     return page;
   }
 
@@ -563,20 +654,24 @@ export default class HelpMenu extends Container {
 
   private buildPrimaryPaytablePage(): Container {
     const page = new Container();
+    const pageCfg = this.config.paytablePages?.primary || {};
+    const topSymbolCfg = pageCfg.topSymbol || {};
+    const descriptionCfg = pageCfg.description || {};
+    const scatterPaysCfg = pageCfg.scatterPays || {};
 
-    const topSymbol = this.createSprite('book_blur_01.png', 0, 0);
+    const topSymbol = this.createSprite(String(topSymbolCfg.frame || 'book_blur_01.png'), 0, 0);
     if (topSymbol) {
-      topSymbol.scale.set(0.5);
-      this.placeLegacy(topSymbol, 660, 800);
+      topSymbol.scale.set(toNumber(topSymbolCfg.scale, 0.5));
+      this.placeLegacy(topSymbol, toNumber(topSymbolCfg.x, 660), toNumber(topSymbolCfg.bottomY, 800));
       page.addChild(topSymbol);
     }
 
-    const description = this.createLegacyBodyText(getLocalized(this.game, 'paytableScatter', ''), 850, 860, 720, 28);
+    const description = this.createLegacyBodyText(getLocalized(this.game, String(descriptionCfg.key || 'paytableScatter'), ''), toNumber(descriptionCfg.x, 850), toNumber(descriptionCfg.bottomY, 860), toNumber(descriptionCfg.width, 720), toNumber(descriptionCfg.fontSize, 28));
     page.addChild(description);
 
-    this.addPayoutColumn(page, PAYTABLE_PAGE_1[0].pays, 483, 884, 32, false, true);
+    this.addPayoutColumn(page, PAYTABLE_PAGE_1[0].pays, toNumber(scatterPaysCfg.x, 483), toNumber(scatterPaysCfg.bottomY, 884), toNumber(scatterPaysCfg.fontSize, 32), false, true);
 
-    const items = [
+    const items = Array.isArray(pageCfg.items) && pageCfg.items.length > 0 ? pageCfg.items : [
       { symbol: PAYTABLE_PAGE_2[4], x: 165, y: 570, paysX: 365, paysY: 674, four: true },
       { symbol: PAYTABLE_PAGE_2[3], x: 575, y: 600, paysX: 745, paysY: 674 },
       { symbol: PAYTABLE_PAGE_2[2], x: 970, y: 600, paysX: 1130, paysY: 674 },
@@ -590,7 +685,9 @@ export default class HelpMenu extends Container {
 
     for (let i = 0; i < items.length; i += 1) {
       const item = items[i];
-      this.addPaytableSymbolBlock(page, item.symbol, item.x, item.y, false, item.paysX, item.paysY, !!item.four, true);
+      const symbol = (item as any).symbol || this.resolvePaySymbolByFrame(String((item as any).frame || ''));
+      if (!symbol) continue;
+      this.addPaytableSymbolBlock(page, symbol, toNumber((item as any).x, 0), toNumber((item as any).y ?? (item as any).bottomY, 0), false, toNumber((item as any).paysX, 0), toNumber((item as any).paysY, 0), !!((item as any).four ?? (item as any).includeFourRows), true);
     }
 
     return page;
@@ -598,7 +695,8 @@ export default class HelpMenu extends Container {
 
   private buildGoldPaytablePage(): Container {
     const page = new Container();
-    const items = [
+    const pageCfg = this.config.paytablePages?.gold || {};
+    const items = Array.isArray(pageCfg.items) && pageCfg.items.length > 0 ? pageCfg.items : [
       { symbol: PAYTABLE_GOLD_PAGE[0], x: 145, y: 671, paysX: 335, paysY: 743, four: true },
       { symbol: PAYTABLE_GOLD_PAGE[1], x: 585, y: 688, paysX: 755, paysY: 743 },
       { symbol: PAYTABLE_GOLD_PAGE[2], x: 990, y: 688, paysX: 1150, paysY: 743 },
@@ -612,7 +710,9 @@ export default class HelpMenu extends Container {
 
     for (let i = 0; i < items.length; i += 1) {
       const item = items[i];
-      this.addPaytableSymbolBlock(page, item.symbol, item.x, item.y, true, item.paysX, item.paysY, !!item.four, true);
+      const symbol = (item as any).symbol || this.resolvePaySymbolByFrame(String((item as any).frame || ''));
+      if (!symbol) continue;
+      this.addPaytableSymbolBlock(page, symbol, toNumber((item as any).x, 0), toNumber((item as any).y ?? (item as any).bottomY, 0), true, toNumber((item as any).paysX, 0), toNumber((item as any).paysY, 0), !!((item as any).four ?? (item as any).includeFourRows), true);
     }
 
     return page;
@@ -638,13 +738,14 @@ export default class HelpMenu extends Container {
         sprite.position.set(x, y);
       }
       if (gold) {
-        sprite.tint = 0xffdc57;
+        const goldCfg = this.config.paytablePages?.gold || {};
+        sprite.tint = toNumber(goldCfg.tint, 0xffdc57);
         const frameX = sprite.x - 6;
         const frameY = sprite.y - 6;
         const frame = new Graphics()
           .rect(frameX, frameY, sprite.width + 12, sprite.height + 12)
-          .fill({ color: 0xd19a12, alpha: 0.85 })
-          .stroke({ color: 0xffef9f, width: 3, alpha: 1 });
+          .fill({ color: toNumber(goldCfg.frameFill, 0xd19a12), alpha: 0.85 })
+          .stroke({ color: toNumber(goldCfg.frameStroke, 0xffef9f), width: 3, alpha: 1 });
         page.addChild(frame);
       }
       page.addChild(sprite);
@@ -688,14 +789,18 @@ export default class HelpMenu extends Container {
 
   private buildPaylinesPage(): Container {
     const page = new Container();
-    const text = this.createLegacyBodyText(getLocalized(this.game, 'paylinesTxt', ''), 310, 445, 1300, 28, 'center');
+    const pageCfg = this.config.paytablePages?.paylines || {};
+    const text1Cfg = pageCfg.text1 || {};
+    const text2Cfg = pageCfg.text2 || {};
+    const gridCfg = pageCfg.grid || {};
+    const text = this.createLegacyBodyText(getLocalized(this.game, String(text1Cfg.key || 'paylinesTxt'), ''), toNumber(text1Cfg.x, 310), toNumber(text1Cfg.bottomY, 445), toNumber(text1Cfg.width, 1300), toNumber(text1Cfg.fontSize, 28), String(text1Cfg.align || 'center') as 'center');
     text.anchor.set(0.5, 0);
     text.position.x = HelpMenu.SCREEN_WIDTH / 2;
     page.addChild(text);
 
-    const text2Value = getLocalized(this.game, 'paylinesTxt2', '');
+    const text2Value = getLocalized(this.game, String(text2Cfg.key || 'paylinesTxt2'), '');
     if (text2Value.trim().length > 0) {
-      const text2 = this.createLegacyBodyText(text2Value, 310, 365, 1300, 28, 'center');
+      const text2 = this.createLegacyBodyText(text2Value, toNumber(text2Cfg.x, 310), toNumber(text2Cfg.bottomY, 365), toNumber(text2Cfg.width, 1300), toNumber(text2Cfg.fontSize, 28), String(text2Cfg.align || 'center') as 'center');
       text2.anchor.set(0.5, 0);
       text2.position.x = HelpMenu.SCREEN_WIDTH / 2;
       page.addChild(text2);
@@ -703,8 +808,8 @@ export default class HelpMenu extends Container {
 
     for (let i = 0; i < PAYLINE_PATTERNS.length; i += 1) {
       const preview = this.createPaylinePreview(PAYLINE_PATTERNS[i], i);
-      const x = i > 4 ? 500 + (i % 5) * 260 : 500 + i * 260;
-      const y = i > 4 ? 650 : 800;
+      const x = i > 4 ? toNumber(gridCfg.startX, 500) + (i % 5) * toNumber(gridCfg.stepX, 260) : toNumber(gridCfg.startX, 500) + i * toNumber(gridCfg.stepX, 260);
+      const y = i > 4 ? toNumber(gridCfg.bottomRowBottomY, 650) : toNumber(gridCfg.topRowBottomY, 800);
       this.placeLegacy(preview, x, y);
       page.addChild(preview);
     }
@@ -855,16 +960,18 @@ export default class HelpMenu extends Container {
 
   private buildSettingsPage(): Container {
     const page = new Container();
-
-    const leftColumnX = 357;
-    const rightColumnX = 1063;
-    const soundY = 812;
-    const soundFxY = 658;
-    const musicY = 499;
-    const volumeY = 345;
-    const lobbyY = 812;
-    const skipIntroY = 658;
-    const turboY = 499;
+    const pageCfg = this.config.settingsPage || {};
+    const columnsCfg = pageCfg.columns || {};
+    const rowsCfg = pageCfg.rows || {};
+    const leftColumnX = toNumber(columnsCfg.leftX, 357);
+    const rightColumnX = toNumber(columnsCfg.rightX, 1063);
+    const soundY = toNumber(rowsCfg.sound, 812);
+    const soundFxY = toNumber(rowsCfg.soundFx, 658);
+    const musicY = toNumber(rowsCfg.music, 499);
+    const volumeY = toNumber(rowsCfg.volume, 345);
+    const lobbyY = toNumber(rowsCfg.lobby, 812);
+    const skipIntroY = toNumber(rowsCfg.skipIntro, 658);
+    const turboY = toNumber(rowsCfg.turbo, 499);
 
     this.settingsToggles.soundOn = this.createToggleButton('sound_bg', leftColumnX, soundY, 'settingsSoundOn', 'SOUND ON', () => {
       const next = !this.getSettingBool('audioEnabled', true);
@@ -907,7 +1014,7 @@ export default class HelpMenu extends Container {
       this.forceRefresh();
     });
 
-    this.settingsToggles.skipScreen = this.createToggleButton('skipscreen_bg', rightColumnX, 340, 'settingsSkipScreen', 'SKIP SCREENS', () => {
+    this.settingsToggles.skipScreen = this.createToggleButton('skipscreen_bg', rightColumnX, toNumber(rowsCfg.skipScreen, 340), 'settingsSkipScreen', 'SKIP SCREENS', () => {
       if (this.game?.context) {
         this.game.context.skipScreen = !this.game.context.skipScreen;
       }
@@ -924,15 +1031,18 @@ export default class HelpMenu extends Container {
     if (volumeBg) this.placeLegacy(volumeBg, leftColumnX, volumeY);
     if (volumeBg) page.addChild(volumeBg);
 
+    const volumeTitleCfg = pageCfg.volumeTitle || {};
+    const volumeValueCfg = pageCfg.volumeValue || {};
+    const infoTextCfg = pageCfg.infoText || {};
     const volumeTitle = this.createText(getLocalized(this.game, 'settingsVolume', 'VOLUME'), 0, 0, {
-      fontSize: 34,
-      fill: 0xb9c5d3,
+      fontSize: toNumber(volumeTitleCfg.fontSize, 34),
+      fill: toNumber(volumeTitleCfg.color, 0xb9c5d3),
       anchorX: 0
     });
-    this.placeLegacy(volumeTitle, leftColumnX + 80, 382);
+    this.placeLegacy(volumeTitle, leftColumnX + toNumber(volumeTitleCfg.offsetX, 80), toNumber(volumeTitleCfg.bottomY, 382));
     page.addChild(volumeTitle);
     page.addChild(this.volumeValueText);
-    this.placeLegacy(this.volumeValueText, leftColumnX + 295, 382);
+    this.placeLegacy(this.volumeValueText, leftColumnX + toNumber(volumeValueCfg.offsetX, 295), toNumber(volumeValueCfg.bottomY, 382));
 
     this.volumeMinusButton = this.createButton('minus_001.png', 'minus_002.png', 597, 340, () => {
       this.setVolumeStep(this.getVolumeStep() - 1);
@@ -969,7 +1079,7 @@ export default class HelpMenu extends Container {
     if (this.lobbyButton) this.placeLegacy(this.lobbyButton.root, rightColumnX, lobbyY);
 
     page.addChild(this.settingsInfoText);
-    this.placeLegacy(this.settingsInfoText, rightColumnX, 430);
+    this.placeLegacy(this.settingsInfoText, toNumber(infoTextCfg.x, rightColumnX), toNumber(infoTextCfg.bottomY, 430));
     return page;
   }
 
@@ -979,6 +1089,30 @@ export default class HelpMenu extends Container {
     const bet = typeof meters.getBetPerLine === 'function' ? Number(meters.getBetPerLine()) : toNumber(meters.bet, 0);
     const denom = typeof meters.getDenomination === 'function' ? Number(meters.getDenomination()) : toNumber(meters.denomination, 0);
     return Math.max(0, bet * denom);
+  }
+
+  private getTotalBetAmount(): number {
+    const meters = this.game?.meters as any;
+    if (!meters) return 0;
+    if (typeof meters.getTotalBet === 'function') {
+      return Math.max(0, Number(meters.getTotalBet()) || 0);
+    }
+    return Math.max(0, toNumber(meters.totalBet, 0));
+  }
+
+  private getCreditAmount(): number {
+    const meters = this.game?.meters as any;
+    if (!meters) return 0;
+    if (typeof meters.getCredit === 'function') {
+      return Math.max(0, Number(meters.getCredit()) || 0);
+    }
+    return Math.max(0, toNumber(meters.credit, 0));
+  }
+
+  private getCurrency(): string {
+    const meters = this.game?.meters as any;
+    if (!meters) return 'FUN';
+    return typeof meters.getCurrency === 'function' ? String(meters.getCurrency() || 'FUN') : String(meters.currency || 'FUN');
   }
 
   private getMinBetLabel(): string {
@@ -997,6 +1131,17 @@ export default class HelpMenu extends Container {
     return `${getLocalized(this.game, 'rulesMAXbet', 'MAXIMUM BET:')} ${formatMoney(maxBet, this.game)} ${currency}`;
   }
 
+  private resolvePaySymbolByFrame(frame: string): PaySymbol | null {
+    const pages = [PAYTABLE_PAGE_1, PAYTABLE_PAGE_2, PAYTABLE_GOLD_PAGE];
+    for (let i = 0; i < pages.length; i += 1) {
+      const set = pages[i];
+      for (let j = 0; j < set.length; j += 1) {
+        if (set[j].frame === frame) return set[j];
+      }
+    }
+    return null;
+  }
+
   private createBodyText(text: string, x: number, y: number, maxWidth: number, fontSize = 28): Text {
     const body = this.createText(text, x, y, {
       fontSize,
@@ -1009,6 +1154,28 @@ export default class HelpMenu extends Container {
     body.style.wordWrap = true;
     body.style.wordWrapWidth = maxWidth;
     return body;
+  }
+
+  private createBitmapLabel(text: string, x: number, y: number, fontSize: number, fill: number): BitmapText {
+    const label = new BitmapText({
+      text,
+      style: {
+        fontFamily: BITMAP_FONT_ROBOTO_CONDENSED_MEDIUM,
+        fontSize,
+        fill,
+        align: 'left'
+      }
+    });
+    label.roundPixels = true;
+    label.position.set(x, y);
+    return label;
+  }
+
+  private getFooterTextY(text: { height: number }): number {
+    const footerSprite = this.footerBar.children[0] as { y?: number; height?: number } | undefined;
+    const footerY = Number(footerSprite?.y ?? 1034);
+    const footerHeight = Number(footerSprite?.height ?? 46);
+    return Math.round(footerY + (footerHeight - text.height) / 2);
   }
 
   private createLegacyBodyText(
@@ -1220,17 +1387,19 @@ export default class HelpMenu extends Container {
     }
     root.eventMode = 'static';
     root.cursor = 'pointer';
+    let selectedState = false;
     root.on('pointerdown', () => {
       root.texture = selected;
     });
     root.on('pointerup', () => {
+      root.texture = selectedState ? selected : normal;
       onTap();
     });
     root.on('pointerupoutside', () => {
-      root.texture = normal;
+      root.texture = selectedState ? selected : normal;
     });
     root.on('pointerout', () => {
-      root.texture = normal;
+      root.texture = selectedState ? selected : normal;
     });
 
     const label = new Text({
@@ -1253,6 +1422,7 @@ export default class HelpMenu extends Container {
       root,
       label,
       setSelected: (value: boolean) => {
+        selectedState = value;
         root.texture = value ? selected : disabled;
         label.alpha = value ? 1 : 0.65;
       }

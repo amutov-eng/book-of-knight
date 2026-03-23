@@ -699,6 +699,111 @@ export function getUiHudConfig(manifest) {
             texts: {
                 title: { x: 960, y: 250, fontSize: 54 }
             }
+        },
+        helpMenu: {
+            background: { frame: 'bg_menu.png', width: 1920, height: 1080 },
+            overlay: { color: 0x000000, alpha: 0.08 },
+            title: { x: 960, y: 98, fontSize: 58, color: 0x93a7bf, maxWidth: 760 },
+            page: { x: 1750, y: 925, fontSize: 28, color: 0xffffff, maxWidth: 180 },
+            logo: { frame: 'logo.png', x: 18, y: 8, scale: 0.76 },
+            footer: {
+                background: { frame: 'bottom_bg.png', x: 0, y: 1034 },
+                credit: { x: 220, y: 1039, fontSize: 34, labelColor: 0xffc600, valueColor: 0xf3f9f9, labelMaxWidth: 260, valueMaxWidth: 360 },
+                totalBet: { x: 1490, y: 1039, fontSize: 34, labelColor: 0xffc600, valueColor: 0xf3f9f9, labelMaxWidth: 160, valueMaxWidth: 260 }
+            },
+            navigation: {
+                close: { normal: 'button_close_001.png', pressed: 'button_close_002.png', x: 1711, y: 928, legacyY: true },
+                prev: { normal: 'button_arrow_l_001.png', pressed: 'button_arrow_l_002.png', x: 1660, y: 150, legacyY: true },
+                next: { normal: 'button_arrow_r_001.png', pressed: 'button_arrow_r_002.png', x: 1760, y: 150, legacyY: true }
+            },
+            tabs: {
+                history: { base: 'button_history', x: 1394, y: 140, legacyY: true, key: 'helpHistory', fallback: 'HISTORY' },
+                paytable: { base: 'button_pay', x: 354, y: 140, legacyY: true, key: 'helpPay', fallback: 'PAYTABLE' },
+                settings: { base: 'button_sett', x: 874, y: 140, legacyY: true, key: 'helpSettings', fallback: 'SETTINGS' },
+                rules: { base: 'button_rules', x: 1394, y: 140, legacyY: true, key: 'helpRules', fallback: 'RULES' }
+            },
+            paytablePages: {
+                holdAndWin: {
+                    symbols: { frames: ['mega_blur_01.png', 'major_blur_01.png', 'mini_blur_01.png', 'shield_blur_01.png'], startX: 500, bottomY: 690, scale: 0.7, stepMultiplier: 0.7 },
+                    texts: [
+                        { x: 200, bottomY: 690, width: 1580, fontSize: 30, key: 'splashTxt' },
+                        { x: 200, bottomY: 600, width: 1580, fontSize: 30, key: 'splashTxt2' },
+                        { x: 200, bottomY: 450, width: 1580, fontSize: 30, key: 'splashTxt3' }
+                    ]
+                },
+                freeGames: {
+                    book: { frame: 'book_blur_01.png', x: 346, bottomY: 590, scale: 0.7 },
+                    titles: {
+                        wild: { x: 391, bottomY: 870, fontSize: 34, key: 'splashSecTitleWild', fallback: 'SCATTER / WILD' },
+                        special: { x: 1073, bottomY: 870, fontSize: 34, key: 'splashSecTitleSpecial', fallback: 'SPECIAL SYMBOLS' }
+                    },
+                    specialSymbols: {
+                        frames: ['10_blur_01.png', 'J_blur_01.png', 'Q_blur_01.png', 'K_blur_01.png', 'A_blur_01.png', 'torch_blur_01.png', 'axe_blur_01.png', 'chalice_blur_01.png', 'knight_blur_01.png'],
+                        topRowX: 900,
+                        secondRowX: 948,
+                        bottomY: 665,
+                        scale: 0.3,
+                        stepMultiplier: 0.35,
+                        tint: 0xffdc57
+                    },
+                    texts: [
+                        { x: 210, bottomY: 568, width: 1520, fontSize: 30, key: 'splashSecTxt' },
+                        { x: 210, bottomY: 484, width: 1520, fontSize: 30, key: 'splashSecTxt2' },
+                        { x: 210, bottomY: 400, width: 1520, fontSize: 30, key: 'splashSecTxt3' }
+                    ]
+                },
+                primary: {
+                    topSymbol: { frame: 'book_blur_01.png', x: 660, bottomY: 800, scale: 0.5 },
+                    description: { x: 850, bottomY: 860, width: 720, fontSize: 28, key: 'paytableScatter' },
+                    scatterPays: { x: 483, bottomY: 884, fontSize: 32 },
+                    items: [
+                        { frame: 'knight_blur_01.png', x: 165, bottomY: 570, paysX: 365, paysY: 674, includeFourRows: true },
+                        { frame: 'chalice_blur_01.png', x: 575, bottomY: 600, paysX: 745, paysY: 674 },
+                        { frame: 'axe_blur_01.png', x: 970, bottomY: 600, paysX: 1130, paysY: 674 },
+                        { frame: 'torch_blur_01.png', x: 1365, bottomY: 600, paysX: 1525, paysY: 674 },
+                        { frame: 'A_blur_01.png', x: 110, bottomY: 400, paysX: 260, paysY: 506 },
+                        { frame: 'K_blur_01.png', x: 440, bottomY: 400, paysX: 590, paysY: 506 },
+                        { frame: 'Q_blur_01.png', x: 770, bottomY: 400, paysX: 920, paysY: 506 },
+                        { frame: 'J_blur_01.png', x: 1100, bottomY: 400, paysX: 1250, paysY: 506 },
+                        { frame: '10_blur_01.png', x: 1430, bottomY: 400, paysX: 1580, paysY: 506 }
+                    ]
+                },
+                gold: {
+                    items: [
+                        { frame: 'knight_blur_01.png', x: 145, bottomY: 671, paysX: 335, paysY: 743, includeFourRows: true },
+                        { frame: 'chalice_blur_01.png', x: 585, bottomY: 688, paysX: 755, paysY: 743 },
+                        { frame: 'axe_blur_01.png', x: 990, bottomY: 688, paysX: 1150, paysY: 743 },
+                        { frame: 'torch_blur_01.png', x: 1410, bottomY: 688, paysX: 1570, paysY: 743 },
+                        { frame: 'A_blur_01.png', x: 110, bottomY: 488, paysX: 260, paysY: 558 },
+                        { frame: 'K_blur_01.png', x: 450, bottomY: 488, paysX: 600, paysY: 558 },
+                        { frame: 'Q_blur_01.png', x: 790, bottomY: 488, paysX: 940, paysY: 558 },
+                        { frame: 'J_blur_01.png', x: 1130, bottomY: 488, paysX: 1280, paysY: 558 },
+                        { frame: '10_blur_01.png', x: 1470, bottomY: 488, paysX: 1620, paysY: 558 }
+                    ],
+                    scale: 0.45,
+                    tint: 0xffdc57,
+                    frameFill: 0xd19a12,
+                    frameStroke: 0xffef9f
+                },
+                paylines: {
+                    text1: { x: 310, bottomY: 445, width: 1300, fontSize: 28, key: 'paylinesTxt', align: 'center' },
+                    text2: { x: 310, bottomY: 365, width: 1300, fontSize: 28, key: 'paylinesTxt2', align: 'center' },
+                    grid: { startX: 500, topRowBottomY: 800, bottomRowBottomY: 650, stepX: 260 }
+                }
+            },
+            settingsPage: {
+                columns: { leftX: 357, rightX: 1063 },
+                rows: { sound: 812, soundFx: 658, music: 499, volume: 345, lobby: 812, skipIntro: 658, turbo: 499, skipScreen: 340 },
+                volumeTitle: { offsetX: 80, bottomY: 382, fontSize: 34, color: 0xb9c5d3 },
+                volumeValue: { offsetX: 295, bottomY: 382, fontSize: 38, color: 0xb9c5d3 },
+                infoText: { x: 1063, bottomY: 430, fontSize: 26, color: 0xb9c5d3, maxWidth: 320 }
+            },
+            rulesPages: {
+                howTo: {
+                    minBet: { x: 0, bottomY: 910, width: 920, fontSize: 28 },
+                    maxBet: { x: 0, bottomY: 950, width: 920, fontSize: 28 }
+                }
+            }
         }
     }; 
 
@@ -717,7 +822,8 @@ export function getUiHudConfig(manifest) {
         autoPlayMenu: mergeBranch(fallback.autoPlayMenu, hud.autoPlayMenu),
         buyBonusMenu: mergeBranch(fallback.buyBonusMenu, hud.buyBonusMenu),
         buyBonusConfirm: mergeBranch(fallback.buyBonusConfirm, hud.buyBonusConfirm),
-        bootSoundPrompt: mergeBranch(fallback.bootSoundPrompt, hud.bootSoundPrompt)
+        bootSoundPrompt: mergeBranch(fallback.bootSoundPrompt, hud.bootSoundPrompt),
+        helpMenu: mergeBranch(fallback.helpMenu, hud.helpMenu)
     };
 }
 
