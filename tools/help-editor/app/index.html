@@ -6,7 +6,16 @@
     <title>Help Menu Editor</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.10.0/jsoneditor.min.css" rel="stylesheet" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.10.0/jsoneditor.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.4.3/pixi.min.js"></script>
     <style>
+        @font-face {
+            font-family: 'EditorRoboto';
+            src: url('/assets/common/fonts/Roboto-Regular.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
         :root {
             color-scheme: dark;
             --bg: #11151b;
@@ -23,7 +32,7 @@
         * { box-sizing: border-box; }
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'EditorRoboto', Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
         }
@@ -72,6 +81,13 @@
             min-height: 0;
         }
 
+        .layout-stack {
+            display: grid;
+            grid-template-rows: minmax(220px, 0.58fr) minmax(520px, 1.42fr);
+            gap: 16px;
+            min-height: 0;
+        }
+
         .panel {
             background: var(--panel);
             border: 1px solid var(--line);
@@ -90,12 +106,161 @@
         }
 
         #json-editor {
-            height: calc(100vh - 180px);
+            height: 100%;
+            min-height: 200px;
         }
 
         .translations {
             padding: 0;
             overflow: auto;
+        }
+
+        .visual-editor {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 0;
+            height: 100%;
+        }
+
+        .visual-list {
+            border-right: 1px solid var(--line);
+            padding: 12px;
+            overflow: auto;
+        }
+
+        .visual-canvas {
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            min-height: 0;
+        }
+
+        .visual-toolbar {
+            padding: 12px 16px 0;
+            color: var(--muted);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .preview-wrap {
+            padding: 12px 16px;
+        }
+
+        .preview-stage {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(8, 12, 18, 0.98), rgba(10, 17, 24, 0.96)),
+                radial-gradient(circle at top, rgba(210, 166, 44, 0.12), transparent 30%);
+        }
+
+        .preview-stage canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .preview-guides {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: calc(100% / 12) calc(100% / 8);
+            pointer-events: none;
+        }
+
+        .preview-box {
+            position: absolute;
+            border: 2px solid rgba(143, 160, 178, 0.9);
+            background: rgba(143, 160, 178, 0.12);
+            color: #f2f6fb;
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 12px;
+            line-height: 1.2;
+            overflow: hidden;
+            cursor: pointer;
+            user-select: none;
+            white-space: normal;
+        }
+
+        .preview-box.active {
+            border-color: var(--accent);
+            background: rgba(210, 166, 44, 0.16);
+            box-shadow: 0 0 0 1px rgba(210, 166, 44, 0.3) inset;
+        }
+
+        .preview-box-body {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font-weight: 400;
+            font-family: 'EditorRoboto', Arial, sans-serif;
+        }
+
+        .preview-image {
+            position: absolute;
+            border: 2px solid rgba(107, 196, 109, 0.8);
+            background-repeat: no-repeat;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .preview-image.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px rgba(210, 166, 44, 0.3) inset;
+        }
+
+        .preview-shell-text {
+            position: absolute;
+            color: #ffffff;
+            font-weight: 700;
+            pointer-events: none;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.55);
+            white-space: nowrap;
+            font-family: 'EditorRoboto', Arial, sans-serif;
+        }
+
+        .inspector {
+            border-top: 1px solid var(--line);
+            padding: 14px 16px 16px;
+            overflow: auto;
+        }
+
+        .inspector-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .inspector-grid label,
+        .inspector-extra label {
+            display: grid;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .inspector-extra {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .field-note {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--muted);
         }
 
         .translation-tools {
@@ -229,18 +394,46 @@
                 </div>
                 <div class="toolbar">
                     <button class="primary" id="reload-btn">Reload</button>
+                    <button class="primary" id="add-page-btn">Add Page</button>
+                    <button class="primary" id="copy-page-btn">Copy Page</button>
+                    <button class="primary" id="delete-page-btn">Delete Page</button>
                     <button class="primary" id="save-btn">Save All</button>
                     <span id="status" class="status"></span>
                 </div>
             </div>
             <div class="hint">
-                Layout JSON edits the selected help section inside the desktop manifest. Translation edits update <code>assets/common/localization/translations.json</code> for all languages.
+                Layout JSON edits the selected help section inside the desktop manifest. For text boxes use <code>x</code>, <code>bottomY</code>, <code>width</code>, <code>height</code> and <code>fontSize</code>. Runtime auto-fits every language inside the configured width and height. Translation edits update <code>assets/common/localization/translations.json</code> for all languages.
             </div>
             <div class="main">
-                <section class="panel">
-                    <h2>Layout Config</h2>
-                    <div id="json-editor"></div>
-                </section>
+                <div class="layout-stack">
+                    <section class="panel">
+                        <h2>Layout Inspector</h2>
+                        <div class="visual-editor">
+                            <div id="layout-item-list" class="visual-list"></div>
+                            <div class="visual-canvas">
+                                <div class="visual-toolbar">
+                                    <div>Preview uses a 1920x1080 stage. Images and text use legacy <code>bottomY</code> positioning.</div>
+                                    <label style="display:flex;align-items:center;gap:8px;color:var(--muted);">
+                                        <span>Preview Language</span>
+                                        <select id="preview-language"></select>
+                                    </label>
+                                </div>
+                                <div class="preview-wrap">
+                                    <div id="layout-preview" class="preview-stage">
+                                        <div class="preview-guides"></div>
+                                    </div>
+                                </div>
+                                <div class="inspector">
+                                    <div id="layout-form" class="status">Select an image or text box.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="panel">
+                        <h2>Layout Config</h2>
+                        <div id="json-editor"></div>
+                    </section>
+                </div>
                 <section class="panel translations">
                     <h2>Translations</h2>
                     <div class="translation-tools">
@@ -251,6 +444,7 @@
                             <option value="custom">Custom</option>
                         </select>
                         <input id="custom-languages" type="text" placeholder="e.g. en,bg,de" style="min-width:220px;">
+                        <button class="primary" id="add-translation-key-btn" type="button">Add Text Key</button>
                     </div>
                     <div id="translation-list" class="translation-list"></div>
                 </section>
@@ -259,35 +453,726 @@
     </div>
 
     <script>
-        const PAGE_DEFS = [
+        const BASE_PAGE_DEFS = [
             { id: 'shell-general', title: 'General Shell', group: 'shell', manifestPath: ['ui', 'hud', 'helpMenu'], translationKeys: ['helpPay', 'helpRules', 'helpSettings', 'helpHistory', 'helpPages'] },
-            { id: 'paytable-hold', title: 'Paytable: Hold And Win', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'holdAndWin'], translationKeys: ['splashTitle', 'splashTxt'] },
-            { id: 'paytable-free', title: 'Paytable: Free Games', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'freeGames'], translationKeys: ['splashSecTitle', 'splashSecTitleWild', 'splashSecTitleSpecial', 'splashSecTxt'] },
-            { id: 'paytable-primary', title: 'Paytable: Main Paytable', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'primary'], translationKeys: ['paytableTitle', 'paytableScatter'] },
-            { id: 'paytable-gold', title: 'Paytable: Gold Paytable', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'gold'], translationKeys: ['paytableTitle'] },
-            { id: 'paytable-lines', title: 'Paytable: Paylines', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'paylines'], translationKeys: ['paylinesTitle', 'paylinesLine', 'paylinesTxt'] },
-            { id: 'settings', title: 'Help: Settings Page', group: 'shell', manifestPath: ['ui', 'hud', 'helpMenu', 'settingsPage'], translationKeys: ['settingsTitle', 'settingsSoundOn', 'settingsGameSounds', 'settingsMusic', 'settingsVolume', 'settingsLobby', 'settingsSkipIntro', 'settingsTurboSpin', 'settingsTurboSpinTxt', 'settingsSkipScreen'] },
-            { id: 'rules-howto', title: 'Rules: How To Play', group: 'rules', manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'howTo'], translationKeys: ['rulesTitle', 'rulesMINbet', 'rulesMAXbet', 'rulesInterface', 'rulesAutoplay'] },
-            { id: 'rules-bet', title: 'Rules: Bet / Settings', group: 'rules', manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'betSettings'], translationKeys: ['rulesBetMenu', 'rulesSettings'] },
-            { id: 'rules-lines', title: 'Rules: Lines', group: 'rules', manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'lines'], translationKeys: ['rulesLines', 'rulesUnfinished', 'rulesGamePercent'] },
-            { id: 'rules-extra', title: 'Rules: Extra', group: 'rules', manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'extra'], translationKeys: ['rulesMaxWin', 'rulesBuyBonus', 'rulesGamePercentBuyFree', 'rulesGamePercentBuyHold'] },
-            { id: 'rules-fg', title: 'Rules: Free Spins Bonus', group: 'rules', manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'addFreeGames'], translationKeys: ['rulesAddFg'] }
+            {
+                id: 'paytable-hold',
+                title: 'Paytable: Hold And Win',
+                group: 'paytable',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'holdAndWin'],
+                translationKeys: ['splashTitle', 'splashTxt'],
+                defaultLayout: {
+                    items: [
+                        { id: 'mega', frame: 'mega_blur_01.png', x: 500, bottomY: 690, scale: 0.7 },
+                        { id: 'major', frame: 'major_blur_01.png', x: 696, bottomY: 690, scale: 0.7 },
+                        { id: 'mini', frame: 'mini_blur_01.png', x: 892, bottomY: 690, scale: 0.7 },
+                        { id: 'wooden', frame: 'shield_blur_01.png', x: 1088, bottomY: 690, scale: 0.7 }
+                    ],
+                    texts: [{ x: 200, bottomY: 690, width: 1580, height: 300, fontSize: 30, key: 'splashTxt' }]
+                }
+            },
+            {
+                id: 'paytable-free',
+                title: 'Paytable: Free Games',
+                group: 'paytable',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'freeGames'],
+                translationKeys: ['splashSecTitle', 'splashSecTitleWild', 'splashSecTitleSpecial', 'splashSecTxt'],
+                defaultLayout: {
+                    items: [
+                        { id: 'book', frame: 'book_blur_01.png', x: 346, bottomY: 590, scale: 0.7 },
+                        { id: '10', frame: '10_blur_01.png', x: 900, bottomY: 665, scale: 0.3, tint: 16702551 },
+                        { id: 'J', frame: 'J_blur_01.png', x: 997, bottomY: 665, scale: 0.3, tint: 16702551 },
+                        { id: 'Q', frame: 'Q_blur_01.png', x: 1094, bottomY: 665, scale: 0.3, tint: 16702551 },
+                        { id: 'K', frame: 'K_blur_01.png', x: 1191, bottomY: 665, scale: 0.3, tint: 16702551 },
+                        { id: 'A', frame: 'A_blur_01.png', x: 1288, bottomY: 665, scale: 0.3, tint: 16702551 },
+                        { id: 'torch', frame: 'torch_blur_01.png', x: 948, bottomY: 573, scale: 0.3, tint: 16702551 },
+                        { id: 'axe', frame: 'axe_blur_01.png', x: 1045, bottomY: 573, scale: 0.3, tint: 16702551 },
+                        { id: 'chalice', frame: 'chalice_blur_01.png', x: 1142, bottomY: 573, scale: 0.3, tint: 16702551 },
+                        { id: 'knight', frame: 'knight_blur_01.png', x: 1239, bottomY: 573, scale: 0.3, tint: 16702551 }
+                    ],
+                    titles: {
+                        wild: { x: 391, bottomY: 870, fontSize: 34, key: 'splashSecTitleWild', fallback: 'SCATTER / WILD' },
+                        special: { x: 1073, bottomY: 870, fontSize: 34, key: 'splashSecTitleSpecial', fallback: 'SPECIAL SYMBOLS' }
+                    },
+                    texts: [{ x: 210, bottomY: 568, width: 1520, height: 240, fontSize: 30, key: 'splashSecTxt' }]
+                }
+            },
+            {
+                id: 'paytable-primary',
+                title: 'Paytable: Main Paytable',
+                group: 'paytable',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'primary'],
+                translationKeys: ['paytableTitle', 'paytableScatter'],
+                defaultLayout: {
+                    scatter: {
+                        frame: 'book_blur_01.png',
+                        x: 660,
+                        bottomY: 800,
+                        scale: 0.5,
+                        descriptionX: 850,
+                        descriptionBottomY: 860,
+                        descriptionWidth: 720,
+                        descriptionHeight: 160,
+                        descriptionFontSize: 28,
+                        descriptionAlign: 'left',
+                        paysX: 483,
+                        paysBottomY: 884,
+                        paysFontSize: 32,
+                        descriptionKey: 'paytableScatter',
+                        descriptionFallback: 'This symbol is both WILD and SCATTER.',
+                        pays: [
+                            { count: 3, mult: 2 },
+                            { count: 4, mult: 40 },
+                            { count: 5, mult: 1000 }
+                        ]
+                    },
+                    symbols: [
+                        { frame: 'knight_blur_01.png', x: 165, bottomY: 570, paysX: 365, paysY: 674, includeFourRows: true, pays: [{ count: 2, mult: 5 }, { count: 3, mult: 100 }, { count: 4, mult: 1000 }, { count: 5, mult: 5000 }] },
+                        { frame: 'chalice_blur_01.png', x: 575, bottomY: 600, paysX: 745, paysY: 674, pays: [{ count: 3, mult: 30 }, { count: 4, mult: 400 }, { count: 5, mult: 2000 }] },
+                        { frame: 'axe_blur_01.png', x: 970, bottomY: 600, paysX: 1130, paysY: 674, pays: [{ count: 3, mult: 20 }, { count: 4, mult: 100 }, { count: 5, mult: 750 }] },
+                        { frame: 'torch_blur_01.png', x: 1365, bottomY: 600, paysX: 1525, paysY: 674, pays: [{ count: 3, mult: 20 }, { count: 4, mult: 100 }, { count: 5, mult: 750 }] },
+                        { frame: 'A_blur_01.png', x: 110, bottomY: 400, paysX: 260, paysY: 506, pays: [{ count: 3, mult: 5 }, { count: 4, mult: 30 }, { count: 5, mult: 150 }] },
+                        { frame: 'K_blur_01.png', x: 440, bottomY: 400, paysX: 590, paysY: 506, pays: [{ count: 3, mult: 5 }, { count: 4, mult: 30 }, { count: 5, mult: 150 }] },
+                        { frame: 'Q_blur_01.png', x: 770, bottomY: 400, paysX: 920, paysY: 506, pays: [{ count: 3, mult: 5 }, { count: 4, mult: 20 }, { count: 5, mult: 100 }] },
+                        { frame: 'J_blur_01.png', x: 1100, bottomY: 400, paysX: 1250, paysY: 506, pays: [{ count: 3, mult: 5 }, { count: 4, mult: 20 }, { count: 5, mult: 100 }] },
+                        { frame: '10_blur_01.png', x: 1430, bottomY: 400, paysX: 1580, paysY: 506, pays: [{ count: 3, mult: 5 }, { count: 4, mult: 20 }, { count: 5, mult: 100 }] }
+                    ]
+                }
+            },
+            { id: 'paytable-gold', title: 'Paytable: Gold Paytable', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'gold'], translationKeys: ['paytableTitle'], defaultLayout: {} },
+            {
+                id: 'paytable-lines',
+                title: 'Paytable: Paylines',
+                group: 'paytable',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'paylines'],
+                translationKeys: ['paylinesTitle', 'paylinesLine', 'paylinesTxt'],
+                defaultLayout: {
+                    text1: { x: 310, bottomY: 445, width: 1300, height: 220, fontSize: 28, key: 'paylinesTxt', align: 'center' },
+                    grid: { startX: 500, stepX: 260, topRowBottomY: 800, rowBottomYStep: 150, columnsPerRow: 5, scale: 1 },
+                    lines: [
+                        [1, 1, 1, 1, 1],
+                        [0, 0, 0, 0, 0],
+                        [2, 2, 2, 2, 2],
+                        [0, 1, 2, 1, 0],
+                        [2, 1, 0, 1, 2],
+                        [1, 2, 2, 2, 1],
+                        [1, 0, 0, 0, 1],
+                        [2, 2, 1, 0, 0],
+                        [0, 0, 1, 2, 2],
+                        [2, 1, 1, 1, 0]
+                    ]
+                }
+            },
+            { id: 'settings', title: 'Help: Settings Page', group: 'shell', manifestPath: ['ui', 'hud', 'helpMenu', 'settingsPage'], translationKeys: ['settingsTitle', 'settingsSoundOn', 'settingsGameSounds', 'settingsMusic', 'settingsVolume', 'settingsLobby', 'settingsSkipIntro', 'settingsTurboSpin', 'settingsTurboSpinTxt', 'settingsSkipScreen'], defaultLayout: {} },
+            {
+                id: 'rules-howto',
+                title: 'Rules: How To Play',
+                group: 'rules',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'howTo'],
+                translationKeys: ['rulesTitle', 'rulesMINbet', 'rulesMAXbet', 'rulesInterface', 'rulesAutoplay'],
+                defaultLayout: {
+                    minBet: { x: 0, bottomY: 910, width: 920, height: 40, fontSize: 28 },
+                    maxBet: { x: 0, bottomY: 950, width: 920, height: 40, fontSize: 28 },
+                    interfaceText: { x: 220, bottomY: 720, width: 1265, height: 220, fontSize: 26, key: 'rulesInterface' },
+                    autoplayText: { x: 220, bottomY: 420, width: 1265, height: 180, fontSize: 26, key: 'rulesAutoplay' }
+                }
+            },
+            {
+                id: 'rules-bet',
+                title: 'Rules: Bet / Settings',
+                group: 'rules',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'betSettings'],
+                translationKeys: ['rulesBetMenu', 'rulesSettings'],
+                defaultLayout: {
+                    betMenuText: { x: 220, bottomY: 760, width: 1265, height: 220, fontSize: 26, key: 'rulesBetMenu' },
+                    settingsText: { x: 220, bottomY: 480, width: 1265, height: 220, fontSize: 26, key: 'rulesSettings' }
+                }
+            },
+            {
+                id: 'rules-lines',
+                title: 'Rules: Lines',
+                group: 'rules',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'lines'],
+                translationKeys: ['rulesLines', 'rulesUnfinished', 'rulesGamePercent'],
+                defaultLayout: {
+                    linesText: { x: 220, bottomY: 700, width: 1265, height: 250, fontSize: 26, key: 'rulesLines' },
+                    unfinishedText: { x: 220, bottomY: 420, width: 1265, height: 140, fontSize: 26, key: 'rulesUnfinished' },
+                    gamePercent: { x: 220, bottomY: 330, width: 1265, height: 80, fontSize: 28 }
+                }
+            },
+            {
+                id: 'rules-extra',
+                title: 'Rules: Extra',
+                group: 'rules',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'extra'],
+                translationKeys: ['rulesMaxWin', 'rulesBuyBonus', 'rulesGamePercentBuyFree', 'rulesGamePercentBuyHold'],
+                defaultLayout: {
+                    maxWinText: { x: 220, bottomY: 790, width: 1580, height: 140, fontSize: 26, key: 'rulesMaxWin' },
+                    buyBonusText: { x: 220, bottomY: 590, width: 1580, height: 190, fontSize: 26, key: 'rulesBuyBonus' },
+                    buyFreeRtp: { x: 220, bottomY: 360, width: 1580, height: 60, fontSize: 28 },
+                    buyHoldRtp: { x: 220, bottomY: 315, width: 1580, height: 60, fontSize: 28 }
+                }
+            },
+            {
+                id: 'rules-fg',
+                title: 'Rules: Free Spins Bonus',
+                group: 'rules',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'addFreeGames'],
+                translationKeys: ['rulesAddFg'],
+                defaultLayout: {
+                    addFreeGamesText: { x: 220, bottomY: 750, width: 1700, height: 180, fontSize: 34, key: 'rulesAddFg' }
+                }
+            }
         ];
 
         const COMMON_LANGUAGES = ['en', 'bg', 'de', 'ru', 'pl', 'cs'];
         let state = {
             manifest: null,
             translations: null,
-            currentPageId: PAGE_DEFS[0].id,
-            editor: null
+            atlasIndex: {},
+            currentPageId: 'paytable-hold',
+            editor: null,
+            selectedNodeId: '',
+            previewApp: null,
+            previewRoot: null,
+            previewTextureCache: {},
+            dirty: false,
+            previewLanguage: 'en'
         };
+
+        function getLocaleMap(language) {
+            const locale = state.translations?.locales?.[language];
+            if (!locale || typeof locale !== 'object') return {};
+            if (locale.translation && typeof locale.translation === 'object') return locale.translation;
+            return locale;
+        }
 
         function deepClone(value) {
             return JSON.parse(JSON.stringify(value));
         }
 
+        function isLocaleLayoutField(field) {
+            return ['x', 'y', 'bottomY', 'width', 'height', 'fontSize', 'align', 'maxWidth', 'color', 'fill'].includes(field);
+        }
+
+        function resolveEditorLocaleLayout(node, language, defaults = {}) {
+            const base = { ...(defaults || {}), ...(node || {}) };
+            const locales = node && typeof node === 'object' && node.locales && typeof node.locales === 'object'
+                ? node.locales
+                : null;
+            const localeOverrides = locales ? (locales[language] || locales.en || {}) : {};
+            return { ...base, ...(localeOverrides || {}) };
+        }
+
+        function setDirty(dirty = true) {
+            state.dirty = !!dirty;
+            const saveBtn = document.getElementById('save-btn');
+            if (!saveBtn) return;
+            saveBtn.disabled = !state.dirty;
+            saveBtn.style.opacity = state.dirty ? '1' : '0.55';
+            saveBtn.style.cursor = state.dirty ? 'pointer' : 'not-allowed';
+        }
+
+        function getPrimaryPaytableConfig() {
+            const page = getByPath(state.manifest, ['ui', 'hud', 'helpMenu', 'paytablePages', 'primary']) || {};
+            if (!page.scatter || typeof page.scatter !== 'object') page.scatter = {};
+            if (!Array.isArray(page.symbols)) page.symbols = [];
+            if (!page.scatter.multiplierSource) page.scatter.multiplierSource = 'totalBet';
+            page.symbols.forEach((symbol) => {
+                if (!symbol.multiplierSource) symbol.multiplierSource = 'lineBet';
+            });
+            if (!Number.isFinite(Number(page.previewLineBet))) page.previewLineBet = 1;
+            if (!Number.isFinite(Number(page.previewTotalBet))) page.previewTotalBet = 1;
+            return page;
+        }
+
+        function updatePrimaryPaytableSetting(field, rawValue) {
+            const page = getPrimaryPaytableConfig();
+            const value = Number(rawValue);
+            page[field] = Number.isFinite(value) ? value : 0;
+            setDirty(true);
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+        }
+
+        function addPrimaryPaytableSymbol(copyFromIndex = -1) {
+            const page = getPrimaryPaytableConfig();
+            const source = copyFromIndex >= 0 && page.symbols[copyFromIndex]
+                ? deepClone(page.symbols[copyFromIndex])
+                : {
+                    frame: 'A_blur_01.png',
+                    x: 110,
+                    bottomY: 400,
+                    scale: 0.5,
+                    paysX: 260,
+                    paysY: 506,
+                    paysFontSize: 32,
+                    multiplierSource: 'lineBet',
+                    descriptionX: 0,
+                    descriptionBottomY: 0,
+                    descriptionWidth: 300,
+                    descriptionHeight: 120,
+                    descriptionFontSize: 24,
+                    descriptionAlign: 'left',
+                    includeFourRows: false,
+                    pays: [
+                        { count: 3, mult: 5 },
+                        { count: 4, mult: 20 },
+                        { count: 5, mult: 100 }
+                    ]
+                };
+            page.symbols.push(source);
+            setDirty(true);
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+        }
+
+        function deletePrimaryPaytableSymbol(index) {
+            const page = getPrimaryPaytableConfig();
+            if (!page.symbols[index]) return;
+            page.symbols.splice(index, 1);
+            setDirty(true);
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+        }
+
+        function updatePrimaryPaytableSymbol(index, field, rawValue) {
+            const page = getPrimaryPaytableConfig();
+            const symbol = page.symbols[index];
+            if (!symbol) return;
+            if (field === 'frame' || field === 'descriptionKey' || field === 'descriptionFallback' || field === 'multiplierSource' || field === 'descriptionAlign') {
+                if (field.startsWith('description') && field !== 'descriptionKey' && field !== 'descriptionFallback') {
+                    const locale = previewLocale();
+                    if (!symbol.locales || typeof symbol.locales !== 'object') symbol.locales = {};
+                    if (!symbol.locales[locale] || typeof symbol.locales[locale] !== 'object') symbol.locales[locale] = {};
+                    symbol.locales[locale][field] = rawValue;
+                } else {
+                    symbol[field] = rawValue;
+                }
+            } else if (field === 'includeFourRows') {
+                symbol.includeFourRows = !!rawValue;
+            } else if (field.startsWith('description')) {
+                const locale = previewLocale();
+                if (!symbol.locales || typeof symbol.locales !== 'object') symbol.locales = {};
+                if (!symbol.locales[locale] || typeof symbol.locales[locale] !== 'object') symbol.locales[locale] = {};
+                const value = Number(rawValue);
+                symbol.locales[locale][field] = Number.isFinite(value) ? value : 0;
+            } else {
+                const value = Number(rawValue);
+                symbol[field] = Number.isFinite(value) ? value : 0;
+            }
+            setDirty(true);
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+        }
+
+        function updatePrimaryPaytablePayouts(index, rawValue, target = 'symbol') {
+            const page = getPrimaryPaytableConfig();
+            const owner = target === 'scatter' ? page.scatter : page.symbols[index];
+            if (!owner) return;
+            const rows = String(rawValue || '')
+                .split('\n')
+                .map((row) => row.trim())
+                .filter(Boolean)
+                .map((row) => {
+                    const [count, mult] = row.split(':').map((part) => Number(part.trim()));
+                    return Number.isFinite(count) && Number.isFinite(mult) ? { count, mult } : null;
+                })
+                .filter(Boolean);
+            owner.pays = rows;
+            setDirty(true);
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+        }
+
+        function getPaylinePatterns(pageNode) {
+            const patterns = Array.isArray(pageNode?.lines) ? pageNode.lines : [];
+            const normalized = patterns
+                .filter((row) => Array.isArray(row) && row.length === 5 && row.every((value) => Number.isFinite(Number(value))))
+                .map((row) => row.map((value) => Number(value)));
+            if (normalized.length > 0) return normalized;
+            return [
+                [1, 1, 1, 1, 1],
+                [0, 0, 0, 0, 0],
+                [2, 2, 2, 2, 2],
+                [0, 1, 2, 1, 0],
+                [2, 1, 0, 1, 2],
+                [1, 2, 2, 2, 1],
+                [1, 0, 0, 0, 1],
+                [2, 2, 1, 0, 0],
+                [0, 0, 1, 2, 2],
+                [2, 1, 1, 1, 0]
+            ];
+        }
+
+        function updatePaylinesConfig(field, rawValue) {
+            const page = deepClone(getCurrentPageNode());
+            if (!page.grid || typeof page.grid !== 'object') page.grid = {};
+            const value = Number(rawValue);
+            page.grid[field] = Number.isFinite(value) ? value : 0;
+            updateCurrentPageNode(page);
+            setDirty(true);
+            syncEditorFromManifest();
+            renderTextLayoutInspector();
+        }
+
+        function updatePaylinesPatterns(rawValue) {
+            const page = deepClone(getCurrentPageNode());
+            const rows = String(rawValue || '')
+                .split('\n')
+                .map((row) => row.replace(/\/\/.*$/, '').trim())
+                .filter(Boolean)
+                .map((row) => {
+                    const match = row.match(/\[([^\]]+)\]/);
+                    const content = match ? match[1] : row;
+                    return content.split(',').map((value) => Number(String(value).trim()));
+                })
+                .filter((row) => row.length === 5 && row.every((value) => Number.isFinite(value)));
+            page.lines = rows;
+            updateCurrentPageNode(page);
+            setDirty(true);
+            syncEditorFromManifest();
+            renderTextLayoutInspector();
+        }
+
+        function formatPaylinesPatterns(patterns) {
+            return getPaylinePatterns({ lines: patterns })
+                .map((row, index) => `               [${row.join(', ')}], //${index + 1}`)
+                .join('\n');
+        }
+
+        function createEditorPaylinePreview(pattern, index, scale = 1) {
+            const preview = new PIXI.Container();
+            const width = 170;
+            const height = 93;
+            const cellW = 34;
+            const cellH = 31;
+
+            const box = new PIXI.Graphics();
+            box.lineStyle(2, 0x6f7fc2, 1);
+            box.beginFill(0xeceef5, 1);
+            box.drawRoundedRect(0, 0, width, height, 4);
+            box.endFill();
+            preview.addChild(box);
+
+            const lane = new PIXI.Graphics();
+            lane.lineStyle(1, 0x6f7fc2, 1);
+            for (let reel = 0; reel < 5; reel += 1) {
+                for (let row = 0; row < 3; row += 1) {
+                    lane.drawRect(reel * cellW, row * cellH, cellW, cellH);
+                }
+            }
+            preview.addChild(lane);
+
+            const marks = new PIXI.Graphics();
+            marks.beginFill(0xf13716, 1);
+            for (let reel = 0; reel < pattern.length; reel += 1) {
+                marks.drawRect(reel * cellW + 1, pattern[reel] * cellH + 1, cellW - 2, cellH - 2);
+            }
+            marks.endFill();
+            preview.addChild(marks);
+
+            const label = new PIXI.Text(`${getLocaleMap(previewLocale())?.paylinesLine || 'Line'} ${index + 1}`, new PIXI.TextStyle({
+                fontFamily: 'EditorRoboto',
+                fontSize: 26,
+                fill: 0xffffff,
+                fontWeight: 400
+            }));
+            label.anchor.set(0.5);
+            label.position.set(width / 2, -14);
+            preview.addChild(label);
+            preview.scale.set(Number(scale) || 1);
+            return preview;
+        }
+
+        function renderPaylinesPreview(pageNode) {
+            if (state.currentPageId !== 'paytable-lines' || !state.previewRoot) return;
+            const gridCfg = pageNode.grid || {};
+            const patterns = getPaylinePatterns(pageNode);
+            const columnsPerRow = Math.max(1, Number(gridCfg.columnsPerRow) || 5);
+            const rowBottomYStep = Number(gridCfg.rowBottomYStep) || 150;
+            const scale = Number(gridCfg.scale) || 1;
+            for (let i = 0; i < patterns.length; i += 1) {
+                const preview = createEditorPaylinePreview(patterns[i], i, scale);
+                const row = Math.floor(i / columnsPerRow);
+                const col = i % columnsPerRow;
+                const x = (Number(gridCfg.startX) || 500) + col * (Number(gridCfg.stepX) || 260);
+                const bottomY = (Number(gridCfg.topRowBottomY) || 800) - row * rowBottomYStep;
+                preview.position.set(x, 1080 - bottomY - preview.height);
+                state.previewRoot.addChild(preview);
+            }
+        }
+
+        function renderPrimaryPaytablePayoutPreview() {
+            if (state.currentPageId !== 'paytable-primary') return;
+            const page = getPrimaryPaytableConfig();
+            const scatter = page.scatter || {};
+            addPixiSprite(scatter.frame || 'book_blur_01.png', scatter, {
+                x: Number(scatter.x) || 0,
+                bottomY: Number(scatter.bottomY) || 0,
+                scale: Number(scatter.scale) || 0.5
+            });
+            page.symbols.forEach((symbol) => {
+                addPixiSprite(symbol.frame || '', symbol, {
+                    x: Number(symbol.x) || 0,
+                    bottomY: Number(symbol.bottomY) || 0,
+                    scale: Number(symbol.scale) || 0.5
+                });
+            });
+            if (page.description) {
+                // legacy fallback if an older manifest still uses page.description
+                const language = previewLocale();
+                const descriptionText = getLocaleMap(language)?.[page.description.key] || page.description.fallback || '';
+                addPixiText(descriptionText, page.description, {
+                    x: Number(page.description.x) || 0,
+                    bottomY: Number(page.description.bottomY) || 0,
+                    maxWidth: Number(page.description.width) || 0,
+                    maxHeight: Number(page.description.height) || 0,
+                    fontSize: Number(page.description.fontSize) || 28,
+                    align: page.description.align || 'left',
+                    autoFit: String(language || 'en').toLowerCase() !== 'en'
+                });
+            }
+            const language = previewLocale();
+            const localizedScatter = resolveEditorLocaleLayout(scatter, language);
+            const scatterDescriptionText = getLocaleMap(language)?.[scatter.descriptionKey] || scatter.descriptionFallback || '';
+            if (scatterDescriptionText) {
+                addPixiText(scatterDescriptionText, {}, {
+                    x: Number(localizedScatter.descriptionX) || 850,
+                    bottomY: Number(localizedScatter.descriptionBottomY) || 860,
+                    maxWidth: Number(localizedScatter.descriptionWidth) || 720,
+                    maxHeight: Number(localizedScatter.descriptionHeight) || 160,
+                    fontSize: Number(localizedScatter.descriptionFontSize) || 28,
+                    align: localizedScatter.descriptionAlign || 'left',
+                    autoFit: false
+                });
+            }
+            page.symbols.forEach((symbol) => {
+                const localizedSymbol = resolveEditorLocaleLayout(symbol, language);
+                const symbolDescriptionText = getLocaleMap(language)?.[symbol.descriptionKey] || symbol.descriptionFallback || '';
+                if (!symbolDescriptionText) return;
+                addPixiText(symbolDescriptionText, {}, {
+                    x: Number(localizedSymbol.descriptionX) || 0,
+                    bottomY: Number(localizedSymbol.descriptionBottomY) || 0,
+                    maxWidth: Number(localizedSymbol.descriptionWidth) || 300,
+                    maxHeight: Number(localizedSymbol.descriptionHeight) || 120,
+                    fontSize: Number(localizedSymbol.descriptionFontSize) || 24,
+                    align: localizedSymbol.descriptionAlign || 'left',
+                    autoFit: false
+                });
+            });
+            const drawRows = (rows, x, y, fontSize = 32, includeFourRows = false, source = 'lineBet') => {
+                if (!Array.isArray(rows)) return;
+                const stake = source === 'totalBet' ? Number(page.previewTotalBet) || 1 : Number(page.previewLineBet) || 1;
+                rows.forEach((row, index) => {
+                    if (!includeFourRows && Number(row.count) < 3) return;
+                    const rowY = Number(y) + index * (fontSize + 10);
+                    addPixiText(String(row.count), {}, {
+                        x: Number(x) || 0,
+                        bottomY: rowY,
+                        fontSize,
+                        fill: 0xffc72f,
+                        autoFit: false
+                    });
+                    addPixiText(String((Number(row.mult) * stake).toFixed(2)), {}, {
+                        x: (Number(x) || 0) + 32,
+                        bottomY: rowY,
+                        fontSize,
+                        fill: 0xffffff,
+                        autoFit: false
+                    });
+                });
+            };
+            drawRows(page.scatter?.pays, page.scatter?.paysX, page.scatter?.paysBottomY, Number(page.scatter?.paysFontSize) || 32, false, page.scatter?.multiplierSource || 'totalBet');
+            page.symbols.forEach((symbol) => {
+                drawRows(symbol.pays, symbol.paysX, symbol.paysY, Number(symbol.paysFontSize) || 32, !!symbol.includeFourRows, symbol.multiplierSource || 'lineBet');
+            });
+        }
+
+        function getEditorPageStore() {
+            const helpMenu = state.manifest?.ui?.hud?.helpMenu;
+            if (!helpMenu) return { paytable: [], rules: [] };
+            if (!helpMenu.editorPageDefs || typeof helpMenu.editorPageDefs !== 'object') {
+                helpMenu.editorPageDefs = { paytable: [], rules: [] };
+            }
+            if (!Array.isArray(helpMenu.editorPageDefs.paytable)) helpMenu.editorPageDefs.paytable = [];
+            if (!Array.isArray(helpMenu.editorPageDefs.rules)) helpMenu.editorPageDefs.rules = [];
+            return helpMenu.editorPageDefs;
+        }
+
+        function getTranslationKeyStore() {
+            const helpMenu = state.manifest?.ui?.hud?.helpMenu;
+            if (!helpMenu) return {};
+            if (!helpMenu.editorTranslationKeys || typeof helpMenu.editorTranslationKeys !== 'object') {
+                helpMenu.editorTranslationKeys = {};
+            }
+            return helpMenu.editorTranslationKeys;
+        }
+
+        function getPageDefs() {
+            const store = getEditorPageStore();
+            return [
+                ...BASE_PAGE_DEFS,
+                ...store.paytable,
+                ...store.rules
+            ];
+        }
+
+        function getPageTranslationKeys(page) {
+            const store = getTranslationKeyStore();
+            const extra = Array.isArray(store[page.id]) ? store[page.id] : [];
+            return [...new Set([...(page.translationKeys || []), ...extra])];
+        }
+
+        function addTranslationKey() {
+            const page = getPageDef(state.currentPageId);
+            const rawKey = window.prompt('New translation key', '');
+            const key = String(rawKey || '').trim();
+            if (!key) return;
+
+            const store = getTranslationKeyStore();
+            if (!Array.isArray(store[page.id])) store[page.id] = [];
+            if (!store[page.id].includes(key) && !(page.translationKeys || []).includes(key)) {
+                store[page.id].push(key);
+            }
+
+            const locales = state.translations?.locales || {};
+            Object.keys(locales).forEach((language) => {
+                const locale = locales[language];
+                if (!locale || typeof locale !== 'object') return;
+                const target = locale.translation && typeof locale.translation === 'object'
+                    ? locale.translation
+                    : locale;
+                if (typeof target[key] !== 'string') target[key] = '';
+            });
+
+            setDirty(true);
+            renderTranslations();
+            renderTextLayoutInspector();
+            setStatus(`Added text key "${key}".`, 'good');
+        }
+
+        function slugify(value) {
+            return String(value || '')
+                .trim()
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '') || `page-${Date.now()}`;
+        }
+
+        function getTemplateOptions(group) {
+            return BASE_PAGE_DEFS.filter((page) => page.group === group && page.id !== 'shell-general' && page.id !== 'settings');
+        }
+
+        function getCustomManifestPath(group, slug) {
+            if (group === 'paytable') {
+                return ['ui', 'hud', 'helpMenu', 'paytablePages', `custom_${slug}`];
+            }
+            return ['ui', 'hud', 'helpMenu', 'rulesPages', `custom_${slug}`];
+        }
+
+        function pageExists(pageId) {
+            return getPageDefs().some((page) => page.id === pageId);
+        }
+
+        function createCustomPageDef({ group, title, templatePage, cloneCurrent = false }) {
+            const slug = slugify(title);
+            let uniqueId = `${group}-custom-${slug}`;
+            let counter = 2;
+            while (pageExists(uniqueId)) {
+                uniqueId = `${group}-custom-${slug}-${counter}`;
+                counter += 1;
+            }
+
+            const manifestPath = getCustomManifestPath(group, uniqueId.replace(`${group}-custom-`, ''));
+            const pageDef = {
+                id: uniqueId,
+                title,
+                group,
+                manifestPath,
+                translationKeys: deepClone(templatePage.translationKeys || []),
+                defaultLayout: deepClone(templatePage.defaultLayout || {}),
+                templateId: templatePage.id
+            };
+
+            const sourceNode = cloneCurrent ? deepClone(getCurrentPageNode()) : deepClone(templatePage.defaultLayout || {});
+            setByPath(state.manifest, manifestPath, sourceNode);
+            const store = getEditorPageStore();
+            store[group].push(pageDef);
+            setDirty(true);
+            return pageDef;
+        }
+
+        function addPageFromTemplate() {
+            const current = getPageDef(state.currentPageId);
+            const group = current.group === 'rules' ? 'rules' : 'paytable';
+            const templates = getTemplateOptions(group);
+            const defaultTemplate = current.group === group ? current : templates[0];
+            const templateList = templates.map((page) => page.id).join(', ');
+            const selectedTemplateId = window.prompt(`Template page id (${templateList})`, defaultTemplate?.id || templates[0]?.id || '');
+            if (!selectedTemplateId) return;
+            const templatePage = templates.find((page) => page.id === selectedTemplateId) || defaultTemplate || templates[0];
+            if (!templatePage) return;
+            const title = window.prompt(`New ${group} page title`, `${templatePage.title} Copy`);
+            if (!title) return;
+            const newPage = createCustomPageDef({ group, title, templatePage, cloneCurrent: false });
+            state.currentPageId = newPage.id;
+            renderSidebar();
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+            renderTranslations();
+            setStatus(`Added page "${title}".`, 'good');
+        }
+
+        function copyCurrentPage() {
+            const current = getPageDef(state.currentPageId);
+            if (current.group !== 'paytable' && current.group !== 'rules') {
+                setStatus('Only Paytable and Rules pages can be copied.', 'bad');
+                return;
+            }
+            const title = window.prompt('Copy page title', `${current.title} Copy`);
+            if (!title) return;
+            const newPage = createCustomPageDef({ group: current.group, title, templatePage: current, cloneCurrent: true });
+            state.currentPageId = newPage.id;
+            renderSidebar();
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+            renderTranslations();
+            setStatus(`Copied page "${current.title}".`, 'good');
+        }
+
+        function deleteCurrentPage() {
+            const current = getPageDef(state.currentPageId);
+            if (!current.id.includes('-custom-')) {
+                setStatus('Built-in pages cannot be deleted. Copy one first if you want a custom variant.', 'bad');
+                return;
+            }
+            if (!window.confirm(`Delete page "${current.title}"?`)) return;
+
+            const store = getEditorPageStore();
+            const bucket = store[current.group];
+            const index = bucket.findIndex((page) => page.id === current.id);
+            if (index >= 0) {
+                bucket.splice(index, 1);
+            }
+
+            const parent = getByPath(state.manifest, current.manifestPath.slice(0, -1));
+            if (parent && typeof parent === 'object') {
+                delete parent[current.manifestPath[current.manifestPath.length - 1]];
+            }
+
+            setDirty(true);
+            state.currentPageId = current.group === 'rules' ? 'rules-howto' : 'paytable-hold';
+            renderSidebar();
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+            renderTranslations();
+            setStatus(`Deleted page "${current.title}".`, 'good');
+        }
+
         function getPageDef(id) {
-            return PAGE_DEFS.find((page) => page.id === id) || PAGE_DEFS[0];
+            const defs = getPageDefs();
+            return defs.find((page) => page.id === id) || defs[0];
         }
 
         function getByPath(root, path) {
@@ -311,6 +1196,309 @@
             current[path[path.length - 1]] = value;
         }
 
+        function isPlainObject(value) {
+            return !!value && typeof value === 'object' && !Array.isArray(value);
+        }
+
+        function mergeDefaults(base, defaults) {
+            if (Array.isArray(defaults)) {
+                return Array.isArray(base) && base.length > 0 ? base : deepClone(defaults);
+            }
+            if (!isPlainObject(defaults)) {
+                return base === undefined ? defaults : base;
+            }
+
+            const result = isPlainObject(base) ? deepClone(base) : {};
+            Object.entries(defaults).forEach(([key, value]) => {
+                result[key] = mergeDefaults(result[key], value);
+            });
+            return result;
+        }
+
+        function getCurrentPageNode() {
+            return getByPath(state.manifest, getPageDef(state.currentPageId).manifestPath);
+        }
+
+        function ensurePageDefaults(page) {
+            if (!page.defaultLayout) return;
+            const current = getByPath(state.manifest, page.manifestPath);
+            const merged = mergeDefaults(current, page.defaultLayout);
+            setByPath(state.manifest, page.manifestPath, merged);
+        }
+
+        function getAtPath(root, path) {
+            let current = root;
+            for (const segment of path) {
+                if (current == null) return undefined;
+                current = current[segment];
+            }
+            return current;
+        }
+
+        function isTextLayoutNode(value) {
+            if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+            const hasCoordinates = Number.isFinite(value.x) && Number.isFinite(value.bottomY);
+            const looksLikeText = value.key || Number.isFinite(value.width) || Number.isFinite(value.height) || Number.isFinite(value.fontSize);
+            return !!hasCoordinates && !!looksLikeText;
+        }
+
+        function isImageLayoutNode(value) {
+            if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+            return typeof value.frame === 'string' && value.frame.length > 0 && Number.isFinite(value.x) && Number.isFinite(value.bottomY);
+        }
+
+        function collectTextLayouts(root, path = [], result = []) {
+            if (!root || typeof root !== 'object') return result;
+
+            if (isTextLayoutNode(root)) {
+                result.push({
+                    path: [...path],
+                    label: path.length ? path.join('.') : 'root',
+                    node: root
+                });
+            }
+
+            if (Array.isArray(root)) {
+                root.forEach((item, index) => collectTextLayouts(item, [...path, index], result));
+                return result;
+            }
+
+            Object.entries(root).forEach(([key, value]) => {
+                if (value && typeof value === 'object') {
+                    collectTextLayouts(value, [...path, key], result);
+                }
+            });
+
+            return result;
+        }
+
+        function collectImageLayouts(root, path = [], result = []) {
+            if (!root || typeof root !== 'object') return result;
+
+            if (isImageLayoutNode(root)) {
+                result.push({
+                    path: [...path],
+                    label: path.length ? path.join('.') : 'root',
+                    node: root
+                });
+            }
+
+            if (Array.isArray(root)) {
+                root.forEach((item, index) => collectImageLayouts(item, [...path, index], result));
+                return result;
+            }
+
+            Object.entries(root).forEach(([key, value]) => {
+                if (value && typeof value === 'object') {
+                    collectImageLayouts(value, [...path, key], result);
+                }
+            });
+
+            return result;
+        }
+
+        function updateCurrentPageNode(node) {
+            setByPath(state.manifest, getPageDef(state.currentPageId).manifestPath, node);
+        }
+
+        function syncEditorFromManifest() {
+            if (!state.editor) return;
+            state.editor.update(deepClone(getCurrentPageNode()));
+        }
+
+        function updateSelectedNodeField(field, rawValue) {
+            const isShellNode = state.selectedNodeId.startsWith('shellText:');
+            const rootNode = isShellNode ? deepClone(state.manifest) : deepClone(getCurrentPageNode());
+            const nodePath = state.selectedNodeId
+                .replace(/^(text|image|shellText):/, '')
+                .split('.')
+                .map((segment) => /^\d+$/.test(segment) ? Number(segment) : segment);
+            const target = getAtPath(rootNode, nodePath);
+            if (!target || typeof target !== 'object') return;
+
+            if (field === 'key' || field === 'fallback' || field === 'frame' || field === 'id') {
+                target[field] = rawValue;
+            } else if (isLocaleLayoutField(field)) {
+                const locale = previewLocale();
+                if (!target.locales || typeof target.locales !== 'object') target.locales = {};
+                if (!target.locales[locale] || typeof target.locales[locale] !== 'object') target.locales[locale] = {};
+                target.locales[locale][field] = field === 'align' ? rawValue : (Number.isFinite(Number(rawValue)) ? Number(rawValue) : 0);
+            } else {
+                const value = Number(rawValue);
+                target[field] = Number.isFinite(value) ? value : 0;
+            }
+
+            if (isShellNode) {
+                state.manifest = rootNode;
+            } else {
+                updateCurrentPageNode(rootNode);
+            }
+            setDirty(true);
+            syncEditorFromManifest();
+            renderTextLayoutInspector();
+        }
+
+        function getPreviewTitle() {
+            const pageId = state.currentPageId;
+            const language = previewLocale();
+            const t = (key, fallback = key) => getLocaleMap(language)?.[key] || fallback;
+            if (pageId === 'paytable-hold') return t('splashTitle', 'HOLD AND WIN');
+            if (pageId === 'paytable-free') return t('splashSecTitle', 'FREE GAMES');
+            if (pageId === 'paytable-primary' || pageId === 'paytable-gold') return t('paytableTitle', 'PAYTABLE');
+            if (pageId === 'paytable-lines') return t('paylinesTitle', 'PAYLINES');
+            if (pageId === 'settings') return t('settingsTitle', 'SETTINGS');
+            return t('rulesTitle', 'RULES');
+        }
+
+        function getActiveTabId() {
+            if (state.currentPageId === 'settings') return 'settings';
+            if (state.currentPageId.startsWith('rules-')) return 'rules';
+            return 'paytable';
+        }
+
+        function addPreviewSprite(preview, frameName, cfg, options = {}) {
+            const atlas = state.atlasIndex[frameName];
+            if (!atlas) return null;
+            const scale = Number(options.scale ?? cfg?.scale ?? 1) || 1;
+            const width = Number(options.width) || Math.round((atlas.w || 0) * scale);
+            const height = Number(options.height) || Math.round((atlas.h || 0) * scale);
+            const x = Number(options.x ?? cfg?.x ?? 0) || 0;
+            const hasBottomY = Number.isFinite(Number(options.bottomY ?? cfg?.bottomY));
+            const y = hasBottomY
+                ? 1080 - (Number(options.bottomY ?? cfg?.bottomY) || 0) - height
+                : (Number(options.y ?? cfg?.y ?? 0) || 0);
+
+            const node = document.createElement('div');
+            node.className = 'preview-image';
+            node.style.pointerEvents = 'none';
+            node.style.border = 'none';
+            node.style.left = `${x / 1920 * 100}%`;
+            node.style.top = `${y / 1080 * 100}%`;
+            node.style.width = `${width / 1920 * 100}%`;
+            node.style.height = `${height / 1080 * 100}%`;
+            node.style.opacity = `${Number.isFinite(Number(options.alpha ?? cfg?.alpha)) ? Number(options.alpha ?? cfg?.alpha) : 1}`;
+            node.style.backgroundImage = `url('${atlas.imagePath}')`;
+            if (atlas.direct) {
+                node.style.backgroundSize = '100% 100%';
+                node.style.backgroundPosition = '0 0';
+            } else {
+                node.style.backgroundSize = `${Math.round((atlas.sheetW || 0) * scale)}px ${Math.round((atlas.sheetH || 0) * scale)}px`;
+                node.style.backgroundPosition = `-${atlas.x * scale}px -${atlas.y * scale}px`;
+            }
+            if (Number.isFinite(Number(options.borderRadius))) {
+                node.style.borderRadius = `${Number(options.borderRadius)}px`;
+            }
+            preview.appendChild(node);
+            return node;
+        }
+
+        function addPreviewText(preview, text, x, y, fontSize, color, align = 'left') {
+            const stageScale = Math.max(0.1, preview.clientWidth / 1920);
+            const node = document.createElement('div');
+            node.className = 'preview-shell-text';
+            node.textContent = text;
+            node.style.left = `${x / 1920 * 100}%`;
+            node.style.top = `${y / 1080 * 100}%`;
+            node.style.fontSize = `${Math.max(8, fontSize * stageScale)}px`;
+            node.style.color = color;
+            if (align === 'center') {
+                node.style.transform = 'translateX(-50%)';
+                node.style.textAlign = 'center';
+            }
+            preview.appendChild(node);
+            return node;
+        }
+
+        function fitPreviewTextToBox(node, baseFontPx, minFontPx = 8, autoFit = true) {
+            const body = node.querySelector('.preview-box-body') || node;
+            let fontPx = Math.max(minFontPx, Math.round(baseFontPx));
+            body.style.fontSize = `${fontPx}px`;
+            body.style.lineHeight = '1.15';
+            if (!autoFit) return;
+
+            while (fontPx > minFontPx && (node.scrollWidth > node.clientWidth || node.scrollHeight > node.clientHeight)) {
+                fontPx -= 1;
+                body.style.fontSize = `${fontPx}px`;
+            }
+        }
+
+        function renderShellPreview(preview) {
+            const helpMenu = state.manifest?.ui?.hud?.helpMenu || {};
+            const titleCfg = resolveEditorLocaleLayout(helpMenu.title || {}, previewLocale(), { x: 960, y: 98, fontSize: 58, color: 0x93a7bf, maxWidth: 760 });
+            const pageCfg = resolveEditorLocaleLayout(helpMenu.page || {}, previewLocale(), { x: 1768, y: 925, fontSize: 28, color: 0xffffff, maxWidth: 180 });
+            const footerCfg = helpMenu.footer || {};
+            const navCfg = helpMenu.navigation || {};
+            const tabsCfg = helpMenu.tabs || {};
+            const logoCfg = helpMenu.logo || {};
+            const language = previewLocale();
+            const t = (key, fallback = key) => getLocaleMap(language)?.[key] || fallback;
+            const activeTab = getActiveTabId();
+
+            addPixiSprite(helpMenu.background?.frame || 'bg_menu.png', { x: 0, y: 0 }, { x: 0, y: 0, width: 1920, height: 1080 });
+            addPixiSprite(logoCfg.frame || 'logo.png', logoCfg, { x: Number(logoCfg.x) || 18, y: Number(logoCfg.y) || 8, scale: Number(logoCfg.scale) || 0.76 });
+            addPixiText(getPreviewTitle(), titleCfg, {
+                x: Number(titleCfg.x) || 960,
+                y: Number(titleCfg.y) || 98,
+                fontSize: Number(titleCfg.fontSize) || 58,
+                fill: Number(titleCfg.color) || 0x93a7bf,
+                maxWidth: Number(titleCfg.maxWidth) || 760,
+                align: 'center',
+                autoFit: false
+            });
+
+            addPixiSprite(navCfg.close?.normal || 'button_close_001.png', navCfg.close, { x: Number(navCfg.close?.x) || 1711, bottomY: Number(navCfg.close?.y) || 928, scale: 1 });
+            if (state.currentPageId !== 'settings') {
+                addPixiSprite(navCfg.prev?.normal || 'button_arrow_l_001.png', navCfg.prev, { x: Number(navCfg.prev?.x) || 1660, bottomY: Number(navCfg.prev?.y) || 150, scale: 1 });
+                addPixiSprite(navCfg.next?.normal || 'button_arrow_r_001.png', navCfg.next, { x: Number(navCfg.next?.x) || 1760, bottomY: Number(navCfg.next?.y) || 150, scale: 1 });
+                addPixiText(`${t('helpPages', 'PAGE')} 1/5`, pageCfg, {
+                    x: Number(pageCfg.x) || 1768,
+                    y: Number(pageCfg.y) || 925,
+                    fontSize: Number(pageCfg.fontSize) || 28,
+                    fill: Number(pageCfg.color) || 0xffffff,
+                    maxWidth: Number(pageCfg.maxWidth) || 180,
+                    align: 'center',
+                    autoFit: false
+                });
+            }
+
+            const tabDefs = [
+                { id: 'paytable', cfg: tabsCfg.paytable || {}, label: t('helpPay', 'PAYTABLE') },
+                { id: 'settings', cfg: tabsCfg.settings || {}, label: t('helpSettings', 'SETTINGS') },
+                { id: 'rules', cfg: tabsCfg.rules || {}, label: t('helpRules', 'RULES') }
+            ];
+            tabDefs.forEach((tab) => {
+                const frame = `${tab.cfg.base || `button_${tab.id}`}_${tab.id === activeTab ? '002' : '001'}.png`;
+                const sprite = addPixiSprite(frame, tab.cfg, { x: Number(tab.cfg.x) || 0, bottomY: Number(tab.cfg.y) || 0, scale: 1 });
+                if (sprite) {
+                    addPixiText(tab.label, tab.cfg, {
+                        x: (Number(tab.cfg.x) || 0),
+                        y: sprite.y + sprite.height - 44,
+                        fontSize: 30,
+                        fill: 0xd4dfef,
+                        maxWidth: sprite.width,
+                        align: 'center',
+                        autoFit: true
+                    });
+                }
+            });
+
+            addPixiSprite(footerCfg.background?.frame || 'bottom_bg.png', footerCfg.background, { x: Number(footerCfg.background?.x) || 0, y: Number(footerCfg.background?.y) || 1034, scale: 1 });
+            addPixiText(`${t('balanceDemo', 'DEMO PLAY :')} 10,000.00 FUN`, footerCfg.credit, {
+                x: Number(footerCfg.credit?.x) || 220,
+                y: Number(footerCfg.credit?.y) || 1039,
+                fontSize: Number(footerCfg.credit?.fontSize) || 34,
+                fill: Number(footerCfg.credit?.labelColor) || 0xffc600,
+                autoFit: true
+            });
+            addPixiText(`${t('bet', 'BET :')} 0.50 FUN`, footerCfg.totalBet, {
+                x: Number(footerCfg.totalBet?.x) || 1490,
+                y: Number(footerCfg.totalBet?.y) || 1039,
+                fontSize: Number(footerCfg.totalBet?.fontSize) || 34,
+                fill: Number(footerCfg.totalBet?.labelColor) || 0xffc600,
+                autoFit: true
+            });
+        }
+
         function getVisibleLanguages() {
             const filterMode = document.getElementById('language-filter').value;
             const allLanguages = Object.keys(state.translations?.locales || {});
@@ -321,11 +1509,159 @@
             return raw.split(',').map((value) => value.trim()).filter((value) => allLanguages.includes(value));
         }
 
+        function previewLocale() {
+            return String(state.previewLanguage || 'en').toLowerCase();
+        }
+
+        function renderPreviewLanguageOptions() {
+            const select = document.getElementById('preview-language');
+            if (!select) return;
+            const languages = Object.keys(state.translations?.locales || {});
+            if (languages.length === 0) {
+                select.innerHTML = '<option value="en">en</option>';
+                state.previewLanguage = 'en';
+                return;
+            }
+            if (!languages.includes(state.previewLanguage)) {
+                state.previewLanguage = languages.includes('en') ? 'en' : languages[0];
+            }
+            select.innerHTML = languages
+                .map((language) => `<option value="${language}" ${language === state.previewLanguage ? 'selected' : ''}>${language}</option>`)
+                .join('');
+        }
+
+        function fitsBounds(display, maxWidth, maxHeight) {
+            if (maxWidth > 0 && display.width > maxWidth) return false;
+            if (maxHeight > 0 && display.height > maxHeight) return false;
+            return true;
+        }
+
+        function applyPreviewFont(display, fontSize) {
+            display.style.fontSize = fontSize;
+            display.style.lineHeight = Math.max(10, Math.round(Number(fontSize) * 1.02));
+        }
+
+        function fitPixiText(display, maxWidth = 0, maxHeight = 0, minFontSize = 8, autoFit = true) {
+            if (!display || !display.style) return;
+            const baseFontSize = Math.max(1, Math.floor(Number(display.style.fontSize) || 1));
+            const preferredMinFontSize = autoFit
+                ? Math.max(minFontSize, Math.round(baseFontSize * 0.82))
+                : baseFontSize;
+            applyPreviewFont(display, baseFontSize);
+            if (!autoFit) return;
+            while (Number(display.style.fontSize) > preferredMinFontSize && !fitsBounds(display, maxWidth, maxHeight)) {
+                applyPreviewFont(display, Number(display.style.fontSize) - 1);
+            }
+        }
+
+        function ensurePreviewApp(preview) {
+            if (state.previewApp) return state.previewApp;
+            const app = new PIXI.Application({
+                width: 1920,
+                height: 1080,
+                backgroundAlpha: 0,
+                antialias: true,
+                resolution: window.devicePixelRatio || 1,
+                autoDensity: true
+            });
+            app.view.style.position = 'absolute';
+            app.view.style.inset = '0';
+            app.view.style.width = '100%';
+            app.view.style.height = '100%';
+            preview.prepend(app.view);
+            state.previewApp = app;
+            state.previewRoot = new PIXI.Container();
+            app.stage.addChild(state.previewRoot);
+            return app;
+        }
+
+        function clearPreviewScene() {
+            if (!state.previewRoot) return;
+            state.previewRoot.removeChildren().forEach((child) => {
+                if (child && typeof child.destroy === 'function') {
+                    child.destroy();
+                }
+            });
+        }
+
+        function getAtlasTexture(frameName) {
+            if (!frameName) return null;
+            if (state.previewTextureCache[frameName]) return state.previewTextureCache[frameName];
+            const atlas = state.atlasIndex[frameName];
+            if (!atlas) return null;
+            let texture = null;
+            if (atlas.direct) {
+                texture = PIXI.Texture.from(atlas.imagePath);
+            } else {
+                const base = PIXI.Texture.from(atlas.imagePath);
+                texture = new PIXI.Texture(base.baseTexture, new PIXI.Rectangle(atlas.x, atlas.y, atlas.w, atlas.h));
+            }
+            state.previewTextureCache[frameName] = texture;
+            return texture;
+        }
+
+        function addPixiSprite(frameName, cfg = {}, options = {}) {
+            const texture = getAtlasTexture(frameName);
+            if (!texture || !state.previewRoot) return null;
+            const sprite = new PIXI.Sprite(texture);
+            const scale = Number(options.scale ?? cfg.scale ?? 1) || 1;
+            sprite.scale.set(scale);
+            const targetWidth = Number(options.width ?? cfg.width);
+            const targetHeight = Number(options.height ?? cfg.height);
+            if (Number.isFinite(targetWidth) && targetWidth > 0) sprite.width = targetWidth;
+            if (Number.isFinite(targetHeight) && targetHeight > 0) sprite.height = targetHeight;
+            sprite.alpha = Number.isFinite(Number(options.alpha ?? cfg.alpha)) ? Number(options.alpha ?? cfg.alpha) : 1;
+            if (Number.isFinite(Number(options.tint ?? cfg.tint))) sprite.tint = Number(options.tint ?? cfg.tint);
+            const x = Number(options.x ?? cfg.x ?? 0) || 0;
+            const hasBottomY = Number.isFinite(Number(options.bottomY ?? cfg.bottomY));
+            const y = hasBottomY
+                ? 1080 - Number(options.bottomY ?? cfg.bottomY) - sprite.height
+                : (Number(options.y ?? cfg.y ?? 0) || 0);
+            sprite.position.set(x, y);
+            state.previewRoot.addChild(sprite);
+            return sprite;
+        }
+
+        function addPixiText(text, cfg = {}, options = {}) {
+            if (!state.previewRoot) return null;
+            const fontSize = Number(options.fontSize ?? cfg.fontSize ?? 28) || 28;
+            const align = options.align ?? cfg.align ?? 'left';
+            const display = new PIXI.Text(String(text || ''), new PIXI.TextStyle({
+                fontFamily: 'EditorRoboto',
+                fontSize,
+                fill: options.fill ?? cfg.fill ?? 0xffffff,
+                fontWeight: 400,
+                align,
+                wordWrap: Number(options.maxWidth ?? cfg.width ?? 0) > 0,
+                wordWrapWidth: Number(options.maxWidth ?? cfg.width ?? 0) || 0
+            }));
+            const autoFit = options.autoFit !== false;
+            fitPixiText(
+                display,
+                Number(options.maxWidth ?? cfg.width ?? 0) || 0,
+                Number(options.maxHeight ?? cfg.height ?? 0) || 0,
+                8,
+                autoFit
+            );
+            const x = Number(options.x ?? cfg.x ?? 0) || 0;
+            const hasBottomY = Number.isFinite(Number(options.bottomY ?? cfg.bottomY));
+            const y = hasBottomY
+                ? 1080 - Number(options.bottomY ?? cfg.bottomY) - display.height
+                : (Number(options.y ?? cfg.y ?? 0) || 0);
+            display.position.set(x, y);
+            if (align === 'center' && Number(options.maxWidth ?? cfg.width ?? 0) > 0) {
+                display.anchor.set(0.5, 0);
+                display.position.x = x + (Number(options.maxWidth ?? cfg.width ?? 0) / 2);
+            }
+            state.previewRoot.addChild(display);
+            return display;
+        }
+
         function renderSidebar() {
             const mount = (targetId, group) => {
                 const target = document.getElementById(targetId);
                 target.innerHTML = '';
-                PAGE_DEFS.filter((page) => page.group === group).forEach((page) => {
+                getPageDefs().filter((page) => page.group === group).forEach((page) => {
                     const button = document.createElement('button');
                     button.className = `page-button${state.currentPageId === page.id ? ' active' : ''}`;
                     button.textContent = page.title;
@@ -343,6 +1679,7 @@
             const page = getPageDef(state.currentPageId);
             const locales = state.translations?.locales || {};
             const visibleLanguages = getVisibleLanguages();
+            const keys = getPageTranslationKeys(page);
             const translationList = document.getElementById('translation-list');
             translationList.innerHTML = '';
 
@@ -351,7 +1688,7 @@
                 return;
             }
 
-            page.translationKeys.forEach((key) => {
+            keys.forEach((key) => {
                 const block = document.createElement('div');
                 block.className = 'translation-key';
                 const title = document.createElement('h3');
@@ -367,12 +1704,17 @@
                     const label = document.createElement('label');
                     label.textContent = language;
                     const textarea = document.createElement('textarea');
-                    textarea.value = locales?.[language]?.[key] ?? '';
+                    textarea.value = getLocaleMap(language)?.[key] ?? '';
                     textarea.oninput = (event) => {
                         if (!state.translations.locales[language]) {
                             state.translations.locales[language] = {};
                         }
-                        state.translations.locales[language][key] = event.target.value;
+                        if (state.translations.locales[language].translation && typeof state.translations.locales[language].translation === 'object') {
+                            state.translations.locales[language].translation[key] = event.target.value;
+                        } else {
+                            state.translations.locales[language][key] = event.target.value;
+                        }
+                        setDirty(true);
                     };
 
                     row.appendChild(label);
@@ -387,10 +1729,478 @@
 
         function renderLayoutEditor() {
             const page = getPageDef(state.currentPageId);
+            ensurePageDefaults(page);
             const node = deepClone(getByPath(state.manifest, page.manifestPath));
             state.editor.update(node);
             document.getElementById('current-page-title').textContent = page.title;
             document.getElementById('current-page-path').textContent = page.manifestPath.join('.');
+        }
+
+        function renderTextLayoutInspector() {
+            const shellTitle = state.manifest?.ui?.hud?.helpMenu?.title || {};
+            const pageNode = getCurrentPageNode();
+            const boxes = collectTextLayouts(pageNode);
+            const images = collectImageLayouts(pageNode);
+            const allItems = [
+                { type: 'shellText', path: ['ui', 'hud', 'helpMenu', 'title'], label: 'title', node: shellTitle },
+                ...images.map((item) => ({ ...item, type: 'image' })),
+                ...boxes.map((item) => ({ ...item, type: 'text' }))
+            ];
+            const list = document.getElementById('layout-item-list');
+            const preview = document.getElementById('layout-preview');
+            const form = document.getElementById('layout-form');
+
+            list.innerHTML = '';
+            ensurePreviewApp(preview);
+            clearPreviewScene();
+            preview.querySelectorAll(':scope > :not(canvas)').forEach((node) => node.remove());
+            const guides = document.createElement('div');
+            guides.className = 'preview-guides';
+            preview.appendChild(guides);
+            renderShellPreview(preview);
+            form.innerHTML = '';
+
+            if (allItems.length === 0) {
+                list.innerHTML = '<div class="status">No image or text layouts on this page.</div>';
+                form.textContent = 'No editable image or text boxes found for this page.';
+                state.selectedNodeId = '';
+                return;
+            }
+
+            if (!allItems.some((item) => `${item.type}:${item.path.join('.')}` === state.selectedNodeId)) {
+                const first = allItems[0];
+                state.selectedNodeId = `${first.type}:${first.path.join('.')}`;
+            }
+
+            const shellTitleButton = document.createElement('div');
+            shellTitleButton.className = 'group-title';
+            shellTitleButton.textContent = 'Shell';
+            list.appendChild(shellTitleButton);
+
+            const titlePath = 'shellText:ui.hud.helpMenu.title';
+            const titleButton = document.createElement('button');
+            titleButton.className = `page-button${titlePath === state.selectedNodeId ? ' active' : ''}`;
+            titleButton.textContent = 'title';
+            titleButton.onclick = () => {
+                state.selectedNodeId = titlePath;
+                renderTextLayoutInspector();
+            };
+            list.appendChild(titleButton);
+
+            const localizedTitle = resolveEditorLocaleLayout(shellTitle, previewLocale(), { x: 960, y: 98, fontSize: 58, maxWidth: 760 });
+            const titleWidth = Number(localizedTitle.maxWidth) || 760;
+            const titleBox = document.createElement('div');
+            titleBox.className = `preview-box${titlePath === state.selectedNodeId ? ' active' : ''}`;
+            titleBox.style.left = `${((Number(localizedTitle.x) || 960) - titleWidth / 2) / 1920 * 100}%`;
+            titleBox.style.width = `${titleWidth / 1920 * 100}%`;
+            titleBox.onclick = () => {
+                state.selectedNodeId = titlePath;
+                renderTextLayoutInspector();
+            };
+            preview.appendChild(titleBox);
+            titleBox.style.top = `${(Number(localizedTitle.y) || 98) / 1080 * 100}%`;
+            titleBox.style.height = `${Math.max(32, Number(localizedTitle.fontSize) || 58) / 1080 * 100}%`;
+
+            const isPrimaryPaytable = state.currentPageId === 'paytable-primary';
+
+            if (!isPrimaryPaytable && images.length > 0) {
+                const imageTitle = document.createElement('div');
+                imageTitle.className = 'group-title';
+                imageTitle.textContent = 'Images';
+                list.appendChild(imageTitle);
+            }
+
+            images.forEach((item, index) => {
+                if (isPrimaryPaytable) return;
+                const itemPath = `image:${item.path.join('.')}`;
+                const button = document.createElement('button');
+                button.className = `page-button${itemPath === state.selectedNodeId ? ' active' : ''}`;
+                button.textContent = item.node.id || item.node.frame || item.label || `Image ${index + 1}`;
+                button.onclick = () => {
+                    state.selectedNodeId = itemPath;
+                    renderTextLayoutInspector();
+                };
+                list.appendChild(button);
+
+                const atlas = state.atlasIndex[item.node.frame];
+                if (!atlas) return;
+                addPixiSprite(item.node.frame, item.node, {
+                    x: Number(item.node.x) || 0,
+                    bottomY: Number(item.node.bottomY) || 0,
+                    scale: Number(item.node.scale) || 1,
+                    width: Number(item.node.width) || undefined,
+                    height: Number(item.node.height) || undefined,
+                    alpha: Number.isFinite(Number(item.node.alpha)) ? Number(item.node.alpha) : 1,
+                    tint: Number.isFinite(Number(item.node.tint)) ? Number(item.node.tint) : undefined
+                });
+                const scale = Number(item.node.scale) || 1;
+                const width = Number(item.node.width) || Math.round((atlas.w || 0) * scale);
+                const height = Number(item.node.height) || Math.round((atlas.h || 0) * scale);
+                const leftPct = (Number(item.node.x) || 0) / 1920 * 100;
+                const topPct = (1080 - (Number(item.node.bottomY) || 0) - height) / 1080 * 100;
+                const widthPct = width / 1920 * 100;
+                const heightPct = height / 1080 * 100;
+                const image = document.createElement('div');
+                image.className = `preview-image${itemPath === state.selectedNodeId ? ' active' : ''}`;
+                image.style.left = `${Math.max(0, leftPct)}%`;
+                image.style.top = `${Math.max(0, topPct)}%`;
+                image.style.width = `${Math.max(1, widthPct)}%`;
+                image.style.height = `${Math.max(1, heightPct)}%`;
+                image.style.background = 'transparent';
+                image.onclick = () => {
+                    state.selectedNodeId = itemPath;
+                    renderTextLayoutInspector();
+                };
+                preview.appendChild(image);
+            });
+
+            renderPaylinesPreview(pageNode);
+            renderPrimaryPaytablePayoutPreview();
+
+            if (!isPrimaryPaytable && boxes.length > 0) {
+                const textTitle = document.createElement('div');
+                textTitle.className = 'group-title';
+                textTitle.textContent = 'Texts';
+                list.appendChild(textTitle);
+            }
+
+            boxes.forEach((item, index) => {
+                if (isPrimaryPaytable) return;
+                const itemPath = `text:${item.path.join('.')}`;
+                const button = document.createElement('button');
+                button.className = `page-button${itemPath === state.selectedNodeId ? ' active' : ''}`;
+                button.textContent = item.node.key || item.label || `Text ${index + 1}`;
+                button.onclick = () => {
+                    state.selectedNodeId = itemPath;
+                    renderTextLayoutInspector();
+                };
+                list.appendChild(button);
+
+                const localizedNode = resolveEditorLocaleLayout(item.node, previewLocale());
+                const width = Number(localizedNode.width) || 220;
+                const leftPct = (Number(localizedNode.x) || 0) / 1920 * 100;
+                const widthPct = width / 1920 * 100;
+                const box = document.createElement('div');
+                box.className = `preview-box${itemPath === state.selectedNodeId ? ' active' : ''}`;
+                box.style.left = `${Math.max(0, leftPct)}%`;
+                box.style.width = `${Math.max(2, widthPct)}%`;
+                box.style.textAlign = localizedNode.align || 'left';
+                box.onclick = () => {
+                    state.selectedNodeId = itemPath;
+                    renderTextLayoutInspector();
+                };
+
+                const previewLanguage = previewLocale();
+                const previewText = getLocaleMap(previewLanguage)?.[item.node.key] || item.node.key || item.label;
+                const pixiText = addPixiText(String(previewText || ''), localizedNode, {
+                    x: Number(localizedNode.x) || 0,
+                    bottomY: Number(localizedNode.bottomY) || 0,
+                    maxWidth: Number(localizedNode.width) || 0,
+                    maxHeight: Number(localizedNode.height) || 0,
+                    fontSize: Number(localizedNode.fontSize) || 24,
+                    align: localizedNode.align || 'left',
+                    autoFit: false
+                });
+                preview.appendChild(box);
+                const actualHeight = Math.max(24, Number(pixiText?.height) || Number(localizedNode.height) || 24);
+                const topPct = (1080 - (Number(localizedNode.bottomY) || 0) - actualHeight) / 1080 * 100;
+                box.style.top = `${Math.max(0, topPct)}%`;
+                box.style.height = `${Math.max(3, ((Number(localizedNode.height) || actualHeight) / 1080) * 100)}%`;
+            });
+
+            const selected = allItems.find((item) => `${item.type}:${item.path.join('.')}` === state.selectedNodeId) || allItems[0];
+            const node = selected.node;
+            const previewLanguage = previewLocale();
+            const localizedNode = resolveEditorLocaleLayout(node, previewLanguage);
+            if (!isPrimaryPaytable && selected.type === 'shellText') {
+                form.innerHTML = `
+                    <div class="field-note">Editing layout for locale <code>${previewLanguage}</code>.</div>
+                    <div class="inspector-grid">
+                        <label>X<input type="number" data-field="x" value="${Number(localizedNode.x) || 960}"></label>
+                        <label>Y<input type="number" data-field="y" value="${Number(localizedNode.y) || 98}"></label>
+                        <label>Font Size<input type="number" data-field="fontSize" value="${Number(localizedNode.fontSize) || 58}"></label>
+                        <label>Max Width<input type="number" data-field="maxWidth" value="${Number(localizedNode.maxWidth) || 760}"></label>
+                        <label>Color<input type="number" data-field="color" value="${Number(localizedNode.color) || 9678783}"></label>
+                    </div>
+                    <div class="field-note">This edits locale-specific title layout at <code>ui.hud.helpMenu.title.locales.${previewLanguage}</code>.</div>
+                `;
+            } else if (!isPrimaryPaytable && selected.type === 'image') {
+                const atlas = state.atlasIndex[node.frame] || {};
+                const effectiveWidth = Number(node.width) || Math.round((atlas.w || 0) * (Number(node.scale) || 1));
+                const effectiveHeight = Number(node.height) || Math.round((atlas.h || 0) * (Number(node.scale) || 1));
+                form.innerHTML = `
+                    <div class="inspector-grid">
+                        <label>X<input type="number" data-field="x" value="${Number(node.x) || 0}"></label>
+                        <label>Bottom Y<input type="number" data-field="bottomY" value="${Number(node.bottomY) || 0}"></label>
+                        <label>Scale<input type="number" step="0.01" data-field="scale" value="${Number(node.scale) || 1}"></label>
+                        <label>Width<input type="number" data-field="width" value="${effectiveWidth || 0}"></label>
+                        <label>Height<input type="number" data-field="height" value="${effectiveHeight || 0}"></label>
+                        <label>Alpha<input type="number" step="0.01" data-field="alpha" value="${Number.isFinite(Number(node.alpha)) ? Number(node.alpha) : 1}"></label>
+                    </div>
+                    <div class="inspector-extra">
+                        <label>Frame<input type="text" data-field="frame" value="${node.frame || ''}"></label>
+                        <label>Id<input type="text" data-field="id" value="${node.id || ''}"></label>
+                    </div>
+                    <div class="field-note">Original frame size: ${atlas.sourceW || atlas.w || 0} x ${atlas.sourceH || atlas.h || 0}. Image changes update the manifest immediately. You can swap the asset by editing <code>frame</code>.</div>
+                `;
+            } else if (!isPrimaryPaytable) {
+                form.innerHTML = `
+                    <div class="field-note">Editing layout for locale <code>${previewLanguage}</code>.</div>
+                    <div class="inspector-grid">
+                        <label>X<input type="number" data-field="x" value="${Number(localizedNode.x) || 0}"></label>
+                        <label>Bottom Y<input type="number" data-field="bottomY" value="${Number(localizedNode.bottomY) || 0}"></label>
+                        <label>Font Size<input type="number" data-field="fontSize" value="${Number(localizedNode.fontSize) || 0}"></label>
+                        <label>Width<input type="number" data-field="width" value="${Number(localizedNode.width) || 0}"></label>
+                        <label>Height<input type="number" data-field="height" value="${Number(localizedNode.height) || 0}"></label>
+                        <label>Align
+                            <select data-field="align">
+                                <option value="left" ${localizedNode.align === 'left' || !localizedNode.align ? 'selected' : ''}>left</option>
+                                <option value="center" ${localizedNode.align === 'center' ? 'selected' : ''}>center</option>
+                                <option value="right" ${localizedNode.align === 'right' ? 'selected' : ''}>right</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="inspector-extra">
+                        <label>Key<input type="text" data-field="key" value="${node.key || ''}"></label>
+                        <label>Fallback<input type="text" data-field="fallback" value="${node.fallback || ''}"></label>
+                    </div>
+                    <div class="field-note">Text layout is stored per locale. Auto-fit is disabled.</div>
+                `;
+            }
+
+            if (state.currentPageId === 'paytable-lines') {
+                const currentPageNode = deepClone(getCurrentPageNode());
+                const gridCfg = currentPageNode.grid || {};
+                const linesValue = formatPaylinesPatterns(getPaylinePatterns(currentPageNode));
+                form.innerHTML += `
+                    <div class="translation-key" style="margin-top:14px;">
+                        <h3>Paylines Grid</h3>
+                        <div class="inspector-grid">
+                            <label>Start X<input type="number" data-paylines-grid="startX" value="${Number(gridCfg.startX) || 500}"></label>
+                            <label>Step X<input type="number" data-paylines-grid="stepX" value="${Number(gridCfg.stepX) || 260}"></label>
+                            <label>Top Row Bottom Y<input type="number" data-paylines-grid="topRowBottomY" value="${Number(gridCfg.topRowBottomY) || 800}"></label>
+                            <label>Row Bottom Y Step<input type="number" data-paylines-grid="rowBottomYStep" value="${Number(gridCfg.rowBottomYStep) || 150}"></label>
+                            <label>Columns Per Row<input type="number" data-paylines-grid="columnsPerRow" value="${Number(gridCfg.columnsPerRow) || 5}"></label>
+                            <label>Scale<input type="number" step="0.01" data-paylines-grid="scale" value="${Number(gridCfg.scale) || 1}"></label>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <label style="display:grid;gap:6px;color:var(--muted);font-size:13px;">Lines (frame-server format supported)
+                                <textarea id="paylines-patterns" style="min-height:180px;">${linesValue}</textarea>
+                            </label>
+                        </div>
+                        <div class="field-note">Paste format like <code>[1, 1, 1, 1, 1], //1</code>. Comments are ignored.</div>
+                    </div>
+                `;
+            }
+
+            if (isPrimaryPaytable) {
+                const page = getPrimaryPaytableConfig();
+                const previewLanguage = previewLocale();
+                const localizedScatter = resolveEditorLocaleLayout(page.scatter || {}, previewLanguage);
+                const primaryTitle = document.createElement('div');
+                primaryTitle.className = 'group-title';
+                primaryTitle.textContent = 'Main Paytable';
+                list.appendChild(primaryTitle);
+
+                const scatterButton = document.createElement('button');
+                scatterButton.className = 'page-button';
+                scatterButton.textContent = `Scatter: ${page.scatter.frame || 'book_blur_01.png'}`;
+                list.appendChild(scatterButton);
+
+                page.symbols.forEach((symbol, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'page-button';
+                    button.textContent = `Symbol ${index + 1}: ${symbol.frame || 'symbol'}`;
+                    list.appendChild(button);
+                });
+
+                const symbolCards = page.symbols.map((symbol, index) => {
+                    const localizedSymbol = resolveEditorLocaleLayout(symbol, previewLanguage);
+                    return `
+                    <div class="translation-key" style="margin-top:12px;">
+                        <h3>Symbol ${index + 1}: ${symbol.frame || 'symbol'}</h3>
+                        <div class="inspector-grid">
+                            <label>Frame<input type="text" data-pt-index="${index}" data-pt-field="frame" value="${symbol.frame || ''}"></label>
+                            <label>X<input type="number" data-pt-index="${index}" data-pt-field="x" value="${Number(symbol.x) || 0}"></label>
+                            <label>Bottom Y<input type="number" data-pt-index="${index}" data-pt-field="bottomY" value="${Number(symbol.bottomY) || 0}"></label>
+                            <label>Scale<input type="number" step="0.01" data-pt-index="${index}" data-pt-field="scale" value="${Number(symbol.scale) || 0.5}"></label>
+                            <label>Pays X<input type="number" data-pt-index="${index}" data-pt-field="paysX" value="${Number(symbol.paysX) || 0}"></label>
+                            <label>Pays Y<input type="number" data-pt-index="${index}" data-pt-field="paysY" value="${Number(symbol.paysY) || 0}"></label>
+                            <label>Pays Font Size<input type="number" data-pt-index="${index}" data-pt-field="paysFontSize" value="${Number(symbol.paysFontSize) || 32}"></label>
+                            <label>Multiplier Source
+                                <select data-pt-index="${index}" data-pt-field="multiplierSource">
+                                    <option value="lineBet" ${symbol.multiplierSource !== 'totalBet' ? 'selected' : ''}>Bet Per Line</option>
+                                    <option value="totalBet" ${symbol.multiplierSource === 'totalBet' ? 'selected' : ''}>Total Bet</option>
+                                </select>
+                            </label>
+                            <label><span>4 rows</span><input type="checkbox" data-pt-index="${index}" data-pt-field="includeFourRows" ${symbol.includeFourRows ? 'checked' : ''}></label>
+                        </div>
+                        <div class="inspector-extra">
+                            <label>Description Key<input type="text" data-pt-index="${index}" data-pt-field="descriptionKey" value="${symbol.descriptionKey || ''}"></label>
+                            <label>Description Fallback<input type="text" data-pt-index="${index}" data-pt-field="descriptionFallback" value="${symbol.descriptionFallback || ''}"></label>
+                        </div>
+                        <div class="inspector-grid" style="margin-top:10px;">
+                            <label>Description X<input type="number" data-pt-index="${index}" data-pt-field="descriptionX" value="${Number(localizedSymbol.descriptionX) || 0}"></label>
+                            <label>Description Bottom Y<input type="number" data-pt-index="${index}" data-pt-field="descriptionBottomY" value="${Number(localizedSymbol.descriptionBottomY) || 0}"></label>
+                            <label>Description Font Size<input type="number" data-pt-index="${index}" data-pt-field="descriptionFontSize" value="${Number(localizedSymbol.descriptionFontSize) || 24}"></label>
+                            <label>Description Width<input type="number" data-pt-index="${index}" data-pt-field="descriptionWidth" value="${Number(localizedSymbol.descriptionWidth) || 300}"></label>
+                            <label>Description Height<input type="number" data-pt-index="${index}" data-pt-field="descriptionHeight" value="${Number(localizedSymbol.descriptionHeight) || 120}"></label>
+                            <label>Description Align
+                                <select data-pt-index="${index}" data-pt-field="descriptionAlign">
+                                    <option value="left" ${localizedSymbol.descriptionAlign === 'left' || !localizedSymbol.descriptionAlign ? 'selected' : ''}>left</option>
+                                    <option value="center" ${localizedSymbol.descriptionAlign === 'center' ? 'selected' : ''}>center</option>
+                                    <option value="right" ${localizedSymbol.descriptionAlign === 'right' ? 'selected' : ''}>right</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <label style="display:grid;gap:6px;color:var(--muted);font-size:13px;">Payouts count:mult
+                                <textarea data-pt-payouts="${index}" style="min-height:96px;">${Array.isArray(symbol.pays) ? symbol.pays.map((row) => `${row.count}:${row.mult}`).join('\n') : ''}</textarea>
+                            </label>
+                        </div>
+                        <div class="toolbar" style="padding:10px 0 0;">
+                            <button type="button" data-pt-copy="${index}">Copy Symbol</button>
+                            <button type="button" data-pt-delete="${index}">Delete Symbol</button>
+                        </div>
+                    </div>
+                `; }).join('');
+
+                form.innerHTML += `
+                    <div class="translation-key" style="margin-top:14px;">
+                        <h3>Scatter</h3>
+                        <div class="field-note">Editing description layout for locale <code>${previewLanguage}</code>.</div>
+                        <div class="inspector-grid">
+                            <label>Preview Line Bet<input type="number" step="0.01" data-pt-setting="previewLineBet" value="${Number(page.previewLineBet) || 1}"></label>
+                            <label>Preview Total Bet<input type="number" step="0.01" data-pt-setting="previewTotalBet" value="${Number(page.previewTotalBet) || 1}"></label>
+                            <label>Scatter Multiplier Source
+                                <select data-pt-scatter="multiplierSource">
+                                    <option value="totalBet" ${page.scatter.multiplierSource !== 'lineBet' ? 'selected' : ''}>Total Bet</option>
+                                    <option value="lineBet" ${page.scatter.multiplierSource === 'lineBet' ? 'selected' : ''}>Bet Per Line</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="inspector-grid">
+                            <label>Frame<input type="text" data-pt-scatter="frame" value="${page.scatter.frame || ''}"></label>
+                            <label>X<input type="number" data-pt-scatter="x" value="${Number(page.scatter.x) || 0}"></label>
+                            <label>Bottom Y<input type="number" data-pt-scatter="bottomY" value="${Number(page.scatter.bottomY) || 0}"></label>
+                            <label>Scale<input type="number" step="0.01" data-pt-scatter="scale" value="${Number(page.scatter.scale) || 0}"></label>
+                            <label>Pays X<input type="number" data-pt-scatter="paysX" value="${Number(page.scatter.paysX) || 0}"></label>
+                            <label>Pays Bottom Y<input type="number" data-pt-scatter="paysBottomY" value="${Number(page.scatter.paysBottomY) || 0}"></label>
+                            <label>Pays Font Size<input type="number" data-pt-scatter="paysFontSize" value="${Number(page.scatter.paysFontSize) || 32}"></label>
+                        </div>
+                        <div class="inspector-extra">
+                            <label>Description Key<input type="text" data-pt-scatter="descriptionKey" value="${page.scatter.descriptionKey || ''}"></label>
+                            <label>Description Fallback<input type="text" data-pt-scatter="descriptionFallback" value="${page.scatter.descriptionFallback || ''}"></label>
+                        </div>
+                        <div class="inspector-grid" style="margin-top:10px;">
+                            <label>Description X<input type="number" data-pt-scatter="descriptionX" value="${Number(localizedScatter.descriptionX) || 850}"></label>
+                            <label>Description Bottom Y<input type="number" data-pt-scatter="descriptionBottomY" value="${Number(localizedScatter.descriptionBottomY) || 860}"></label>
+                            <label>Description Font Size<input type="number" data-pt-scatter="descriptionFontSize" value="${Number(localizedScatter.descriptionFontSize) || 28}"></label>
+                            <label>Description Width<input type="number" data-pt-scatter="descriptionWidth" value="${Number(localizedScatter.descriptionWidth) || 720}"></label>
+                            <label>Description Height<input type="number" data-pt-scatter="descriptionHeight" value="${Number(localizedScatter.descriptionHeight) || 160}"></label>
+                            <label>Description Align
+                                <select data-pt-scatter="descriptionAlign">
+                                    <option value="left" ${localizedScatter.descriptionAlign === 'left' || !localizedScatter.descriptionAlign ? 'selected' : ''}>left</option>
+                                    <option value="center" ${localizedScatter.descriptionAlign === 'center' ? 'selected' : ''}>center</option>
+                                    <option value="right" ${localizedScatter.descriptionAlign === 'right' ? 'selected' : ''}>right</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <label style="display:grid;gap:6px;color:var(--muted);font-size:13px;">Scatter Payouts count:mult
+                                <textarea data-pt-scatter-payouts="1" style="min-height:96px;">${Array.isArray(page.scatter.pays) ? page.scatter.pays.map((row) => `${row.count}:${row.mult}`).join('\n') : ''}</textarea>
+                            </label>
+                        </div>
+                        <div class="toolbar" style="padding-top:10px;">
+                            <button type="button" id="pt-add-symbol-btn">Add Symbol</button>
+                        </div>
+                    </div>
+                    ${symbolCards}
+                `;
+            }
+
+            form.querySelectorAll('input[data-field], select[data-field]').forEach((input) => {
+                if (input.tagName === 'SELECT') {
+                    input.addEventListener('change', (event) => {
+                        updateSelectedNodeField(event.target.dataset.field, event.target.value);
+                    });
+                    return;
+                }
+
+                input.addEventListener('change', (event) => {
+                    updateSelectedNodeField(event.target.dataset.field, event.target.value);
+                });
+                input.addEventListener('blur', (event) => {
+                    updateSelectedNodeField(event.target.dataset.field, event.target.value);
+                });
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                        requestAnimationFrame(() => {
+                            updateSelectedNodeField(event.target.dataset.field, event.target.value);
+                        });
+                    }
+                });
+            });
+
+            if (state.currentPageId === 'paytable-primary') {
+                form.querySelector('#pt-add-symbol-btn')?.addEventListener('click', () => addPrimaryPaytableSymbol());
+                form.querySelectorAll('[data-pt-copy]').forEach((button) => button.addEventListener('click', (event) => addPrimaryPaytableSymbol(Number(event.currentTarget.dataset.ptCopy))));
+                form.querySelectorAll('[data-pt-delete]').forEach((button) => button.addEventListener('click', (event) => deletePrimaryPaytableSymbol(Number(event.currentTarget.dataset.ptDelete))));
+                form.querySelectorAll('[data-pt-setting]').forEach((input) => {
+                    const apply = () => updatePrimaryPaytableSetting(input.dataset.ptSetting, input.value);
+                    input.addEventListener('change', apply);
+                    input.addEventListener('blur', apply);
+                });
+                form.querySelectorAll('[data-pt-index][data-pt-field]').forEach((input) => {
+                    const apply = () => updatePrimaryPaytableSymbol(Number(input.dataset.ptIndex), input.dataset.ptField, input.type === 'checkbox' ? input.checked : input.value);
+                    input.addEventListener('change', apply);
+                    input.addEventListener('blur', apply);
+                });
+                form.querySelectorAll('[data-pt-payouts]').forEach((textarea) => {
+                    const apply = () => updatePrimaryPaytablePayouts(Number(textarea.dataset.ptPayouts), textarea.value, 'symbol');
+                    textarea.addEventListener('change', apply);
+                    textarea.addEventListener('blur', apply);
+                });
+                form.querySelectorAll('[data-pt-scatter]').forEach((input) => {
+                    const apply = () => {
+                        const page = getPrimaryPaytableConfig();
+                        const field = input.dataset.ptScatter;
+                        if (field === 'frame' || field === 'descriptionKey' || field === 'descriptionFallback' || field === 'multiplierSource') {
+                            page.scatter[field] = input.value;
+                        } else if (field && field.startsWith('description')) {
+                            const locale = previewLocale();
+                            if (!page.scatter.locales || typeof page.scatter.locales !== 'object') page.scatter.locales = {};
+                            if (!page.scatter.locales[locale] || typeof page.scatter.locales[locale] !== 'object') page.scatter.locales[locale] = {};
+                            page.scatter.locales[locale][field] = field === 'descriptionAlign'
+                                ? input.value
+                                : (Number.isFinite(Number(input.value)) ? Number(input.value) : 0);
+                        } else {
+                            const value = Number(input.value);
+                            page.scatter[field] = Number.isFinite(value) ? value : 0;
+                        }
+                        setDirty(true);
+                        renderLayoutEditor();
+                        renderTextLayoutInspector();
+                    };
+                    input.addEventListener('change', apply);
+                    input.addEventListener('blur', apply);
+                });
+                form.querySelector('[data-pt-scatter-payouts]')?.addEventListener('change', (event) => updatePrimaryPaytablePayouts(-1, event.target.value, 'scatter'));
+                form.querySelector('[data-pt-scatter-payouts]')?.addEventListener('blur', (event) => updatePrimaryPaytablePayouts(-1, event.target.value, 'scatter'));
+            }
+
+            if (state.currentPageId === 'paytable-lines') {
+                form.querySelectorAll('[data-paylines-grid]').forEach((input) => {
+                    const apply = () => updatePaylinesConfig(input.dataset.paylinesGrid, input.value);
+                    input.addEventListener('input', apply);
+                    input.addEventListener('change', apply);
+                    input.addEventListener('blur', apply);
+                });
+                const patterns = form.querySelector('#paylines-patterns');
+                patterns?.addEventListener('input', (event) => updatePaylinesPatterns(event.target.value));
+                patterns?.addEventListener('change', (event) => updatePaylinesPatterns(event.target.value));
+                patterns?.addEventListener('blur', (event) => updatePaylinesPatterns(event.target.value));
+            }
         }
 
         function selectPage(id) {
@@ -402,6 +2212,7 @@
             state.currentPageId = id;
             renderSidebar();
             renderLayoutEditor();
+            renderTextLayoutInspector();
             renderTranslations();
         }
 
@@ -411,8 +2222,16 @@
             const data = await response.json();
             state.manifest = data.manifest;
             state.translations = data.translations;
+            state.atlasIndex = data.atlasIndex || {};
+            renderPreviewLanguageOptions();
+            getPageDefs().forEach((page) => ensurePageDefaults(page));
+            if (!getPageDefs().some((page) => page.id === state.currentPageId)) {
+                state.currentPageId = 'paytable-hold';
+            }
+            setDirty(false);
             renderSidebar();
             renderLayoutEditor();
+            renderTextLayoutInspector();
             renderTranslations();
             setStatus('Loaded successfully.', 'good');
         }
@@ -437,6 +2256,7 @@
                     throw new Error(payload.error || 'Save failed.');
                 }
 
+                setDirty(false);
                 setStatus('Saved successfully.', 'good');
             } catch (error) {
                 setStatus(error instanceof Error ? error.message : String(error), 'bad');
@@ -454,12 +2274,25 @@
             state.editor = new JSONEditor(container, {
                 mode: 'tree',
                 modes: ['tree', 'code', 'form', 'view'],
+                onChangeJSON: (json) => {
+                    updateCurrentPageNode(deepClone(json));
+                    setDirty(true);
+                    renderTextLayoutInspector();
+                },
                 onError: (error) => alert(error.toString())
             });
 
             document.getElementById('reload-btn').onclick = () => loadAll().catch((error) => setStatus(error.message, 'bad'));
+            document.getElementById('add-page-btn').onclick = () => addPageFromTemplate();
+            document.getElementById('copy-page-btn').onclick = () => copyCurrentPage();
+            document.getElementById('delete-page-btn').onclick = () => deleteCurrentPage();
             document.getElementById('save-btn').onclick = () => saveAll();
+            document.getElementById('add-translation-key-btn').onclick = () => addTranslationKey();
             document.getElementById('language-filter').onchange = () => renderTranslations();
+            document.getElementById('preview-language').onchange = (event) => {
+                state.previewLanguage = event.target.value || 'en';
+                renderTextLayoutInspector();
+            };
             document.getElementById('custom-languages').oninput = () => {
                 if (document.getElementById('language-filter').value === 'custom') {
                     renderTranslations();
@@ -467,6 +2300,7 @@
             };
 
             loadAll().catch((error) => setStatus(error.message, 'bad'));
+            setDirty(false);
         }
 
         boot();

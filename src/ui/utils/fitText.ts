@@ -16,7 +16,7 @@ function exceedsBounds(displayObject: { width: number; height: number }, maxWidt
 }
 
 export function fitPixiTextToBounds(
-  text: { width: number; height: number; scale: { set: (x: number, y?: number) => void }; style: { fontSize: number | string } },
+  text: { width: number; height: number; scale: { set: (x: number, y?: number) => void }; style: { fontSize: number | string; lineHeight?: number | string } },
   options: TextFitOptions = {}
 ): void {
   if (!text || !text.style) return;
@@ -27,12 +27,18 @@ export function fitPixiTextToBounds(
 
   const baseFontSize = Math.max(1, Math.floor(Number(text.style.fontSize) || 0));
   const minFontSize = Math.max(8, Math.floor(toPositiveNumber(options.minFontSize, baseFontSize)));
+  const applyFontSize = (fontSize: number): void => {
+    text.style.fontSize = fontSize;
+    if ('lineHeight' in text.style) {
+      text.style.lineHeight = Math.max(10, Math.round(fontSize * 1.02));
+    }
+  };
 
   text.scale.set(1);
-  text.style.fontSize = baseFontSize;
+  applyFontSize(baseFontSize);
 
   while (Number(text.style.fontSize) > minFontSize && exceedsBounds(text, maxWidth, maxHeight)) {
-    text.style.fontSize = Number(text.style.fontSize) - 1;
+    applyFontSize(Number(text.style.fontSize) - 1);
   }
 }
 

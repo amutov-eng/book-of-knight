@@ -218,7 +218,7 @@ const DEFAULT_SYMBOL_WIN_PROFILES = {
  * Loads the merged runtime manifest.
  *
  * Merge order:
- * 1. `assets/assets-manifest.common.json`
+ * 1. `assets/common/assets-manifest.common.json`
  * 2. active variant manifest
  * 3. fallback variant manifest when the active one is missing
  */
@@ -228,10 +228,10 @@ export async function loadAssetsManifest(variant = getRuntimeVariant()) {
     }
 
     const fallbackVariant = variant === 'mobile' ? 'desktop' : 'mobile';
-    const commonManifest = await fetchJsonIfExists('assets/assets-manifest.common.json');
+    const commonManifest = await fetchJsonIfExists('assets/common/assets-manifest.common.json');
     const lookup = [
-        `assets/assets-manifest.${variant}.json`,
-        `assets/assets-manifest.${fallbackVariant}.json`
+        `assets/${variant}/assets-manifest.${variant}.json`,
+        `assets/${fallbackVariant}/assets-manifest.${fallbackVariant}.json`
     ];
 
     for (let i = 0; i < lookup.length; i++) {
@@ -245,7 +245,7 @@ export async function loadAssetsManifest(variant = getRuntimeVariant()) {
     }
 
     cachedManifest = null;
-    cachedManifestErrors = ['Missing assets manifest. Expected one of: ' + ['assets/assets-manifest.common.json', ...lookup].join(', ')];
+    cachedManifestErrors = ['Missing assets manifest. Expected one of: ' + ['assets/common/assets-manifest.common.json', ...lookup].join(', ')];
     return cachedManifest;
 }
 
@@ -726,7 +726,7 @@ export function getUiHudConfig(manifest) {
                 holdAndWin: {
                     symbols: { frames: ['mega_blur_01.png', 'major_blur_01.png', 'mini_blur_01.png', 'shield_blur_01.png'], startX: 500, bottomY: 690, scale: 0.7, stepMultiplier: 0.7 },
                     texts: [
-                        { x: 200, bottomY: 690, width: 1580, fontSize: 30, key: 'splashTxt' }
+                        { x: 200, bottomY: 690, width: 1580, height: 300, fontSize: 30, key: 'splashTxt' }
                     ]
                 },
                 freeGames: {
@@ -745,12 +745,12 @@ export function getUiHudConfig(manifest) {
                         tint: 0xffdc57
                     },
                     texts: [
-                        { x: 210, bottomY: 568, width: 1520, fontSize: 30, key: 'splashSecTxt' }
+                        { x: 210, bottomY: 568, width: 1520, height: 240, fontSize: 30, key: 'splashSecTxt' }
                     ]
                 },
                 primary: {
                     topSymbol: { frame: 'book_blur_01.png', x: 660, bottomY: 800, scale: 0.5 },
-                    description: { x: 850, bottomY: 860, width: 720, fontSize: 28, key: 'paytableScatter' },
+                    description: { x: 850, bottomY: 860, width: 720, height: 160, fontSize: 28, key: 'paytableScatter' },
                     scatterPays: { x: 483, bottomY: 884, fontSize: 32 },
                     items: [
                         { frame: 'knight_blur_01.png', x: 165, bottomY: 570, paysX: 365, paysY: 674, includeFourRows: true },
@@ -782,7 +782,7 @@ export function getUiHudConfig(manifest) {
                     frameStroke: 0xffef9f
                 },
                 paylines: {
-                    text1: { x: 310, bottomY: 445, width: 1300, fontSize: 28, key: 'paylinesTxt', align: 'center' },
+                    text1: { x: 310, bottomY: 445, width: 1300, height: 220, fontSize: 28, key: 'paylinesTxt', align: 'center' },
                     grid: { startX: 500, topRowBottomY: 800, bottomRowBottomY: 650, stepX: 260 }
                 }
             },
@@ -795,8 +795,28 @@ export function getUiHudConfig(manifest) {
             },
             rulesPages: {
                 howTo: {
-                    minBet: { x: 0, bottomY: 910, width: 920, fontSize: 28 },
-                    maxBet: { x: 0, bottomY: 950, width: 920, fontSize: 28 }
+                    minBet: { x: 0, bottomY: 910, width: 920, height: 40, fontSize: 28 },
+                    maxBet: { x: 0, bottomY: 950, width: 920, height: 40, fontSize: 28 },
+                    interfaceText: { x: 220, bottomY: 720, width: 1265, height: 220, fontSize: 26, key: 'rulesInterface' },
+                    autoplayText: { x: 220, bottomY: 420, width: 1265, height: 180, fontSize: 26, key: 'rulesAutoplay' }
+                },
+                betSettings: {
+                    betMenuText: { x: 220, bottomY: 760, width: 1265, height: 220, fontSize: 26, key: 'rulesBetMenu' },
+                    settingsText: { x: 220, bottomY: 480, width: 1265, height: 220, fontSize: 26, key: 'rulesSettings' }
+                },
+                lines: {
+                    linesText: { x: 220, bottomY: 700, width: 1265, height: 250, fontSize: 26, key: 'rulesLines' },
+                    unfinishedText: { x: 220, bottomY: 420, width: 1265, height: 140, fontSize: 26, key: 'rulesUnfinished' },
+                    gamePercent: { x: 220, bottomY: 330, width: 1265, height: 80, fontSize: 28 }
+                },
+                extra: {
+                    maxWinText: { x: 220, bottomY: 790, width: 1580, height: 140, fontSize: 26, key: 'rulesMaxWin' },
+                    buyBonusText: { x: 220, bottomY: 590, width: 1580, height: 190, fontSize: 26, key: 'rulesBuyBonus' },
+                    buyFreeRtp: { x: 220, bottomY: 360, width: 1580, height: 60, fontSize: 28 },
+                    buyHoldRtp: { x: 220, bottomY: 315, width: 1580, height: 60, fontSize: 28 }
+                },
+                addFreeGames: {
+                    addFreeGamesText: { x: 220, bottomY: 750, width: 1700, height: 180, fontSize: 34, key: 'rulesAddFg' }
                 }
             }
         }

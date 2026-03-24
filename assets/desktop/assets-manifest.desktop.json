@@ -1,1000 +1,1631 @@
 {
-    "backgrounds": {
-        "base": "assets/backgrounds/bg.jpg",
-        "fg": "assets/backgrounds/bg_fg.jpg",
-        "haw": "assets/backgrounds/bg_haw.jpg"
+  "backgrounds": {
+    "base": "assets/backgrounds/bg.jpg",
+    "fg": "assets/backgrounds/bg_fg.jpg",
+    "haw": "assets/backgrounds/bg_haw.jpg"
+  },
+  "reels": {
+    "background": {
+      "base": "assets/backgrounds/reels_bg.png",
+      "fg": "assets/backgrounds/reels_bg_fg.png",
+      "haw": "assets/backgrounds/reels_bg_haw.png"
     },
-    "reels": {
-        "background": {
-            "base": "assets/backgrounds/reels_bg.png",
-            "fg": "assets/backgrounds/reels_bg_fg.png",
-            "haw": "assets/backgrounds/reels_bg_haw.png"
-        },
-        "frame": {
-            "base": "assets/backgrounds/reels_frame.png",
-            "fg": "assets/backgrounds/reels_frame_fg_haw.png",
-            "haw": "assets/backgrounds/reels_frame_fg_haw.png"
-        }
-    },
-    "lines": {
-        "atlases": [
-            "assets/lines/lines-0.json",
-            "assets/lines/lines-1.json"
-        ]
-    },
-    "animations": {
-        "atlases": [
-            "assets/animations/win-0.json"
-        ]
-    },
-    "layout": {
-        "shared": {
-            "baseReel": {
-                "spinStep": 28,
-                "pitch": 272,
-                "symbolWidth": 278,
-                "symbolHeight": 264,
-                "trimTopY": 30,
-                "trimBottomY": 30
-            },
-            "reels": {
-                "strip": [
-                    1,
-                    5,
-                    6,
-                    4,
-                    5
-                ],
-                "forceSymbolIndex": null
-            },
-            "layers": {
-                "reelsBgX": 0,
-                "reelsBgY": 0,
-                "titleX": 0,
-                "titleY": 0,
-                "linesAboveSymbols": false
-            }
-        },
-        "desktop": {
-            "reels": {
-                "spacing": 282,
-                "x": 257,
-                "y": 130,
-                "width": 278,
-                "height": 792
-            }
-        }
-    },
-    "symbols": {
-        "atlases": [
-            "assets/symbols/symbols-0.json",
-            "assets/symbols/symbols-1.json"
-        ],
-        "frames": [
-            {
-                "prefix": "book_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "normal",
-                "offsetX": 5,
-                "offsetY": 0,
-                "spine": {
-                    "scatter": {
-                        "jsonPath": "assets/spine/symbols/1920_book_v1.json",
-                        "atlasPath": "assets/spine/symbols/1920_book_v1.atlas",
-                        "runtime": "3.8",
-                        "loop": false,
-                        "scale": 1,
-                        "offsetX": 0,
-                        "offsetY": 0
-                    }
-                }
-            },
-            {
-                "prefix": "10_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "normal",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "J_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "normal",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "Q_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "normal",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "K_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "normal",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "A_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "normal",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "torch_blur_",
-                "atlas": "symbols-1.json",
-                "winProfile": "high",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "axe_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "high",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "chalice_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "high",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "knight_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "high",
-                "offsetX": 0,
-                "offsetY": 0,
-                "spine": {
-                    "win": {
-                        "jsonPath": "assets/spine/symbols/1920_knight_v1.json",
-                        "atlasPath": "assets/spine/symbols/1920_knight_v1.atlas",
-                        "runtime": "3.8",
-                        "loop": false,
-                        "scale": 1,
-                        "offsetX": 0,
-                        "offsetY": 132
-                    }
-                }
-            },
-            {
-                "prefix": "shield_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "high",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "mini_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "high",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "major_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "high",
-                "offsetX": 0,
-                "offsetY": 0
-            },
-            {
-                "prefix": "mega_blur_",
-                "atlas": "symbols-0.json",
-                "winProfile": "high",
-                "offsetX": 0,
-                "offsetY": 0
-            }
-        ]
-    },
-    "ui": {
-        "atlases": [
-            "assets/ui/interface-0.json",
-            "assets/ui/menu_buttons-0.json",
-            "assets/ui/common.json"
-        ],
-        "hud": {
-            "backgrounds": {
-                "bottom": {
-                    "frame": "bottom_bg.png",
-                    "x": 0,
-                    "y": 1034
-                },
-                "winField": {
-                    "frame": "win_field.png",
-                    "x": 0,
-                    "y": 942
-                }
-            },
-            "buttons": {
-                "start": {
-                    "base": "button_start",
-                    "x": 1616,
-                    "y": 368,
-                    "width": 300,
-                    "height": 300,
-                    "enableFadeFrames": 0,
-                    "enableFadeFromAlpha": 1
-                },
-                "stop": {
-                    "base": "button_stop",
-                    "x": 1616,
-                    "y": 368,
-                    "width": 300,
-                    "height": 300,
-                    "enableFadeFrames": 0,
-                    "enableFadeFromAlpha": 1
-                },
-                "auto": {
-                    "base": "button_autoplay",
-                    "x": 1728,
-                    "y": 88,
-                    "width": 162,
-                    "height": 162,
-                    "enableFadeFrames": 0,
-                    "enableFadeFromAlpha": 1
-                },
-                "bet": {
-                    "base": "button_bet",
-                    "x": 1728,
-                    "y": 820,
-                    "width": 162,
-                    "height": 162,
-                    "enableFadeFrames": 0,
-                    "enableFadeFromAlpha": 1
-                },
-                "settings": {
-                    "base": "button_settings",
-                    "x": 30,
-                    "y": 820,
-                    "width": 162,
-                    "height": 162,
-                    "enableFadeFrames": 0,
-                    "enableFadeFromAlpha": 1
-                },
-                "buyBonus": {
-                    "base": "bb_yellow",
-                    "x": 0,
-                    "y": 430,
-                    "width": 194,
-                    "height": 164,
-                    "enableFadeFrames": 0,
-                    "enableFadeFromAlpha": 1
-                },
-                "home": {
-                    "base": "button_home",
-                    "x": 83,
-                    "y": 1030,
-                    "width": 50,
-                    "height": 50,
-                    "enableFadeFrames": 8,
-                    "enableFadeFromAlpha": 0.55
-                },
-                "autoStop": {
-                    "base": "button_autoX",
-                    "x": 1728,
-                    "y": 88,
-                    "width": 162,
-                    "height": 162,
-                    "enableFadeFrames": 10,
-                    "enableFadeFromAlpha": 0.55,
-                    "counter": {
-                        "x": 82,
-                        "y": 91,
-                        "fontSize": 44,
-                        "minFontSize": 26,
-                        "maxWidth": 118,
-                        "color": 16777215,
-                        "fontWeight": "400",
-                        "align": "center"
-                    }
-                }
-            },
-            "texts": {
-                "credit": {
-                    "x": 220,
-                    "y": 1039,
-                    "fontSize": 34,
-                    "align": "left",
-                    "labelColor": 16762368,
-                    "valueColor": 15989241
-                },
-                "totalBet": {
-                    "x": 1490,
-                    "y": 1039,
-                    "fontSize": 34,
-                    "align": "left",
-                    "labelColor": 16762368,
-                    "valueColor": 15989241
-                },
-                "status": {
-                    "x": 960,
-                    "y": 969,
-                    "fontSize": 36,
-                    "align": "center",
-                    "anchorX": 0.5
-                },
-                "winStatus": {
-                    "x": 960,
-                    "y": 990,
-                    "fontSize": 34,
-                    "align": "center",
-                    "anchorX": 0.5
-                },
-                "win": {
-                    "x": 960,
-                    "y": 953,
-                    "fontSize": 36,
-                    "align": "center",
-                    "anchorX": 0.5
-                }
-            },
-            "topBar": {
-                "logo": {
-                    "frame": "logo.png",
-                    "x": 20,
-                    "y": 6
-                },
-                "jackpots": [
-                    {
-                        "frame": "jackpot_gold_act.png",
-                        "x": 248,
-                        "y": 6,
-                        "valueX": 497.5,
-                        "valueY": 15,
-                        "valueText": "1000.00",
-                        "serverValueKey": "GRAND_JACKPOT_VALUE",
-                        "betMultiplier": 1000,
-                        "labelX": 515,
-                        "labelY": 73,
-                        "labelText": "",
-                        "valueFontSize": 48,
-                        "valueMaxWidth": 300,
-                        "valueMinFontSize": 28,
-                        "valueOffsetY": 1,
-                        "labelFontSize": 22,
-                        "valueColor": 16765440,
-                        "labelColor": 16765440
-                    },
-                    {
-                        "frame": "jackpot_silver_act.png",
-                        "x": 736,
-                        "y": 6,
-                        "valueX": 977.5,
-                        "valueY": 15,
-                        "valueText": "10.00",
-                        "serverValueKey": "MAJOR_JACKPOT_VALUE",
-                        "betMultiplier": 100,
-                        "labelX": 976,
-                        "labelY": 73,
-                        "labelText": "",
-                        "valueFontSize": 48,
-                        "valueMaxWidth": 300,
-                        "valueMinFontSize": 28,
-                        "valueOffsetY": -8,
-                        "labelFontSize": 22,
-                        "valueColor": 12246527,
-                        "labelColor": 12246527
-                    },
-                    {
-                        "frame": "jackpot_bronze_act.png",
-                        "x": 1224,
-                        "y": 6,
-                        "valueX": 1464.5,
-                        "valueY": 15,
-                        "valueText": "2.00",
-                        "serverValueKey": "MINOR_JACKPOT_VALUE",
-                        "betMultiplier": 20,
-                        "labelX": 1464,
-                        "labelY": 73,
-                        "labelText": "",
-                        "valueFontSize": 48,
-                        "valueMaxWidth": 300,
-                        "valueMinFontSize": 28,
-                        "valueOffsetY": -8,
-                        "labelFontSize": 22,
-                        "valueColor": 16547151,
-                        "labelColor": 16547151
-                    }
-                ]
-            },
-            "fonts": {
-                "primary": "Roboto",
-                "jackpot": "Roboto",
-                "creditLabel": "Roboto",
-                "creditValue": "Roboto",
-                "creditLabelBitmap": "Roboto_Condensed-Medium",
-                "creditValueBitmap": "Roboto_Condensed-Medium",
-                "totalBetLabel": "Roboto",
-                "totalBetValue": "Roboto",
-                "totalBetLabelBitmap": "Roboto_Condensed-Medium",
-                "totalBetValueBitmap": "Roboto_Condensed-Medium",
-                "status": "Roboto",
-                "winStatus": "Roboto",
-                "win": "Roboto",
-                "winStatusBitmap": "Roboto_Condensed-Medium",
-                "winBitmap": "Roboto-Black",
-                "jackpotValue": "Roboto",
-                "jackpotLabel": "Roboto"
-            },
-            "betMenu": {
-                "overlay": {
-                    "color": 0,
-                    "alpha": 0.5
-                },
-                "panel": {
-                    "frame": "bg_bet.png",
-                    "x": 846,
-                    "y": 86
-                },
-                "valueField": {
-                    "frame": "bet_value.png",
-                    "x": 1036,
-                    "y": 536
-                },
-                "title": {
-                    "x": 1293,
-                    "y": 110,
-                    "fontSize": 56,
-                    "color": 12509685
-                },
-                "totalBetLabel": {
-                    "x": 1293,
-                    "y": 324,
-                    "fontSize": 44,
-                    "color": 12509685
-                },
-                "valueText": {
-                    "x": 1293,
-                    "y": 409,
-                    "fontSize": 44,
-                    "minFontSize": 22,
-                    "maxWidth": 220,
-                    "color": 12509685
-                },
-                "lines": {
-                    "x": 1293,
-                    "y": 840,
-                    "fontSize": 42,
-                    "color": 12509685
-                },
-                "buttons": {
-                    "max": {
-                        "frame": "button_maxbet_001.png",
-                        "pressed": "button_maxbet_002.png",
-                        "x": 1142,
-                        "y": 208,
-                        "fontSize": 32,
-                        "minFontSize": 22,
-                        "maxTextWidth": 250,
-                        "textOffsetY": 0,
-                        "color": 12509685
-                    },
-                    "plus": {
-                        "frame": "plus_001.png",
-                        "pressed": "plus_002.png",
-                        "x": 1392,
-                        "y": 375
-                    },
-                    "minus": {
-                        "frame": "minus_001.png",
-                        "pressed": "minus_002.png",
-                        "x": 1058,
-                        "y": 375
-                    },
-                    "close": {
-                        "frame": "button_closesmall_001.png",
-                        "pressed": "button_closesmall_002.png",
-                        "hover": "button_close_hover.png",
-                        "x": 1550,
-                        "y": 815
-                    },
-                    "preset": {
-                        "frame": "button_digit_001.png",
-                        "pressed": "button_digit_002.png",
-                        "fontSize": 30,
-                        "minFontSize": 20,
-                        "maxTextWidth": 170,
-                        "textOffsetY": 0,
-                        "color": 12509685,
-                        "positions": [
-                            {
-                                "x": 937,
-                                "y": 364
-                            },
-                            {
-                                "x": 1182,
-                                "y": 364
-                            },
-                            {
-                                "x": 1427,
-                                "y": 364
-                            },
-                            {
-                                "x": 937,
-                                "y": 220
-                            },
-                            {
-                                "x": 1182,
-                                "y": 220
-                            },
-                            {
-                                "x": 1427,
-                                "y": 220
-                            }
-                        ]
-                    }
-                }
-            },
-            "autoPlayMenu": {
-                "overlay": {
-                    "color": 0,
-                    "alpha": 0.55
-                },
-                "panel": {
-                    "frame": "bg_auto.png",
-                    "x": 853,
-                    "y": 94
-                },
-                "title": {
-                    "x": 1300,
-                    "y": 96,
-                    "fontSize": 60,
-                    "color": 9676735,
-                    "maxWidth": 760,
-                    "minFontSize": 30
-                },
-                "autoSpinsLabel": {
-                    "x": 1300,
-                    "y": 700,
-                    "fontSize": 54,
-                    "color": 9676735,
-                    "maxWidth": 880,
-                    "minFontSize": 26
-                },
-                "infoText": {
-                    "x": 1296,
-                    "y": 312,
-                    "fontSize": 36,
-                    "color": 12174803
-                },
-                "buttons": {
-                    "close": {
-                        "frame": "button_closesmall_001.png",
-                        "pressed": "button_closesmall_002.png",
-                        "x": 1512,
-                        "y": 859
-                    },
-                    "start": {
-                        "frame": "start_autospins_001.png",
-                        "pressed": "start_autospins_002.png",
-                        "x": 901,
-                        "y": 139,
-                        "fontSize": 60,
-                        "color": 12509685,
-                        "maxTextWidth": 760,
-                        "minFontSize": 18,
-                        "textOffsetY": 0
-                    },
-                    "spin": {
-                        "frame": "button_digit_001.png",
-                        "pressed": "button_digit_002.png",
-                        "fontSize": 60,
-                        "color": 12509685,
-                        "values": [
-                            10,
-                            20,
-                            50,
-                            100,
-                            1000
-                        ],
-                        "positions": [
-                            {
-                                "x": 963,
-                                "y": 403
-                            },
-                            {
-                                "x": 1190,
-                                "y": 403
-                            },
-                            {
-                                "x": 1417,
-                                "y": 403
-                            },
-                            {
-                                "x": 1068,
-                                "y": 276
-                            },
-                            {
-                                "x": 1295,
-                                "y": 276
-                            }
-                        ]
-                    },
-                    "turbo": {
-                        "frame": "turbo_bg_001.png",
-                        "pressed": "turbo_bg_002.png",
-                        "x": 1043,
-                        "y": 762,
-                        "fontSize": 36,
-                        "color": 12174803,
-                        "textAlign": "left",
-                        "textX": 80,
-                        "textY": 53,
-                        "textOffsetY": 0
-                    },
-                    "skip": {
-                        "frame": "skipscreen_bg_001.png",
-                        "pressed": "skipscreen_bg_002.png",
-                        "x": 1043,
-                        "y": 603,
-                        "fontSize": 36,
-                        "color": 12174803,
-                        "textAlign": "left",
-                        "textX": 80,
-                        "textY": 53,
-                        "textOffsetY": 0
-                    }
-                }
-            },
-            "buyBonusMenu": {
-                "background": {
-                    "x": 0,
-                    "y": 0,
-                    "width": 1920,
-                    "height": 1080
-                },
-                "panels": {
-                    "free": {
-                        "x": 420,
-                        "y": 190
-                    },
-                    "haw": {
-                        "x": 989,
-                        "y": 190
-                    }
-                },
-                "symbols": {
-                    "free": {
-                        "x": 493,
-                        "y": 605
-                    },
-                    "haw": {
-                        "x": 1100,
-                        "y": 590
-                    }
-                },
-                "controls": {
-                    "betBg": {
-                        "x": 703,
-                        "y": 86
-                    },
-                    "plus": {
-                        "x": 1068,
-                        "y": 78
-                    },
-                    "minus": {
-                        "x": 709,
-                        "y": 78
-                    },
-                    "close": {
-                        "x": 1711,
-                        "y": 928
-                    },
-                    "freeBuy": {
-                        "x": 552,
-                        "y": 285
-                    },
-                    "hawBuy": {
-                        "x": 1121,
-                        "y": 285
-                    }
-                },
-                "texts": {
-                    "buyButton": {
-                        "maxWidth": 180,
-                        "minFontSize": 24
-                    },
-                    "title": {
-                        "x": 960,
-                        "y": 40,
-                        "fontSize": 60,
-                        "maxWidth": 760,
-                        "minFontSize": 30
-                    },
-                    "totalBetLabel": {
-                        "x": 956,
-                        "y": 206,
-                        "fontSize": 46
-                    },
-                    "totalBetValue": {
-                        "x": 956,
-                        "y": 139,
-                        "fontSize": 46
-                    },
-                    "freeTitle": {
-                        "x": 672,
-                        "y": 560,
-                        "fontSize": 54,
-                        "maxWidth": 430,
-                        "minFontSize": 28
-                    },
-                    "hawTitle": {
-                        "x": 1241,
-                        "y": 560,
-                        "fontSize": 54,
-                        "maxWidth": 430,
-                        "minFontSize": 28
-                    },
-                    "freePrice": {
-                        "x": 672,
-                        "y": 465,
-                        "fontSize": 54
-                    },
-                    "hawPrice": {
-                        "x": 1241,
-                        "y": 465,
-                        "fontSize": 54
-                    }
-                }
-            },
-            "buyBonusConfirm": {
-                "background": {
-                    "x": 0,
-                    "y": 0,
-                    "width": 1920,
-                    "height": 1080
-                },
-                "panel": {
-                    "x": 465,
-                    "y": 240
-                },
-                "symbols": {
-                    "free": {
-                        "x": 782,
-                        "y": 581
-                    },
-                    "haw": {
-                        "x": 811,
-                        "y": 566
-                    }
-                },
-                "buttons": {
-                    "yes": {
-                        "x": 665,
-                        "y": 331
-                    },
-                    "no": {
-                        "x": 988,
-                        "y": 331
-                    }
-                },
-                "texts": {
-                    "title": {
-                        "x": 960,
-                        "y": 345,
-                        "fontSize": 54,
-                        "wordWrapWidth": 930
-                    }
-                }
-            },
-            "helpMenu": {
-                "background": {
-                    "frame": "bg_menu.png",
-                    "width": 1920,
-                    "height": 1080
-                },
-                "overlay": {
-                    "color": 0,
-                    "alpha": 0.08
-                },
-                "title": {
-                    "x": 960,
-                    "y": 98,
-                    "fontSize": 58,
-                    "color": 9678783,
-                    "maxWidth": 760
-                },
-                "page": {
-                    "x": 1768,
-                    "y": 925,
-                    "fontSize": 28,
-                    "color": 16777215,
-                    "maxWidth": 180
-                },
-                "logo": {
-                    "frame": "logo.png",
-                    "x": 18,
-                    "y": 8,
-                    "scale": 0.76
-                },
-                "footer": {
-                    "background": {
-                        "frame": "bottom_bg.png",
-                        "x": 0,
-                        "y": 1034
-                    },
-                    "credit": {
-                        "x": 220,
-                        "y": 1039,
-                        "fontSize": 34,
-                        "labelColor": 16762368,
-                        "valueColor": 15989241,
-                        "labelMaxWidth": 260,
-                        "valueMaxWidth": 360
-                    },
-                    "totalBet": {
-                        "x": 1490,
-                        "y": 1039,
-                        "fontSize": 34,
-                        "labelColor": 16762368,
-                        "valueColor": 15989241,
-                        "labelMaxWidth": 160,
-                        "valueMaxWidth": 260
-                    }
-                },
-                "navigation": {
-                    "close": {
-                        "normal": "button_close_001.png",
-                        "pressed": "button_close_002.png",
-                        "x": 1711,
-                        "y": 928,
-                        "legacyY": true
-                    },
-                    "prev": {
-                        "normal": "button_arrow_l_001.png",
-                        "pressed": "button_arrow_l_002.png",
-                        "x": 1660,
-                        "y": 150,
-                        "legacyY": true
-                    },
-                    "next": {
-                        "normal": "button_arrow_r_001.png",
-                        "pressed": "button_arrow_r_002.png",
-                        "x": 1760,
-                        "y": 150,
-                        "legacyY": true
-                    }
-                },
-                "tabs": {
-                    "history": {
-                        "base": "button_history",
-                        "x": 1394,
-                        "y": 140,
-                        "legacyY": true,
-                        "key": "helpHistory",
-                        "fallback": "HISTORY"
-                    },
-                    "paytable": {
-                        "base": "button_pay",
-                        "x": 354,
-                        "y": 140,
-                        "legacyY": true,
-                        "key": "helpPay",
-                        "fallback": "PAYTABLE"
-                    },
-                    "settings": {
-                        "base": "button_sett",
-                        "x": 874,
-                        "y": 140,
-                        "legacyY": true,
-                        "key": "helpSettings",
-                        "fallback": "SETTINGS"
-                    },
-                    "rules": {
-                        "base": "button_rules",
-                        "x": 1394,
-                        "y": 140,
-                        "legacyY": true,
-                        "key": "helpRules",
-                        "fallback": "RULES"
-                    }
-                },
-                "settingsPage": {},
-                "paytablePages": {
-                    "holdAndWin": {},
-                    "freeGames": {},
-                    "primary": {},
-                    "gold": {},
-                    "paylines": {}
-                },
-                "rulesPages": {
-                    "howTo": {},
-                    "betSettings": {}
-                }
-            },
-            "bootSoundPrompt": {
-                "background": {
-                    "x": 0,
-                    "y": 0,
-                    "width": 1920,
-                    "height": 1080,
-                    "alpha": 0.92
-                },
-                "panel": {
-                    "x": 611,
-                    "y": 297
-                },
-                "logo": {
-                    "x": 711,
-                    "y": 496
-                },
-                "buttons": {
-                    "yes": {
-                        "x": 665,
-                        "y": 341
-                    },
-                    "no": {
-                        "x": 988,
-                        "y": 341
-                    }
-                },
-                "texts": {
-                    "title": {
-                        "x": 960,
-                        "y": 250,
-                        "fontSize": 54
-                    }
-                }
-            }
-        }
-    },
-    "intro": {
-        "boot": {
-            "layoutMode": "fit-center",
-            "backgroundColor": 0,
-            "spine": {
-                "x": 960,
-                "y": 820,
-                "offsetX": -360,
-                "offsetY": 0,
-                "scale": 0.58
-            },
-            "loadingBar": {
-                "atlasPath": "assets/spine/intro/loading.json",
-                "x": 0,
-                "y": 36,
-                "width": 440,
-                "height": 10,
-                "sweepSpeed": 420,
-                "chunkFraction": 0.25
-            }
-        },
-        "gameplay": {
-            "layoutMode": "native-center-top",
-            "backgroundColor": 0,
-            "backgroundImagePath": "assets/backgrounds/bg.jpg",
-            "background": {
-                "x": 0,
-                "y": 0,
-                "width": 1920,
-                "height": 1080
-            },
-            "spine": {
-                "x": 960,
-                "y": -130,
-                "offsetX": 0,
-                "offsetY": 0,
-                "scale": 1
-            },
-            "skipPrompt": {
-                "enabled": true,
-                "text": "TAP TO CONTINUE",
-                "x": 280,
-                "y": 1030,
-                "fontSize": 60,
-                "maxWidth": 500,
-                "color": 16777215,
-                "delaySec": 1.2,
-                "minAlpha": 0.15,
-                "maxAlpha": 1
-            }
-        }
+    "frame": {
+      "base": "assets/backgrounds/reels_frame.png",
+      "fg": "assets/backgrounds/reels_frame_fg_haw.png",
+      "haw": "assets/backgrounds/reels_frame_fg_haw.png"
     }
+  },
+  "lines": {
+    "atlases": [
+      "assets/lines/lines-0.json",
+      "assets/lines/lines-1.json"
+    ]
+  },
+  "animations": {
+    "atlases": [
+      "assets/animations/win-0.json"
+    ]
+  },
+  "layout": {
+    "shared": {
+      "baseReel": {
+        "spinStep": 28,
+        "pitch": 272,
+        "symbolWidth": 278,
+        "symbolHeight": 264,
+        "trimTopY": 30,
+        "trimBottomY": 30
+      },
+      "reels": {
+        "strip": [
+          1,
+          5,
+          6,
+          4,
+          5
+        ],
+        "forceSymbolIndex": null
+      },
+      "layers": {
+        "reelsBgX": 0,
+        "reelsBgY": 0,
+        "titleX": 0,
+        "titleY": 0,
+        "linesAboveSymbols": false
+      }
+    },
+    "desktop": {
+      "reels": {
+        "spacing": 282,
+        "x": 257,
+        "y": 130,
+        "width": 278,
+        "height": 792
+      }
+    }
+  },
+  "symbols": {
+    "atlases": [
+      "assets/symbols/symbols-0.json",
+      "assets/symbols/symbols-1.json"
+    ],
+    "frames": [
+      {
+        "prefix": "book_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal",
+        "offsetX": 5,
+        "offsetY": 0,
+        "spine": {
+          "scatter": {
+            "jsonPath": "assets/spine/symbols/1920_book_v1.json",
+            "atlasPath": "assets/spine/symbols/1920_book_v1.atlas",
+            "runtime": "3.8",
+            "loop": false,
+            "scale": 1,
+            "offsetX": 0,
+            "offsetY": 0
+          }
+        }
+      },
+      {
+        "prefix": "10_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "J_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "Q_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "K_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "A_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "normal",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "torch_blur_",
+        "atlas": "symbols-1.json",
+        "winProfile": "high",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "axe_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "chalice_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "knight_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high",
+        "offsetX": 0,
+        "offsetY": 0,
+        "spine": {
+          "win": {
+            "jsonPath": "assets/spine/symbols/1920_knight_v1.json",
+            "atlasPath": "assets/spine/symbols/1920_knight_v1.atlas",
+            "runtime": "3.8",
+            "loop": false,
+            "scale": 1,
+            "offsetX": 0,
+            "offsetY": 132
+          }
+        }
+      },
+      {
+        "prefix": "shield_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "mini_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "major_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high",
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "prefix": "mega_blur_",
+        "atlas": "symbols-0.json",
+        "winProfile": "high",
+        "offsetX": 0,
+        "offsetY": 0
+      }
+    ]
+  },
+  "ui": {
+    "atlases": [
+      "assets/ui/interface-0.json",
+      "assets/ui/menu_buttons-0.json",
+      "assets/ui/common.json"
+    ],
+    "hud": {
+      "backgrounds": {
+        "bottom": {
+          "frame": "bottom_bg.png",
+          "x": 0,
+          "y": 1034
+        },
+        "winField": {
+          "frame": "win_field.png",
+          "x": 0,
+          "y": 942
+        }
+      },
+      "buttons": {
+        "start": {
+          "base": "button_start",
+          "x": 1616,
+          "y": 368,
+          "width": 300,
+          "height": 300,
+          "enableFadeFrames": 0,
+          "enableFadeFromAlpha": 1
+        },
+        "stop": {
+          "base": "button_stop",
+          "x": 1616,
+          "y": 368,
+          "width": 300,
+          "height": 300,
+          "enableFadeFrames": 0,
+          "enableFadeFromAlpha": 1
+        },
+        "auto": {
+          "base": "button_autoplay",
+          "x": 1728,
+          "y": 88,
+          "width": 162,
+          "height": 162,
+          "enableFadeFrames": 0,
+          "enableFadeFromAlpha": 1
+        },
+        "bet": {
+          "base": "button_bet",
+          "x": 1728,
+          "y": 820,
+          "width": 162,
+          "height": 162,
+          "enableFadeFrames": 0,
+          "enableFadeFromAlpha": 1
+        },
+        "settings": {
+          "base": "button_settings",
+          "x": 30,
+          "y": 820,
+          "width": 162,
+          "height": 162,
+          "enableFadeFrames": 0,
+          "enableFadeFromAlpha": 1
+        },
+        "buyBonus": {
+          "base": "bb_yellow",
+          "x": 0,
+          "y": 430,
+          "width": 194,
+          "height": 164,
+          "enableFadeFrames": 0,
+          "enableFadeFromAlpha": 1
+        },
+        "home": {
+          "base": "button_home",
+          "x": 83,
+          "y": 1030,
+          "width": 50,
+          "height": 50,
+          "enableFadeFrames": 8,
+          "enableFadeFromAlpha": 0.55
+        },
+        "autoStop": {
+          "base": "button_autoX",
+          "x": 1728,
+          "y": 88,
+          "width": 162,
+          "height": 162,
+          "enableFadeFrames": 10,
+          "enableFadeFromAlpha": 0.55,
+          "counter": {
+            "x": 82,
+            "y": 91,
+            "fontSize": 44,
+            "minFontSize": 26,
+            "maxWidth": 118,
+            "color": 16777215,
+            "fontWeight": "400",
+            "align": "center"
+          }
+        }
+      },
+      "texts": {
+        "credit": {
+          "x": 220,
+          "y": 1039,
+          "fontSize": 34,
+          "align": "left",
+          "labelColor": 16762368,
+          "valueColor": 15989241
+        },
+        "totalBet": {
+          "x": 1490,
+          "y": 1039,
+          "fontSize": 34,
+          "align": "left",
+          "labelColor": 16762368,
+          "valueColor": 15989241
+        },
+        "status": {
+          "x": 960,
+          "y": 969,
+          "fontSize": 36,
+          "align": "center",
+          "anchorX": 0.5
+        },
+        "winStatus": {
+          "x": 960,
+          "y": 990,
+          "fontSize": 34,
+          "align": "center",
+          "anchorX": 0.5
+        },
+        "win": {
+          "x": 960,
+          "y": 953,
+          "fontSize": 36,
+          "align": "center",
+          "anchorX": 0.5
+        }
+      },
+      "topBar": {
+        "logo": {
+          "frame": "logo.png",
+          "x": 20,
+          "y": 6
+        },
+        "jackpots": [
+          {
+            "frame": "jackpot_gold_act.png",
+            "x": 248,
+            "y": 6,
+            "valueX": 497.5,
+            "valueY": 15,
+            "valueText": "1000.00",
+            "serverValueKey": "GRAND_JACKPOT_VALUE",
+            "betMultiplier": 1000,
+            "labelX": 515,
+            "labelY": 73,
+            "labelText": "",
+            "valueFontSize": 48,
+            "valueMaxWidth": 300,
+            "valueMinFontSize": 28,
+            "valueOffsetY": 1,
+            "labelFontSize": 22,
+            "valueColor": 16765440,
+            "labelColor": 16765440
+          },
+          {
+            "frame": "jackpot_silver_act.png",
+            "x": 736,
+            "y": 6,
+            "valueX": 977.5,
+            "valueY": 15,
+            "valueText": "10.00",
+            "serverValueKey": "MAJOR_JACKPOT_VALUE",
+            "betMultiplier": 100,
+            "labelX": 976,
+            "labelY": 73,
+            "labelText": "",
+            "valueFontSize": 48,
+            "valueMaxWidth": 300,
+            "valueMinFontSize": 28,
+            "valueOffsetY": -8,
+            "labelFontSize": 22,
+            "valueColor": 12246527,
+            "labelColor": 12246527
+          },
+          {
+            "frame": "jackpot_bronze_act.png",
+            "x": 1224,
+            "y": 6,
+            "valueX": 1464.5,
+            "valueY": 15,
+            "valueText": "2.00",
+            "serverValueKey": "MINOR_JACKPOT_VALUE",
+            "betMultiplier": 20,
+            "labelX": 1464,
+            "labelY": 73,
+            "labelText": "",
+            "valueFontSize": 48,
+            "valueMaxWidth": 300,
+            "valueMinFontSize": 28,
+            "valueOffsetY": -8,
+            "labelFontSize": 22,
+            "valueColor": 16547151,
+            "labelColor": 16547151
+          }
+        ]
+      },
+      "fonts": {
+        "primary": "Roboto",
+        "jackpot": "Roboto",
+        "creditLabel": "Roboto",
+        "creditValue": "Roboto",
+        "creditLabelBitmap": "Roboto_Condensed-Medium",
+        "creditValueBitmap": "Roboto_Condensed-Medium",
+        "totalBetLabel": "Roboto",
+        "totalBetValue": "Roboto",
+        "totalBetLabelBitmap": "Roboto_Condensed-Medium",
+        "totalBetValueBitmap": "Roboto_Condensed-Medium",
+        "status": "Roboto",
+        "winStatus": "Roboto",
+        "win": "Roboto",
+        "winStatusBitmap": "Roboto_Condensed-Medium",
+        "winBitmap": "Roboto-Black",
+        "jackpotValue": "Roboto",
+        "jackpotLabel": "Roboto"
+      },
+      "betMenu": {
+        "overlay": {
+          "color": 0,
+          "alpha": 0.5
+        },
+        "panel": {
+          "frame": "bg_bet.png",
+          "x": 846,
+          "y": 86
+        },
+        "valueField": {
+          "frame": "bet_value.png",
+          "x": 1036,
+          "y": 536
+        },
+        "title": {
+          "x": 1293,
+          "y": 110,
+          "fontSize": 56,
+          "color": 12509685
+        },
+        "totalBetLabel": {
+          "x": 1293,
+          "y": 324,
+          "fontSize": 44,
+          "color": 12509685
+        },
+        "valueText": {
+          "x": 1293,
+          "y": 409,
+          "fontSize": 44,
+          "minFontSize": 22,
+          "maxWidth": 220,
+          "color": 12509685
+        },
+        "lines": {
+          "x": 1293,
+          "y": 840,
+          "fontSize": 42,
+          "color": 12509685
+        },
+        "buttons": {
+          "max": {
+            "frame": "button_maxbet_001.png",
+            "pressed": "button_maxbet_002.png",
+            "x": 1142,
+            "y": 208,
+            "fontSize": 32,
+            "minFontSize": 22,
+            "maxTextWidth": 250,
+            "textOffsetY": 0,
+            "color": 12509685
+          },
+          "plus": {
+            "frame": "plus_001.png",
+            "pressed": "plus_002.png",
+            "x": 1392,
+            "y": 375
+          },
+          "minus": {
+            "frame": "minus_001.png",
+            "pressed": "minus_002.png",
+            "x": 1058,
+            "y": 375
+          },
+          "close": {
+            "frame": "button_closesmall_001.png",
+            "pressed": "button_closesmall_002.png",
+            "hover": "button_close_hover.png",
+            "x": 1550,
+            "y": 815
+          },
+          "preset": {
+            "frame": "button_digit_001.png",
+            "pressed": "button_digit_002.png",
+            "fontSize": 30,
+            "minFontSize": 20,
+            "maxTextWidth": 170,
+            "textOffsetY": 0,
+            "color": 12509685,
+            "positions": [
+              {
+                "x": 937,
+                "y": 364
+              },
+              {
+                "x": 1182,
+                "y": 364
+              },
+              {
+                "x": 1427,
+                "y": 364
+              },
+              {
+                "x": 937,
+                "y": 220
+              },
+              {
+                "x": 1182,
+                "y": 220
+              },
+              {
+                "x": 1427,
+                "y": 220
+              }
+            ]
+          }
+        }
+      },
+      "autoPlayMenu": {
+        "overlay": {
+          "color": 0,
+          "alpha": 0.55
+        },
+        "panel": {
+          "frame": "bg_auto.png",
+          "x": 853,
+          "y": 94
+        },
+        "title": {
+          "x": 1300,
+          "y": 96,
+          "fontSize": 60,
+          "color": 9676735,
+          "maxWidth": 760,
+          "minFontSize": 30
+        },
+        "autoSpinsLabel": {
+          "x": 1300,
+          "y": 700,
+          "fontSize": 54,
+          "color": 9676735,
+          "maxWidth": 880,
+          "minFontSize": 26
+        },
+        "infoText": {
+          "x": 1296,
+          "y": 312,
+          "fontSize": 36,
+          "color": 12174803
+        },
+        "buttons": {
+          "close": {
+            "frame": "button_closesmall_001.png",
+            "pressed": "button_closesmall_002.png",
+            "x": 1512,
+            "y": 859
+          },
+          "start": {
+            "frame": "start_autospins_001.png",
+            "pressed": "start_autospins_002.png",
+            "x": 901,
+            "y": 139,
+            "fontSize": 60,
+            "color": 12509685,
+            "maxTextWidth": 760,
+            "minFontSize": 18,
+            "textOffsetY": 0
+          },
+          "spin": {
+            "frame": "button_digit_001.png",
+            "pressed": "button_digit_002.png",
+            "fontSize": 60,
+            "color": 12509685,
+            "values": [
+              10,
+              20,
+              50,
+              100,
+              1000
+            ],
+            "positions": [
+              {
+                "x": 963,
+                "y": 403
+              },
+              {
+                "x": 1190,
+                "y": 403
+              },
+              {
+                "x": 1417,
+                "y": 403
+              },
+              {
+                "x": 1068,
+                "y": 276
+              },
+              {
+                "x": 1295,
+                "y": 276
+              }
+            ]
+          },
+          "turbo": {
+            "frame": "turbo_bg_001.png",
+            "pressed": "turbo_bg_002.png",
+            "x": 1043,
+            "y": 762,
+            "fontSize": 36,
+            "color": 12174803,
+            "textAlign": "left",
+            "textX": 80,
+            "textY": 53,
+            "textOffsetY": 0
+          },
+          "skip": {
+            "frame": "skipscreen_bg_001.png",
+            "pressed": "skipscreen_bg_002.png",
+            "x": 1043,
+            "y": 603,
+            "fontSize": 36,
+            "color": 12174803,
+            "textAlign": "left",
+            "textX": 80,
+            "textY": 53,
+            "textOffsetY": 0
+          }
+        }
+      },
+      "buyBonusMenu": {
+        "background": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "panels": {
+          "free": {
+            "x": 420,
+            "y": 190
+          },
+          "haw": {
+            "x": 989,
+            "y": 190
+          }
+        },
+        "symbols": {
+          "free": {
+            "x": 493,
+            "y": 605
+          },
+          "haw": {
+            "x": 1100,
+            "y": 590
+          }
+        },
+        "controls": {
+          "betBg": {
+            "x": 703,
+            "y": 86
+          },
+          "plus": {
+            "x": 1068,
+            "y": 78
+          },
+          "minus": {
+            "x": 709,
+            "y": 78
+          },
+          "close": {
+            "x": 1711,
+            "y": 928
+          },
+          "freeBuy": {
+            "x": 552,
+            "y": 285
+          },
+          "hawBuy": {
+            "x": 1121,
+            "y": 285
+          }
+        },
+        "texts": {
+          "buyButton": {
+            "maxWidth": 180,
+            "minFontSize": 24
+          },
+          "title": {
+            "x": 960,
+            "y": 40,
+            "fontSize": 60,
+            "maxWidth": 760,
+            "minFontSize": 30
+          },
+          "totalBetLabel": {
+            "x": 956,
+            "y": 206,
+            "fontSize": 46
+          },
+          "totalBetValue": {
+            "x": 956,
+            "y": 139,
+            "fontSize": 46
+          },
+          "freeTitle": {
+            "x": 672,
+            "y": 560,
+            "fontSize": 54,
+            "maxWidth": 430,
+            "minFontSize": 28
+          },
+          "hawTitle": {
+            "x": 1241,
+            "y": 560,
+            "fontSize": 54,
+            "maxWidth": 430,
+            "minFontSize": 28
+          },
+          "freePrice": {
+            "x": 672,
+            "y": 465,
+            "fontSize": 54
+          },
+          "hawPrice": {
+            "x": 1241,
+            "y": 465,
+            "fontSize": 54
+          }
+        }
+      },
+      "buyBonusConfirm": {
+        "background": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080
+        },
+        "panel": {
+          "x": 465,
+          "y": 240
+        },
+        "symbols": {
+          "free": {
+            "x": 782,
+            "y": 581
+          },
+          "haw": {
+            "x": 811,
+            "y": 566
+          }
+        },
+        "buttons": {
+          "yes": {
+            "x": 665,
+            "y": 331
+          },
+          "no": {
+            "x": 988,
+            "y": 331
+          }
+        },
+        "texts": {
+          "title": {
+            "x": 960,
+            "y": 345,
+            "fontSize": 54,
+            "wordWrapWidth": 930
+          }
+        }
+      },
+      "helpMenu": {
+        "background": {
+          "frame": "bg_menu.png",
+          "width": 1920,
+          "height": 1080
+        },
+        "overlay": {
+          "color": 0,
+          "alpha": 0.08
+        },
+        "title": {
+          "x": 960,
+          "y": 17,
+          "fontSize": 52,
+          "color": 9678783,
+          "maxWidth": 760,
+          "locales": {
+            "ru": {
+              "fontSize": 52
+            }
+          }
+        },
+        "page": {
+          "x": 1768,
+          "y": 925,
+          "fontSize": 28,
+          "color": 16777215,
+          "maxWidth": 180
+        },
+        "logo": {
+          "frame": "logo.png",
+          "x": 18,
+          "y": 8,
+          "scale": 0.76
+        },
+        "footer": {
+          "background": {
+            "frame": "bottom_bg.png",
+            "x": 0,
+            "y": 1034
+          },
+          "credit": {
+            "x": 220,
+            "y": 1039,
+            "fontSize": 34,
+            "labelColor": 16762368,
+            "valueColor": 15989241,
+            "labelMaxWidth": 260,
+            "valueMaxWidth": 360
+          },
+          "totalBet": {
+            "x": 1490,
+            "y": 1039,
+            "fontSize": 34,
+            "labelColor": 16762368,
+            "valueColor": 15989241,
+            "labelMaxWidth": 160,
+            "valueMaxWidth": 260
+          }
+        },
+        "navigation": {
+          "close": {
+            "normal": "button_close_001.png",
+            "pressed": "button_close_002.png",
+            "x": 1711,
+            "y": 928,
+            "legacyY": true
+          },
+          "prev": {
+            "normal": "button_arrow_l_001.png",
+            "pressed": "button_arrow_l_002.png",
+            "x": 1660,
+            "y": 150,
+            "legacyY": true
+          },
+          "next": {
+            "normal": "button_arrow_r_001.png",
+            "pressed": "button_arrow_r_002.png",
+            "x": 1760,
+            "y": 150,
+            "legacyY": true
+          }
+        },
+        "tabs": {
+          "history": {
+            "base": "button_history",
+            "x": 1394,
+            "y": 140,
+            "legacyY": true,
+            "key": "helpHistory",
+            "fallback": "HISTORY"
+          },
+          "paytable": {
+            "base": "button_pay",
+            "x": 354,
+            "y": 140,
+            "legacyY": true,
+            "key": "helpPay",
+            "fallback": "PAYTABLE"
+          },
+          "settings": {
+            "base": "button_sett",
+            "x": 874,
+            "y": 140,
+            "legacyY": true,
+            "key": "helpSettings",
+            "fallback": "SETTINGS"
+          },
+          "rules": {
+            "base": "button_rules",
+            "x": 1394,
+            "y": 140,
+            "legacyY": true,
+            "key": "helpRules",
+            "fallback": "RULES"
+          }
+        },
+        "settingsPage": {},
+        "paytablePages": {
+          "holdAndWin": {
+            "items": [
+              {
+                "id": "mega",
+                "frame": "mega_blur_01.png",
+                "x": 486,
+                "bottomY": 780,
+                "scale": 0.7
+              },
+              {
+                "id": "major",
+                "frame": "major_blur_01.png",
+                "x": 696,
+                "bottomY": 780,
+                "scale": 0.7
+              },
+              {
+                "id": "mini",
+                "frame": "mini_blur_01.png",
+                "x": 892,
+                "bottomY": 780,
+                "scale": 0.7
+              },
+              {
+                "id": "wooden",
+                "frame": "shield_blur_01.png",
+                "x": 1088,
+                "bottomY": 780,
+                "scale": 0.7
+              }
+            ],
+            "texts": [
+              {
+                "x": 200,
+                "bottomY": 315,
+                "width": 1580,
+                "height": 123,
+                "fontSize": 25,
+                "key": "splashTxt"
+              }
+            ]
+          },
+          "freeGames": {
+            "items": [
+              {
+                "id": "book",
+                "frame": "book_blur_01.png",
+                "x": 390,
+                "bottomY": 690,
+                "scale": 0.7
+              },
+              {
+                "id": "10",
+                "frame": "10_blur_01.png",
+                "x": 900,
+                "bottomY": 665,
+                "scale": 0.3,
+                "tint": 16702551
+              },
+              {
+                "id": "J",
+                "frame": "J_blur_01.png",
+                "x": 997,
+                "bottomY": 665,
+                "scale": 0.3,
+                "tint": 16702551
+              },
+              {
+                "id": "Q",
+                "frame": "Q_blur_01.png",
+                "x": 1094,
+                "bottomY": 665,
+                "scale": 0.3,
+                "tint": 16702551
+              },
+              {
+                "id": "K",
+                "frame": "K_blur_01.png",
+                "x": 1191,
+                "bottomY": 665,
+                "scale": 0.3,
+                "tint": 16702551
+              },
+              {
+                "id": "A",
+                "frame": "A_blur_01.png",
+                "x": 1288,
+                "bottomY": 665,
+                "scale": 0.3,
+                "tint": 16702551
+              },
+              {
+                "id": "torch",
+                "frame": "torch_blur_01.png",
+                "x": 948,
+                "bottomY": 573,
+                "scale": 0.3,
+                "tint": 16702551
+              },
+              {
+                "id": "axe",
+                "frame": "axe_blur_01.png",
+                "x": 1045,
+                "bottomY": 573,
+                "scale": 0.3,
+                "tint": 16702551
+              },
+              {
+                "id": "chalice",
+                "frame": "chalice_blur_01.png",
+                "x": 1142,
+                "bottomY": 573,
+                "scale": 0.3,
+                "tint": 16702551
+              },
+              {
+                "id": "knight",
+                "frame": "knight_blur_01.png",
+                "x": 1239,
+                "bottomY": 573,
+                "scale": 0.3,
+                "tint": 16702551
+              }
+            ],
+            "texts": [
+              {
+                "x": 210,
+                "bottomY": 340,
+                "width": 1520,
+                "height": 240,
+                "fontSize": 30,
+                "key": "splashSecTxt"
+              }
+            ],
+            "titles": {
+              "wild": {
+                "x": 391,
+                "bottomY": 920,
+                "fontSize": 34,
+                "key": "splashSecTitleWild",
+                "fallback": "SCATTER / WILD"
+              },
+              "special": {
+                "x": 1073,
+                "bottomY": 920,
+                "fontSize": 34,
+                "key": "splashSecTitleSpecial",
+                "fallback": "SPECIAL SYMBOLS"
+              }
+            }
+          },
+          "primary": {
+            "scatter": {
+              "frame": "book_blur_01.png",
+              "x": 660,
+              "bottomY": 800,
+              "scale": 0.5,
+              "paysX": 483,
+              "paysBottomY": 820,
+              "paysFontSize": 32,
+              "descriptionKey": "paytableScatter",
+              "descriptionFallback": "This symbol is both WILD and SCATTER.",
+              "pays": [
+                {
+                  "count": 3,
+                  "mult": 2
+                },
+                {
+                  "count": 4,
+                  "mult": 40
+                },
+                {
+                  "count": 5,
+                  "mult": 1000
+                }
+              ],
+              "multiplierSource": "totalBet",
+              "descriptionX": 850,
+              "descriptionBottomY": 810,
+              "descriptionWidth": 720,
+              "descriptionHeight": 160,
+              "descriptionFontSize": 28,
+              "descriptionAlign": "left"
+            },
+            "description": {
+              "x": 850,
+              "bottomY": 860,
+              "width": 720,
+              "height": 160,
+              "fontSize": 28,
+              "key": "paytableScatter"
+            },
+            "symbols": [
+              {
+                "frame": "knight_blur_01.png",
+                "x": 165,
+                "bottomY": 570,
+                "paysX": 365,
+                "paysY": 558,
+                "includeFourRows": true,
+                "pays": [
+                  {
+                    "count": 2,
+                    "mult": 5
+                  },
+                  {
+                    "count": 3,
+                    "mult": 100
+                  },
+                  {
+                    "count": 4,
+                    "mult": 1000
+                  },
+                  {
+                    "count": 5,
+                    "mult": 5000
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.5,
+                "descriptionKey": "paytableKnight"
+              },
+              {
+                "frame": "chalice_blur_01.png",
+                "x": 575,
+                "bottomY": 600,
+                "paysX": 745,
+                "paysY": 600,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 30
+                  },
+                  {
+                    "count": 4,
+                    "mult": 400
+                  },
+                  {
+                    "count": 5,
+                    "mult": 2000
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.5
+              },
+              {
+                "frame": "axe_blur_01.png",
+                "x": 970,
+                "bottomY": 600,
+                "paysX": 1130,
+                "paysY": 600,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 20
+                  },
+                  {
+                    "count": 4,
+                    "mult": 100
+                  },
+                  {
+                    "count": 5,
+                    "mult": 750
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.5
+              },
+              {
+                "frame": "torch_blur_01.png",
+                "x": 1365,
+                "bottomY": 600,
+                "paysX": 1525,
+                "paysY": 600,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 20
+                  },
+                  {
+                    "count": 4,
+                    "mult": 100
+                  },
+                  {
+                    "count": 5,
+                    "mult": 750
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.5
+              },
+              {
+                "frame": "A_blur_01.png",
+                "x": 110,
+                "bottomY": 400,
+                "paysX": 260,
+                "paysY": 405,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 5
+                  },
+                  {
+                    "count": 4,
+                    "mult": 30
+                  },
+                  {
+                    "count": 5,
+                    "mult": 150
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.5
+              },
+              {
+                "frame": "K_blur_01.png",
+                "x": 440,
+                "bottomY": 400,
+                "paysX": 590,
+                "paysY": 406,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 5
+                  },
+                  {
+                    "count": 4,
+                    "mult": 30
+                  },
+                  {
+                    "count": 5,
+                    "mult": 150
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.5
+              },
+              {
+                "frame": "Q_blur_01.png",
+                "x": 770,
+                "bottomY": 400,
+                "paysX": 920,
+                "paysY": 406,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 5
+                  },
+                  {
+                    "count": 4,
+                    "mult": 20
+                  },
+                  {
+                    "count": 5,
+                    "mult": 100
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.5
+              },
+              {
+                "frame": "J_blur_01.png",
+                "x": 1100,
+                "bottomY": 400,
+                "paysX": 1250,
+                "paysY": 406,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 5
+                  },
+                  {
+                    "count": 4,
+                    "mult": 20
+                  },
+                  {
+                    "count": 5,
+                    "mult": 100
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.5
+              },
+              {
+                "frame": "10_blur_01.png",
+                "x": 1430,
+                "bottomY": 400,
+                "paysX": 1580,
+                "paysY": 406,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 5
+                  },
+                  {
+                    "count": 4,
+                    "mult": 20
+                  },
+                  {
+                    "count": 5,
+                    "mult": 100
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.5
+              }
+            ],
+            "multiplierSource": "totalBet",
+            "previewLineBet": 1,
+            "previewTotalBet": 1
+          },
+          "gold": {},
+          "paylines": {
+            "text1": {
+              "x": 310,
+              "bottomY": 350,
+              "width": 1300,
+              "height": 220,
+              "fontSize": 28,
+              "key": "paylinesTxt",
+              "align": "center"
+            },
+            "lines": [
+              [
+                1,
+                1,
+                1,
+                1,
+                1
+              ],
+              [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              [
+                2,
+                2,
+                2,
+                2,
+                2
+              ],
+              [
+                0,
+                1,
+                2,
+                1,
+                0
+              ],
+              [
+                2,
+                1,
+                0,
+                1,
+                2
+              ],
+              [
+                1,
+                2,
+                2,
+                2,
+                1
+              ],
+              [
+                1,
+                0,
+                0,
+                0,
+                1
+              ],
+              [
+                2,
+                2,
+                1,
+                0,
+                0
+              ],
+              [
+                0,
+                0,
+                1,
+                2,
+                2
+              ],
+              [
+                2,
+                1,
+                1,
+                1,
+                0
+              ],
+              [
+                1,
+                1,
+                1,
+                1,
+                0
+              ]
+            ],
+            "grid": {
+              "startX": 500,
+              "stepX": 260,
+              "topRowBottomY": 800,
+              "bottomRowBottomY": 650,
+              "rowBottomYStep": 150,
+              "columnsPerRow": 5,
+              "scale": 1
+            }
+          }
+        },
+        "rulesPages": {
+          "howTo": {
+            "minBet": {
+              "x": 0,
+              "bottomY": 910,
+              "width": 920,
+              "height": 40,
+              "fontSize": 28
+            },
+            "maxBet": {
+              "x": 0,
+              "bottomY": 950,
+              "width": 920,
+              "height": 40,
+              "fontSize": 28
+            },
+            "interfaceText": {
+              "x": 220,
+              "bottomY": 720,
+              "width": 1265,
+              "height": 220,
+              "fontSize": 26,
+              "key": "rulesInterface"
+            },
+            "autoplayText": {
+              "x": 220,
+              "bottomY": 420,
+              "width": 1265,
+              "height": 180,
+              "fontSize": 26,
+              "key": "rulesAutoplay"
+            }
+          },
+          "betSettings": {
+            "betMenuText": {
+              "x": 220,
+              "bottomY": 760,
+              "width": 1265,
+              "height": 220,
+              "fontSize": 26,
+              "key": "rulesBetMenu"
+            },
+            "settingsText": {
+              "x": 220,
+              "bottomY": 480,
+              "width": 1265,
+              "height": 220,
+              "fontSize": 26,
+              "key": "rulesSettings"
+            }
+          },
+          "lines": {
+            "linesText": {
+              "x": 220,
+              "bottomY": 600,
+              "width": 1265,
+              "height": 250,
+              "fontSize": 26,
+              "key": "rulesLines"
+            },
+            "unfinishedText": {
+              "x": 220,
+              "bottomY": 480,
+              "width": 1265,
+              "height": 140,
+              "fontSize": 26,
+              "key": "rulesUnfinished"
+            },
+            "gamePercent": {
+              "x": 220,
+              "bottomY": 360,
+              "width": 1265,
+              "height": 80,
+              "fontSize": 28
+            }
+          },
+          "extra": {
+            "maxWinText": {
+              "x": 220,
+              "bottomY": 790,
+              "width": 1580,
+              "height": 140,
+              "fontSize": 26,
+              "key": "rulesMaxWin"
+            },
+            "buyBonusText": {
+              "x": 220,
+              "bottomY": 590,
+              "width": 1580,
+              "height": 190,
+              "fontSize": 26,
+              "key": "rulesBuyBonus"
+            },
+            "buyFreeRtp": {
+              "x": 220,
+              "bottomY": 360,
+              "width": 1580,
+              "height": 60,
+              "fontSize": 28
+            },
+            "buyHoldRtp": {
+              "x": 220,
+              "bottomY": 315,
+              "width": 1580,
+              "height": 60,
+              "fontSize": 28
+            }
+          },
+          "addFreeGames": {
+            "addFreeGamesText": {
+              "x": 220,
+              "bottomY": 750,
+              "width": 1700,
+              "height": 180,
+              "fontSize": 34,
+              "key": "rulesAddFg"
+            }
+          }
+        },
+        "editorPageDefs": {
+          "paytable": [],
+          "rules": []
+        },
+        "editorTranslationKeys": {}
+      },
+      "bootSoundPrompt": {
+        "background": {
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080,
+          "alpha": 0.92
+        },
+        "panel": {
+          "x": 611,
+          "y": 297
+        },
+        "logo": {
+          "x": 711,
+          "y": 496
+        },
+        "buttons": {
+          "yes": {
+            "x": 665,
+            "y": 341
+          },
+          "no": {
+            "x": 988,
+            "y": 341
+          }
+        },
+        "texts": {
+          "title": {
+            "x": 960,
+            "y": 250,
+            "fontSize": 54
+          }
+        }
+      }
+    }
+  },
+  "intro": {
+    "boot": {
+      "layoutMode": "fit-center",
+      "backgroundColor": 0,
+      "spine": {
+        "x": 960,
+        "y": 820,
+        "offsetX": -360,
+        "offsetY": 0,
+        "scale": 0.58
+      },
+      "loadingBar": {
+        "atlasPath": "assets/spine/intro/loading.json",
+        "x": 0,
+        "y": 36,
+        "width": 440,
+        "height": 10,
+        "sweepSpeed": 420,
+        "chunkFraction": 0.25
+      }
+    },
+    "gameplay": {
+      "layoutMode": "native-center-top",
+      "backgroundColor": 0,
+      "backgroundImagePath": "assets/backgrounds/bg.jpg",
+      "background": {
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080
+      },
+      "spine": {
+        "x": 960,
+        "y": -130,
+        "offsetX": 0,
+        "offsetY": 0,
+        "scale": 1
+      },
+      "skipPrompt": {
+        "enabled": true,
+        "text": "TAP TO CONTINUE",
+        "x": 280,
+        "y": 1030,
+        "fontSize": 60,
+        "maxWidth": 500,
+        "color": 16777215,
+        "delaySec": 1.2,
+        "minAlpha": 0.15,
+        "maxAlpha": 1
+      }
+    }
+  }
 }

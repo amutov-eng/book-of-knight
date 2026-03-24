@@ -10,6 +10,11 @@ const PORT = 3006;
 const PROJECT_ROOT = path.resolve(__dirname, '../../');
 const MANIFEST_PATH = path.join(PROJECT_ROOT, 'assets/desktop/assets-manifest.desktop.json');
 const TRANSLATIONS_PATH = path.join(PROJECT_ROOT, 'assets/common/localization/translations.json');
+const ATLAS_FILES = [
+    'assets/desktop/symbols/symbols-0.json',
+    'assets/desktop/ui/interface-0.json',
+    'assets/desktop/ui/menu_buttons-0.json'
+];
 
 function sendJson(res, statusCode, payload) {
     res.writeHead(statusCode, { 'Content-Type': 'application/json; charset=utf-8' });
@@ -24,6 +29,51 @@ function writeJson(filePath, value) {
     fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
+function buildAtlasIndex() {
+    const atlasIndex = {};
+    for (const relativePath of ATLAS_FILES) {
+        const atlasPath = path.join(PROJECT_ROOT, relativePath);
+        if (!fs.existsSync(atlasPath)) continue;
+        const atlas = readJson(atlasPath);
+        const frames = atlas?.frames || {};
+        const imageName = atlas?.meta?.image;
+        const sheetW = Number(atlas?.meta?.size?.w) || 0;
+        const sheetH = Number(atlas?.meta?.size?.h) || 0;
+        if (!imageName) continue;
+        const imagePath = `/${path.posix.join(path.posix.dirname(relativePath), imageName)}`;
+
+        for (const [frameName, frameData] of Object.entries(frames)) {
+            if (!frameData || !frameData.frame) continue;
+            atlasIndex[frameName] = {
+                imagePath,
+                sheetW,
+                sheetH,
+                x: Number(frameData.frame.x) || 0,
+                y: Number(frameData.frame.y) || 0,
+                w: Number(frameData.frame.w) || 0,
+                h: Number(frameData.frame.h) || 0,
+                sourceW: Number(frameData.sourceSize?.w) || Number(frameData.frame.w) || 0,
+                sourceH: Number(frameData.sourceSize?.h) || Number(frameData.frame.h) || 0
+            };
+        }
+    }
+
+    atlasIndex['bg_menu.png'] = {
+        imagePath: '/assets/desktop/ui/bg_menu.png',
+        sheetW: 1920,
+        sheetH: 1080,
+        x: 0,
+        y: 0,
+        w: 1920,
+        h: 1080,
+        sourceW: 1920,
+        sourceH: 1080,
+        direct: true
+    };
+
+    return atlasIndex;
+}
+
 function readRequestBody(req) {
     return new Promise((resolve, reject) => {
         let body = '';
@@ -36,6 +86,29 @@ function readRequestBody(req) {
 }
 
 function serveStatic(req, res) {
+    if (req.url.startsWith('/assets/')) {
+        const assetPath = path.join(PROJECT_ROOT, req.url.replace(/^\//, ''));
+        fs.readFile(assetPath, (err, content) => {
+            if (err) {
+                res.writeHead(err.code === 'ENOENT' ? 404 : 500);
+                res.end(err.code === 'ENOENT' ? 'File not found' : `Server error: ${err.code}`);
+                return;
+            }
+
+            const extname = path.extname(assetPath).toLowerCase();
+            const contentTypes = {
+                '.json': 'application/json; charset=utf-8',
+                '.png': 'image/png',
+                '.jpg': 'image/jpeg',
+                '.jpeg': 'image/jpeg',
+                '.svg': 'image/svg+xml'
+            };
+            res.writeHead(200, { 'Content-Type': contentTypes[extname] || 'application/octet-stream' });
+            res.end(content);
+        });
+        return;
+    }
+
     const filePath = path.join(__dirname, 'app', req.url === '/' ? 'index.html' : req.url);
     const extname = path.extname(filePath).toLowerCase();
     const contentTypes = {
@@ -70,7 +143,8 @@ const server = http.createServer(async (req, res) => {
         try {
             const manifest = readJson(MANIFEST_PATH);
             const translations = readJson(TRANSLATIONS_PATH);
-            sendJson(res, 200, { manifest, translations });
+            const atlasIndex = buildAtlasIndex();
+            sendJson(res, 200, { manifest, translations, atlasIndex });
         } catch (error) {
             sendJson(res, 500, { error: `Failed to load help data: ${error instanceof Error ? error.message : String(error)}` });
         }

@@ -16,6 +16,13 @@ function getLocalized(game: any, key: string, fallback: string): string {
   return fallback;
 }
 
+function getCurrentLocale(game: any): string {
+  if (game && game.localization && typeof game.localization.getLocale === 'function') {
+    return String(game.localization.getLocale() || 'en').toLowerCase();
+  }
+  return 'en';
+}
+
 function getNumberPattern(game: any): string {
   if (!game || !game.gsLink || typeof game.gsLink.getNumberPattern !== 'function') {
     return getDefaultNumberPattern();
@@ -27,6 +34,57 @@ function getNumberPattern(game: any): string {
 function formatMoney(value: number, game: any): string {
   return formatCentsByPattern(Math.max(0, Math.round(value)), getNumberPattern(game));
 }
+
+function getByPath(root: any, path: Array<string | number> | undefined): any {
+  if (!root || !Array.isArray(path)) return undefined;
+  let current = root;
+  for (let i = 0; i < path.length; i += 1) {
+    if (current == null || typeof current !== 'object') return undefined;
+    current = current[path[i] as any];
+  }
+  return current;
+}
+
+function resolveLayoutForLocale<T extends LegacyTextLayout>(game: any, config: T | undefined, defaults: Partial<T> = {}): T {
+  const locale = getCurrentLocale(game);
+  const base = { ...(defaults || {}), ...(config || {}) } as T;
+  const locales = config && typeof config === 'object' && config.locales && typeof config.locales === 'object'
+    ? config.locales
+    : undefined;
+  const localeOverrides = locales ? (locales[locale] || locales.en || {}) : {};
+  return { ...base, ...(localeOverrides || {}) } as T;
+}
+
+type LegacyTextLayout = {
+  key?: string;
+  fallback?: string;
+  x?: number;
+  y?: number;
+  bottomY?: number;
+  width?: number;
+  height?: number;
+  maxWidth?: number;
+  fontSize?: number;
+  align?: 'left' | 'center' | 'right';
+  fill?: number;
+  color?: number;
+  locales?: Record<string, Partial<LegacyTextLayout>>;
+};
+
+type EditorPageDef = {
+  id?: string;
+  title?: string;
+  group?: 'paytable' | 'rules' | 'shell';
+  manifestPath?: Array<string | number>;
+  templateId?: string;
+};
+
+type PageEntry = {
+  id: string;
+  titleKey: string;
+  titleFallback: string;
+  container: Container;
+};
 
 type TabId = 'paytable' | 'settings' | 'rules';
 
@@ -138,10 +196,10 @@ export default class HelpMenu extends Container {
   private readonly tabButtons: Record<TabId, TabButton | null>;
   private readonly pageContainers: Record<TabId, Container>;
 
-  private readonly payPages: Container[];
-  private readonly rulesPages: Container[];
+  private readonly payPages: PageEntry[];
+  private readonly rulesPages: PageEntry[];
   private readonly settingsPage: Container;
-  private readonly paytableValueTexts: Array<{ text: Text; count: number; mult: number }>;
+  private readonly paytableValueTexts: Array<{ text: Text; mult: number; source: 'lineBet' | 'totalBet' }>;
 
   private readonly settingsToggles: {
     soundOn: ToggleControl | null;
@@ -194,16 +252,16 @@ export default class HelpMenu extends Container {
       this.addChild(blocker);
     }
 
-    const titleCfg = this.config.title || {};
-    const pageCfg = this.config.page || {};
+    const titleCfg = resolveLayoutForLocale(this.game, this.config.title || {}, { x: 960, y: 98, fontSize: 58, color: 0x93a7bf });
+    const pageCfg = resolveLayoutForLocale(this.game, this.config.page || {}, { x: 1745, y: 925, fontSize: 28, color: 0xffffff });
     this.titleText = this.createText('', toNumber(titleCfg.x, 960), toNumber(titleCfg.y, 98), {
       fontSize: toNumber(titleCfg.fontSize, 58),
-      fill: toNumber(titleCfg.color, 0x93a7bf),
+      fill: toNumber(titleCfg.color ?? titleCfg.fill, 0x93a7bf),
       anchorX: 0.5
     });
     this.pageText = this.createText('', toNumber(pageCfg.x, 1745), toNumber(pageCfg.y, 925), {
       fontSize: toNumber(pageCfg.fontSize, 28),
-      fill: toNumber(pageCfg.color, 0xffffff),
+      fill: toNumber(pageCfg.color ?? pageCfg.fill, 0xffffff),
       anchorX: 0.5
     });
     this.footerBar = new Container();
@@ -293,32 +351,20 @@ export default class HelpMenu extends Container {
     this.addChild(this.footerBetLabel);
     this.addChild(this.footerBetValue);
 
-    this.payPages = [
-      this.buildHoldAndWinPage(),
-      this.buildFreeGamesPage(),
-      this.buildPaytablePage(PAYTABLE_PAGE_1),
-      this.buildPaytablePage(PAYTABLE_PAGE_2),
-      this.buildPaylinesPage()
-    ];
+    this.payPages = this.buildConfiguredPayPages();
 
-    this.rulesPages = [
-      this.buildRulesHowToPage(),
-      this.buildRulesBetSettingsPage(),
-      this.buildRulesLinesPage(),
-      this.buildRulesExtraPage(),
-      this.buildRulesAddFreeGamesPage()
-    ];
+    this.rulesPages = this.buildConfiguredRulesPages();
 
     this.settingsPage = this.buildSettingsPage();
 
     for (const page of this.payPages) {
-      page.visible = false;
-      this.pageContainers.paytable.addChild(page);
+      page.container.visible = false;
+      this.pageContainers.paytable.addChild(page.container);
     }
 
     for (const page of this.rulesPages) {
-      page.visible = false;
-      this.pageContainers.rules.addChild(page);
+      page.container.visible = false;
+      this.pageContainers.rules.addChild(page.container);
     }
 
     this.settingsPage.visible = false;
@@ -329,6 +375,71 @@ export default class HelpMenu extends Container {
 
   isOpen(): boolean {
     return this.visible;
+  }
+
+  private buildConfiguredPayPages(): PageEntry[] {
+    const base: PageEntry[] = [
+      { id: 'paytable-hold', titleKey: 'splashTitle', titleFallback: 'HOLD AND WIN', container: this.buildHoldAndWinPage(this.config.paytablePages?.holdAndWin || {}) },
+      { id: 'paytable-free', titleKey: 'splashSecTitle', titleFallback: 'FREE GAMES', container: this.buildFreeGamesPage(this.config.paytablePages?.freeGames || {}) },
+      { id: 'paytable-primary', titleKey: 'paytableTitle', titleFallback: 'PAYTABLE', container: this.buildPaytablePage(PAYTABLE_PAGE_1, this.config.paytablePages?.primary || {}) },
+      { id: 'paytable-gold', titleKey: 'paytableTitle', titleFallback: 'PAYTABLE', container: this.buildGoldPaytablePage(this.config.paytablePages?.gold || {}) },
+      { id: 'paytable-lines', titleKey: 'paylinesTitle', titleFallback: 'PAYLINES', container: this.buildPaylinesPage(this.config.paytablePages?.paylines || {}) }
+    ];
+    const custom = Array.isArray(this.config.editorPageDefs?.paytable) ? this.config.editorPageDefs.paytable as EditorPageDef[] : [];
+    return [...base, ...this.buildCustomPages(custom, 'paytable')];
+  }
+
+  private buildConfiguredRulesPages(): PageEntry[] {
+    const base: PageEntry[] = [
+      { id: 'rules-howto', titleKey: 'rulesTitle', titleFallback: 'RULES', container: this.buildRulesHowToPage(this.config.rulesPages?.howTo || {}) },
+      { id: 'rules-bet', titleKey: 'rulesTitle', titleFallback: 'RULES', container: this.buildRulesBetSettingsPage(this.config.rulesPages?.betSettings || {}) },
+      { id: 'rules-lines', titleKey: 'rulesTitle', titleFallback: 'RULES', container: this.buildRulesLinesPage(this.config.rulesPages?.lines || {}) },
+      { id: 'rules-extra', titleKey: 'rulesTitle', titleFallback: 'RULES', container: this.buildRulesExtraPage(this.config.rulesPages?.extra || {}) },
+      { id: 'rules-fg', titleKey: 'rulesTitle', titleFallback: 'RULES', container: this.buildRulesAddFreeGamesPage(this.config.rulesPages?.addFreeGames || {}) }
+    ];
+    const custom = Array.isArray(this.config.editorPageDefs?.rules) ? this.config.editorPageDefs.rules as EditorPageDef[] : [];
+    return [...base, ...this.buildCustomPages(custom, 'rules')];
+  }
+
+  private buildCustomPages(defs: EditorPageDef[], group: 'paytable' | 'rules'): PageEntry[] {
+    const result: PageEntry[] = [];
+    for (let i = 0; i < defs.length; i += 1) {
+      const def = defs[i];
+      if (!def || def.group !== group || !Array.isArray(def.manifestPath)) continue;
+      const pageCfg = getByPath(this.config, def.manifestPath.slice(3)) || {};
+      const templateId = String(def.templateId || '');
+      const title = this.getTitleInfoForPage(templateId || String(def.id || ''), group);
+      let container: Container | null = null;
+      if (group === 'paytable') {
+        if (templateId === 'paytable-hold') container = this.buildHoldAndWinPage(pageCfg);
+        else if (templateId === 'paytable-free') container = this.buildFreeGamesPage(pageCfg);
+        else if (templateId === 'paytable-primary') container = this.buildPaytablePage(PAYTABLE_PAGE_1, pageCfg);
+        else if (templateId === 'paytable-gold') container = this.buildGoldPaytablePage(pageCfg);
+        else if (templateId === 'paytable-lines') container = this.buildPaylinesPage(pageCfg);
+      } else {
+        if (templateId === 'rules-howto') container = this.buildRulesHowToPage(pageCfg);
+        else if (templateId === 'rules-bet') container = this.buildRulesBetSettingsPage(pageCfg);
+        else if (templateId === 'rules-lines') container = this.buildRulesLinesPage(pageCfg);
+        else if (templateId === 'rules-extra') container = this.buildRulesExtraPage(pageCfg);
+        else if (templateId === 'rules-fg') container = this.buildRulesAddFreeGamesPage(pageCfg);
+      }
+      if (!container) continue;
+      result.push({
+        id: String(def.id || `${group}-custom-${i}`),
+        titleKey: title.titleKey,
+        titleFallback: title.titleFallback,
+        container
+      });
+    }
+    return result;
+  }
+
+  private getTitleInfoForPage(id: string, group: 'paytable' | 'rules'): { titleKey: string; titleFallback: string } {
+    if (group === 'rules') return { titleKey: 'rulesTitle', titleFallback: 'RULES' };
+    if (id === 'paytable-hold') return { titleKey: 'splashTitle', titleFallback: 'HOLD AND WIN' };
+    if (id === 'paytable-free') return { titleKey: 'splashSecTitle', titleFallback: 'FREE GAMES' };
+    if (id === 'paytable-lines') return { titleKey: 'paylinesTitle', titleFallback: 'PAYLINES' };
+    return { titleKey: 'paytableTitle', titleFallback: 'PAYTABLE' };
   }
 
   show(): void {
@@ -379,10 +490,10 @@ export default class HelpMenu extends Container {
   }
 
   private refreshPaytableAmounts(): void {
-    const lineBet = this.getLineBet();
     for (let i = 0; i < this.paytableValueTexts.length; i += 1) {
       const item = this.paytableValueTexts[i];
-      item.text.text = `${item.count}x   ${formatMoney(item.mult * lineBet, this.game)}`;
+      const stake = item.source === 'totalBet' ? this.getTotalBetAmount() : this.getLineBet();
+      item.text.text = `${formatMoney(item.mult * stake, this.game)}`;
     }
   }
 
@@ -391,20 +502,18 @@ export default class HelpMenu extends Container {
     if (this.activeTab === 'settings') {
       title = getLocalized(this.game, 'settingsTitle', 'SETTINGS');
     } else if (this.activeTab === 'rules') {
-      title = getLocalized(this.game, 'rulesTitle', 'RULES');
+      const page = this.rulesPages[this.rulesPageIndex];
+      title = getLocalized(this.game, page?.titleKey || 'rulesTitle', page?.titleFallback || 'RULES');
     } else {
-      const payTitles = [
-        getLocalized(this.game, 'splashTitle', 'HOLD AND WIN'),
-        getLocalized(this.game, 'splashSecTitle', 'FREE GAMES'),
-        getLocalized(this.game, 'paytableTitle', 'PAYTABLE'),
-        getLocalized(this.game, 'paytableTitle', 'PAYTABLE'),
-        getLocalized(this.game, 'paylinesTitle', 'PAYLINES')
-      ];
-      title = payTitles[this.payPageIndex] || getLocalized(this.game, 'paytableTitle', 'PAYTABLE');
+      const page = this.payPages[this.payPageIndex];
+      title = getLocalized(this.game, page?.titleKey || 'paytableTitle', page?.titleFallback || 'PAYTABLE');
     }
 
+    const titleCfg = resolveLayoutForLocale(this.game, this.config.title || {}, { x: 960, y: 98, fontSize: 58, color: 0x93a7bf });
     this.titleText.text = title;
-    fitPixiTextToBounds(this.titleText, { maxWidth: 760, minFontSize: 28 });
+    this.titleText.style.fontSize = toNumber(titleCfg.fontSize, 58);
+    this.titleText.style.fill = toNumber(titleCfg.color ?? titleCfg.fill, 0x93a7bf);
+    this.titleText.position.set(toNumber(titleCfg.x, 960), toNumber(titleCfg.y, 98));
 
     const pagePrefix = getLocalized(this.game, 'helpPages', 'PAGE');
     if (this.activeTab === 'settings') {
@@ -416,10 +525,12 @@ export default class HelpMenu extends Container {
 
     const pageIndex = this.activeTab === 'rules' ? this.rulesPageIndex : this.payPageIndex;
     const totalPages = this.activeTab === 'rules' ? this.rulesPages.length : this.payPages.length;
+    const pageCfg = resolveLayoutForLocale(this.game, this.config.page || {}, { x: 1750, y: 925, fontSize: 28, color: 0xffffff });
     this.pageText.visible = true;
     this.pageText.text = `${pagePrefix} ${pageIndex + 1}/${totalPages}`;
-    fitPixiTextToBounds(this.pageText, { maxWidth: 180, minFontSize: 18 });
-    this.pageText.position.set(1750, 925);
+    this.pageText.style.fontSize = toNumber(pageCfg.fontSize, 28);
+    this.pageText.style.fill = toNumber(pageCfg.color ?? pageCfg.fill, 0xffffff);
+    this.pageText.position.set(toNumber(pageCfg.x, 1750), toNumber(pageCfg.y, 925));
     if (this.prevButton) this.prevButton.root.visible = true;
     if (this.nextButton) this.nextButton.root.visible = true;
   }
@@ -430,11 +541,11 @@ export default class HelpMenu extends Container {
     this.pageContainers.rules.visible = this.activeTab === 'rules';
 
     for (let i = 0; i < this.payPages.length; i += 1) {
-      this.payPages[i].visible = this.activeTab === 'paytable' && i === this.payPageIndex;
+      this.payPages[i].container.visible = this.activeTab === 'paytable' && i === this.payPageIndex;
     }
 
     for (let i = 0; i < this.rulesPages.length; i += 1) {
-      this.rulesPages[i].visible = this.activeTab === 'rules' && i === this.rulesPageIndex;
+      this.rulesPages[i].container.visible = this.activeTab === 'rules' && i === this.rulesPageIndex;
     }
 
     this.settingsPage.visible = this.activeTab === 'settings';
@@ -485,6 +596,8 @@ export default class HelpMenu extends Container {
     const gamePercent = this.game?.context?.gamePercent;
     const gamePercentBuyFree = this.game?.context?.gamePercentBuyFree;
     const gamePercentBuyHold = this.game?.context?.gamePercentBuyHold;
+    const linesCfg = this.config.rulesPages?.lines || {};
+    const extraCfg = this.config.rulesPages?.extra || {};
 
     const rtp = this.normalizePercentValue(gamePercent);
     const rtpBuyFree = this.normalizePercentValue(gamePercentBuyFree);
@@ -499,6 +612,28 @@ export default class HelpMenu extends Container {
     this.rulesBuyHoldRtpText.text = rtpBuyHold
       ? `${getLocalized(this.game, 'rulesGamePercentBuyHold', "The theoretical return percentage for the 'BUY BONUS HOLD AND WIN' feature is:")} ${rtpBuyHold}`
       : '';
+
+    this.applyLegacyTextConfig(this.rulesRtpText, linesCfg.gamePercent, {
+      x: 220,
+      bottomY: 330,
+      width: 1265,
+      height: 80,
+      fontSize: 28
+    });
+    this.applyLegacyTextConfig(this.rulesBuyFreeRtpText, extraCfg.buyFreeRtp, {
+      x: 220,
+      bottomY: 360,
+      width: 1580,
+      height: 60,
+      fontSize: 28
+    });
+    this.applyLegacyTextConfig(this.rulesBuyHoldRtpText, extraCfg.buyHoldRtp, {
+      x: 220,
+      bottomY: 315,
+      width: 1580,
+      height: 60,
+      fontSize: 28
+    });
 
     const showRulesRtp = this.activeTab === 'rules' && this.rulesPageIndex === 2;
     const showBonusRtp = this.activeTab === 'rules' && this.rulesPageIndex === 3;
@@ -567,19 +702,34 @@ export default class HelpMenu extends Container {
     this.refresh();
   }
 
-  private buildHoldAndWinPage(): Container {
+  private buildHoldAndWinPage(pageCfg: any = this.config.paytablePages?.holdAndWin || {}): Container {
     const page = new Container();
-    const pageCfg = this.config.paytablePages?.holdAndWin || {};
+    const imageItems = Array.isArray(pageCfg.items) ? pageCfg.items : [];
     const symbolCfg = pageCfg.symbols || {};
-    const shields = Array.isArray(symbolCfg.frames) && symbolCfg.frames.length > 0 ? symbolCfg.frames : ['mega_blur_01.png', 'major_blur_01.png', 'mini_blur_01.png', 'shield_blur_01.png'];
-
-    for (let i = 0; i < shields.length; i += 1) {
-      const sprite = this.createSprite(shields[i], 0, 0);
-      if (!sprite) continue;
-      const scale = toNumber(symbolCfg.scale, 0.7);
-      sprite.scale.set(scale);
-      this.placeLegacy(sprite, toNumber(symbolCfg.startX, 500) + i * sprite.texture.width * toNumber(symbolCfg.stepMultiplier, scale), toNumber(symbolCfg.bottomY, 690));
-      page.addChild(sprite);
+    if (imageItems.length > 0) {
+      for (let i = 0; i < imageItems.length; i += 1) {
+        const imageCfg = imageItems[i];
+        const sprite = this.createSprite(String(imageCfg.frame || ''), 0, 0);
+        if (!sprite) continue;
+        const scale = toNumber(imageCfg.scale, 0.7);
+        sprite.scale.set(scale);
+        sprite.alpha = toNumber(imageCfg.alpha, 1);
+        if (Number.isFinite(imageCfg.tint)) {
+          sprite.tint = Number(imageCfg.tint);
+        }
+        this.placeLegacy(sprite, toNumber(imageCfg.x, 0), toNumber(imageCfg.bottomY, 0));
+        page.addChild(sprite);
+      }
+    } else {
+      const shields = Array.isArray(symbolCfg.frames) && symbolCfg.frames.length > 0 ? symbolCfg.frames : ['mega_blur_01.png', 'major_blur_01.png', 'mini_blur_01.png', 'shield_blur_01.png'];
+      for (let i = 0; i < shields.length; i += 1) {
+        const sprite = this.createSprite(shields[i], 0, 0);
+        if (!sprite) continue;
+        const scale = toNumber(symbolCfg.scale, 0.7);
+        sprite.scale.set(scale);
+        this.placeLegacy(sprite, toNumber(symbolCfg.startX, 500) + i * sprite.texture.width * toNumber(symbolCfg.stepMultiplier, scale), toNumber(symbolCfg.bottomY, 690));
+        page.addChild(sprite);
+      }
     }
 
     const textDefaults = [
@@ -587,24 +737,61 @@ export default class HelpMenu extends Container {
     ];
     const texts = Array.isArray(pageCfg.texts) && pageCfg.texts.length > 0 ? pageCfg.texts : textDefaults;
     for (let i = 0; i < texts.length; i += 1) {
-      const textCfg = texts[i];
-      page.addChild(this.createLegacyBodyText(getLocalized(this.game, String(textCfg.key || ''), ''), toNumber(textCfg.x, 200), toNumber(textCfg.bottomY, 690), toNumber(textCfg.width, 1580), toNumber(textCfg.fontSize, 30)));
+      page.addChild(this.createLocalizedLegacyText(texts[i], {
+        x: 200,
+        bottomY: 690,
+        width: 1580,
+        height: 300,
+        fontSize: 30,
+        key: 'splashTxt'
+      }));
     }
     return page;
   }
 
-  private buildFreeGamesPage(): Container {
+  private buildFreeGamesPage(pageCfg: any = this.config.paytablePages?.freeGames || {}): Container {
     const page = new Container();
-    const pageCfg = this.config.paytablePages?.freeGames || {};
+    const imageItems = Array.isArray(pageCfg.items) ? pageCfg.items : [];
     const bookCfg = pageCfg.book || {};
     const titleCfg = pageCfg.titles || {};
     const specialCfg = pageCfg.specialSymbols || {};
 
-    const book = this.createSprite(String(bookCfg.frame || 'book_blur_01.png'), 0, 0);
-    if (book) {
-      book.scale.set(toNumber(bookCfg.scale, 0.7));
-      this.placeLegacy(book, toNumber(bookCfg.x, 346), toNumber(bookCfg.bottomY, 590));
-      page.addChild(book);
+    if (imageItems.length > 0) {
+      for (let i = 0; i < imageItems.length; i += 1) {
+        const imageCfg = imageItems[i];
+        const sprite = this.createSprite(String(imageCfg.frame || ''), 0, 0);
+        if (!sprite) continue;
+        const scale = toNumber(imageCfg.scale, 0.7);
+        sprite.scale.set(scale);
+        sprite.alpha = toNumber(imageCfg.alpha, 1);
+        if (Number.isFinite(imageCfg.tint)) {
+          sprite.tint = Number(imageCfg.tint);
+        }
+        this.placeLegacy(sprite, toNumber(imageCfg.x, 0), toNumber(imageCfg.bottomY, 0));
+        page.addChild(sprite);
+      }
+    } else {
+      const book = this.createSprite(String(bookCfg.frame || 'book_blur_01.png'), 0, 0);
+      if (book) {
+        book.scale.set(toNumber(bookCfg.scale, 0.7));
+        this.placeLegacy(book, toNumber(bookCfg.x, 346), toNumber(bookCfg.bottomY, 590));
+        page.addChild(book);
+      }
+
+      const specialFrames = Array.isArray(specialCfg.frames) && specialCfg.frames.length > 0 ? specialCfg.frames : ['10_blur_01.png', 'J_blur_01.png', 'Q_blur_01.png', 'K_blur_01.png', 'A_blur_01.png', 'torch_blur_01.png', 'axe_blur_01.png', 'chalice_blur_01.png', 'knight_blur_01.png'];
+      for (let i = 0; i < specialFrames.length; i += 1) {
+        const sprite = this.createSprite(specialFrames[i], 0, 0);
+        if (!sprite) continue;
+        const scale = toNumber(specialCfg.scale, 0.3);
+        sprite.scale.set(scale);
+        sprite.tint = toNumber(specialCfg.tint, 0xffdc57);
+        if (i < 5) {
+          this.placeLegacy(sprite, toNumber(specialCfg.topRowX, 900) + i * sprite.texture.width * toNumber(specialCfg.stepMultiplier, 0.35), toNumber(specialCfg.bottomY, 665));
+        } else {
+          this.placeLegacy(sprite, toNumber(specialCfg.secondRowX, 948) + (i % 5) * sprite.texture.width * toNumber(specialCfg.stepMultiplier, 0.35), toNumber(specialCfg.bottomY, 665) - sprite.texture.height * toNumber(specialCfg.stepMultiplier, 0.35));
+        }
+        page.addChild(sprite);
+      }
     }
 
     const wildCfg = titleCfg.wild || {};
@@ -616,58 +803,84 @@ export default class HelpMenu extends Container {
     page.addChild(wildTitle);
     page.addChild(specialTitle);
 
-    const specialFrames = Array.isArray(specialCfg.frames) && specialCfg.frames.length > 0 ? specialCfg.frames : ['10_blur_01.png', 'J_blur_01.png', 'Q_blur_01.png', 'K_blur_01.png', 'A_blur_01.png', 'torch_blur_01.png', 'axe_blur_01.png', 'chalice_blur_01.png', 'knight_blur_01.png'];
-    for (let i = 0; i < specialFrames.length; i += 1) {
-      const sprite = this.createSprite(specialFrames[i], 0, 0);
-      if (!sprite) continue;
-      const scale = toNumber(specialCfg.scale, 0.3);
-      sprite.scale.set(scale);
-      sprite.tint = toNumber(specialCfg.tint, 0xffdc57);
-      if (i < 5) {
-        this.placeLegacy(sprite, toNumber(specialCfg.topRowX, 900) + i * sprite.texture.width * toNumber(specialCfg.stepMultiplier, 0.35), toNumber(specialCfg.bottomY, 665));
-      } else {
-        this.placeLegacy(sprite, toNumber(specialCfg.secondRowX, 948) + (i % 5) * sprite.texture.width * toNumber(specialCfg.stepMultiplier, 0.35), toNumber(specialCfg.bottomY, 665) - sprite.texture.height * toNumber(specialCfg.stepMultiplier, 0.35));
-      }
-      page.addChild(sprite);
-    }
-
     const textDefaults = [
       { x: 210, bottomY: 568, width: 1520, fontSize: 30, key: 'splashSecTxt' }
     ];
     const texts = Array.isArray(pageCfg.texts) && pageCfg.texts.length > 0 ? pageCfg.texts : textDefaults;
     for (let i = 0; i < texts.length; i += 1) {
-      const textCfg = texts[i];
-      page.addChild(this.createLegacyBodyText(getLocalized(this.game, String(textCfg.key || ''), ''), toNumber(textCfg.x, 210), toNumber(textCfg.bottomY, 568), toNumber(textCfg.width, 1520), toNumber(textCfg.fontSize, 30)));
+      page.addChild(this.createLocalizedLegacyText(texts[i], {
+        x: 210,
+        bottomY: 568,
+        width: 1520,
+        height: 240,
+        fontSize: 30,
+        key: 'splashSecTxt'
+      }));
     }
     return page;
   }
 
-  private buildPaytablePage(symbols: PaySymbol[]): Container {
+  private buildPaytablePage(symbols: PaySymbol[], pageCfg?: any): Container {
     return symbols === PAYTABLE_PAGE_1
-      ? this.buildPrimaryPaytablePage()
-      : this.buildGoldPaytablePage();
+      ? this.buildPrimaryPaytablePage(pageCfg)
+      : this.buildGoldPaytablePage(pageCfg);
   }
 
-  private buildPrimaryPaytablePage(): Container {
+  private buildPrimaryPaytablePage(pageCfg: any = this.config.paytablePages?.primary || {}): Container {
     const page = new Container();
-    const pageCfg = this.config.paytablePages?.primary || {};
-    const topSymbolCfg = pageCfg.topSymbol || {};
-    const descriptionCfg = pageCfg.description || {};
-    const scatterPaysCfg = pageCfg.scatterPays || {};
+    const scatterCfg = pageCfg.scatter || {};
+    const localizedScatterCfg = resolveLayoutForLocale(this.game, scatterCfg, {});
+    const topSymbolCfg = pageCfg.topSymbol || scatterCfg || {};
+    const descriptionCfg = pageCfg.description || scatterCfg.description || {};
+    const scatterDescriptionCfg = {
+      ...descriptionCfg,
+      ...(scatterCfg.description || {}),
+      x: toNumber((localizedScatterCfg as any).descriptionX, toNumber((scatterCfg.description || {}).x, toNumber(descriptionCfg.x, 850))),
+      bottomY: toNumber((localizedScatterCfg as any).descriptionBottomY, toNumber((scatterCfg.description || {}).bottomY, toNumber(descriptionCfg.bottomY, 860))),
+      width: toNumber((localizedScatterCfg as any).descriptionWidth, toNumber((scatterCfg.description || {}).width, toNumber(descriptionCfg.width, 720))),
+      height: toNumber((localizedScatterCfg as any).descriptionHeight, toNumber((scatterCfg.description || {}).height, toNumber(descriptionCfg.height, 160))),
+      fontSize: toNumber((localizedScatterCfg as any).descriptionFontSize, toNumber((scatterCfg.description || {}).fontSize, toNumber(descriptionCfg.fontSize, 28))),
+      align: String((localizedScatterCfg as any).descriptionAlign || (scatterCfg.description || {}).align || descriptionCfg.align || 'left')
+    };
+    const scatterPaysCfg = pageCfg.scatterPays || scatterCfg || {};
+    const scatterSymbol: PaySymbol = {
+      frame: String(scatterCfg.frame || topSymbolCfg.frame || 'book_blur_01.png'),
+      descriptionKey: String(scatterCfg.descriptionKey || descriptionCfg.key || 'paytableScatter'),
+      descriptionFallback: String(scatterCfg.descriptionFallback || descriptionCfg.fallback || 'This symbol is both WILD and SCATTER.'),
+      pays: Array.isArray(scatterCfg.pays) && scatterCfg.pays.length > 0 ? scatterCfg.pays : PAYTABLE_PAGE_1[0].pays
+    };
 
-    const topSymbol = this.createSprite(String(topSymbolCfg.frame || 'book_blur_01.png'), 0, 0);
+    const topSymbol = this.createSprite(scatterSymbol.frame, 0, 0);
     if (topSymbol) {
-      topSymbol.scale.set(toNumber(topSymbolCfg.scale, 0.5));
-      this.placeLegacy(topSymbol, toNumber(topSymbolCfg.x, 660), toNumber(topSymbolCfg.bottomY, 800));
+      topSymbol.scale.set(toNumber(scatterCfg.scale, toNumber(topSymbolCfg.scale, 0.5)));
+      this.placeLegacy(topSymbol, toNumber(scatterCfg.x, toNumber(topSymbolCfg.x, 660)), toNumber(scatterCfg.bottomY, toNumber(topSymbolCfg.bottomY, 800)));
       page.addChild(topSymbol);
     }
 
-    const description = this.createLegacyBodyText(getLocalized(this.game, String(descriptionCfg.key || 'paytableScatter'), ''), toNumber(descriptionCfg.x, 850), toNumber(descriptionCfg.bottomY, 860), toNumber(descriptionCfg.width, 720), toNumber(descriptionCfg.fontSize, 28));
+    const description = this.createLocalizedLegacyText(scatterDescriptionCfg, {
+      x: toNumber(scatterDescriptionCfg.x, 850),
+      bottomY: toNumber(scatterDescriptionCfg.bottomY, 860),
+      width: toNumber(scatterDescriptionCfg.width, 720),
+      height: toNumber(scatterDescriptionCfg.height, 160),
+      fontSize: toNumber(scatterDescriptionCfg.fontSize, 28),
+      key: scatterSymbol.descriptionKey,
+      fallback: scatterSymbol.descriptionFallback,
+      align: scatterDescriptionCfg.align as 'left' | 'center' | 'right'
+    });
     page.addChild(description);
 
-    this.addPayoutColumn(page, PAYTABLE_PAGE_1[0].pays, toNumber(scatterPaysCfg.x, 483), toNumber(scatterPaysCfg.bottomY, 884), toNumber(scatterPaysCfg.fontSize, 32), false, true);
+    this.addPayoutColumn(
+      page,
+      scatterSymbol.pays,
+      toNumber(scatterCfg.paysX, toNumber(scatterPaysCfg.x, 483)),
+      toNumber(scatterCfg.paysBottomY, toNumber(scatterPaysCfg.bottomY, 884)),
+      toNumber(scatterCfg.paysFontSize, toNumber(scatterPaysCfg.fontSize, 32)),
+      false,
+      true,
+      String(scatterCfg.multiplierSource || 'totalBet') === 'lineBet' ? 'lineBet' : 'totalBet'
+    );
 
-    const items = Array.isArray(pageCfg.items) && pageCfg.items.length > 0 ? pageCfg.items : [
+    const items = Array.isArray(pageCfg.symbols) && pageCfg.symbols.length > 0 ? pageCfg.symbols : Array.isArray(pageCfg.items) && pageCfg.items.length > 0 ? pageCfg.items : [
       { symbol: PAYTABLE_PAGE_2[4], x: 165, y: 570, paysX: 365, paysY: 674, four: true },
       { symbol: PAYTABLE_PAGE_2[3], x: 575, y: 600, paysX: 745, paysY: 674 },
       { symbol: PAYTABLE_PAGE_2[2], x: 970, y: 600, paysX: 1130, paysY: 674 },
@@ -681,17 +894,61 @@ export default class HelpMenu extends Container {
 
     for (let i = 0; i < items.length; i += 1) {
       const item = items[i];
-      const symbol = (item as any).symbol || this.resolvePaySymbolByFrame(String((item as any).frame || ''));
+      const localizedItem = resolveLayoutForLocale(this.game, item as any, {});
+      const symbol = Array.isArray((item as any).pays) && String((item as any).frame || '').length > 0
+        ? {
+            frame: String((item as any).frame || ''),
+            descriptionKey: typeof (item as any).descriptionKey === 'string' ? String((item as any).descriptionKey) : undefined,
+            descriptionFallback: typeof (item as any).descriptionFallback === 'string' ? String((item as any).descriptionFallback) : undefined,
+            pays: (item as any).pays
+          } as PaySymbol
+        : (item as any).symbol || this.resolvePaySymbolByFrame(String((item as any).frame || ''));
       if (!symbol) continue;
-      this.addPaytableSymbolBlock(page, symbol, toNumber((item as any).x, 0), toNumber((item as any).y ?? (item as any).bottomY, 0), false, toNumber((item as any).paysX, 0), toNumber((item as any).paysY, 0), !!((item as any).four ?? (item as any).includeFourRows), true);
+      this.addPaytableSymbolBlock(
+        page,
+        symbol,
+        toNumber((item as any).x, 0),
+        toNumber((item as any).y ?? (item as any).bottomY, 0),
+        false,
+        toNumber((item as any).paysX, 0),
+        toNumber((item as any).paysY, 0),
+        !!((item as any).four ?? (item as any).includeFourRows),
+        true,
+        String((item as any).multiplierSource || 'lineBet') === 'totalBet' ? 'totalBet' : 'lineBet',
+        toNumber((item as any).scale, 0.5),
+        toNumber((item as any).paysFontSize, 32)
+      );
+      const itemDescriptionCfg = {
+        ...(((item as any).description && typeof (item as any).description === 'object') ? (item as any).description : {}),
+        x: toNumber((localizedItem as any).descriptionX, toNumber(((item as any).description || {}).x, 0)),
+        bottomY: toNumber((localizedItem as any).descriptionBottomY, toNumber(((item as any).description || {}).bottomY, 0)),
+        width: toNumber((localizedItem as any).descriptionWidth, toNumber(((item as any).description || {}).width, 300)),
+        height: toNumber((localizedItem as any).descriptionHeight, toNumber(((item as any).description || {}).height, 120)),
+        fontSize: toNumber((localizedItem as any).descriptionFontSize, toNumber(((item as any).description || {}).fontSize, 24)),
+        align: String((localizedItem as any).descriptionAlign || ((item as any).description || {}).align || 'left')
+      };
+      if (
+        String((item as any).descriptionKey || symbol.descriptionKey || '').length > 0 ||
+        String((item as any).descriptionFallback || symbol.descriptionFallback || '').length > 0
+      ) {
+        page.addChild(this.createLocalizedLegacyText(itemDescriptionCfg, {
+          x: toNumber(itemDescriptionCfg.x, 0),
+          bottomY: toNumber(itemDescriptionCfg.bottomY, 0),
+          width: toNumber(itemDescriptionCfg.width, 300),
+          height: toNumber(itemDescriptionCfg.height, 120),
+          fontSize: toNumber(itemDescriptionCfg.fontSize, 24),
+          key: String((item as any).descriptionKey || symbol.descriptionKey || ''),
+          fallback: String((item as any).descriptionFallback || symbol.descriptionFallback || ''),
+          align: itemDescriptionCfg.align as 'left' | 'center' | 'right'
+        }));
+      }
     }
 
     return page;
   }
 
-  private buildGoldPaytablePage(): Container {
+  private buildGoldPaytablePage(pageCfg: any = this.config.paytablePages?.gold || {}): Container {
     const page = new Container();
-    const pageCfg = this.config.paytablePages?.gold || {};
     const items = Array.isArray(pageCfg.items) && pageCfg.items.length > 0 ? pageCfg.items : [
       { symbol: PAYTABLE_GOLD_PAGE[0], x: 145, y: 671, paysX: 335, paysY: 743, four: true },
       { symbol: PAYTABLE_GOLD_PAGE[1], x: 585, y: 688, paysX: 755, paysY: 743 },
@@ -723,11 +980,14 @@ export default class HelpMenu extends Container {
     paysX: number,
     paysY: number,
     includeFourRows = false,
-    legacyY = false
+    legacyY = false,
+    source: 'lineBet' | 'totalBet' = 'lineBet',
+    scaleOverride?: number,
+    fontSizeOverride?: number
   ): void {
     const sprite = this.createSprite(symbol.frame, 0, 0);
     if (sprite) {
-      sprite.scale.set(gold ? 0.45 : 0.5);
+      sprite.scale.set(toNumber(scaleOverride, gold ? 0.45 : 0.5));
       if (legacyY) {
         this.placeLegacy(sprite, x, y);
       } else {
@@ -747,7 +1007,7 @@ export default class HelpMenu extends Container {
       page.addChild(sprite);
     }
 
-    this.addPayoutColumn(page, symbol.pays, paysX, paysY, 32, includeFourRows, legacyY);
+    this.addPayoutColumn(page, symbol.pays, paysX, paysY, toNumber(fontSizeOverride, 32), includeFourRows, legacyY, source);
   }
 
   private addPayoutColumn(
@@ -757,7 +1017,8 @@ export default class HelpMenu extends Container {
     y: number,
     fontSize: number,
     includeFourRows = false,
-    legacyY = false
+    legacyY = false,
+    source: 'lineBet' | 'totalBet' = 'lineBet'
   ): void {
     for (let i = 0; i < pays.length; i += 1) {
       const pay = pays[i];
@@ -777,26 +1038,41 @@ export default class HelpMenu extends Container {
         this.placeLegacy(countText, x, rowY);
         this.placeLegacy(valueText, x + 32, rowY);
       }
-      this.paytableValueTexts.push({ text: valueText, count: pay.count, mult: pay.mult });
+      this.paytableValueTexts.push({ text: valueText, mult: pay.mult, source });
       page.addChild(countText);
       page.addChild(valueText);
     }
   }
 
-  private buildPaylinesPage(): Container {
+  private buildPaylinesPage(pageCfg: any = this.config.paytablePages?.paylines || {}): Container {
     const page = new Container();
-    const pageCfg = this.config.paytablePages?.paylines || {};
     const text1Cfg = pageCfg.text1 || {};
     const gridCfg = pageCfg.grid || {};
-    const text = this.createLegacyBodyText(getLocalized(this.game, String(text1Cfg.key || 'paylinesTxt'), ''), toNumber(text1Cfg.x, 310), toNumber(text1Cfg.bottomY, 445), toNumber(text1Cfg.width, 1300), toNumber(text1Cfg.fontSize, 28), String(text1Cfg.align || 'center') as 'center');
+    const patterns = Array.isArray(pageCfg.lines) && pageCfg.lines.length > 0
+      ? pageCfg.lines.filter((row: unknown) => Array.isArray(row) && row.length === 5).map((row: any) => row.map((value: unknown) => Number(value)))
+      : PAYLINE_PATTERNS;
+    const columnsPerRow = Math.max(1, toNumber(gridCfg.columnsPerRow, 5));
+    const rowBottomYStep = toNumber(gridCfg.rowBottomYStep, 150);
+    const previewScale = toNumber(gridCfg.scale, 1);
+    const text = this.createLocalizedLegacyText(text1Cfg, {
+      x: 310,
+      bottomY: 445,
+      width: 1300,
+      height: 220,
+      fontSize: 28,
+      key: 'paylinesTxt',
+      align: 'center'
+    });
     text.anchor.set(0.5, 0);
     text.position.x = HelpMenu.SCREEN_WIDTH / 2;
     page.addChild(text);
 
-    for (let i = 0; i < PAYLINE_PATTERNS.length; i += 1) {
-      const preview = this.createPaylinePreview(PAYLINE_PATTERNS[i], i);
-      const x = i > 4 ? toNumber(gridCfg.startX, 500) + (i % 5) * toNumber(gridCfg.stepX, 260) : toNumber(gridCfg.startX, 500) + i * toNumber(gridCfg.stepX, 260);
-      const y = i > 4 ? toNumber(gridCfg.bottomRowBottomY, 650) : toNumber(gridCfg.topRowBottomY, 800);
+    for (let i = 0; i < patterns.length; i += 1) {
+      const preview = this.createPaylinePreview(patterns[i], i, previewScale);
+      const row = Math.floor(i / columnsPerRow);
+      const col = i % columnsPerRow;
+      const x = toNumber(gridCfg.startX, 500) + col * toNumber(gridCfg.stepX, 260);
+      const y = toNumber(gridCfg.topRowBottomY, 800) - row * rowBottomYStep;
       this.placeLegacy(preview, x, y);
       page.addChild(preview);
     }
@@ -804,7 +1080,7 @@ export default class HelpMenu extends Container {
     return page;
   }
 
-  private createPaylinePreview(pattern: number[], index: number): Container {
+  private createPaylinePreview(pattern: number[], index: number, scale = 1): Container {
     const preview = new Container();
     const width = 170;
     const height = 93;
@@ -844,13 +1120,30 @@ export default class HelpMenu extends Container {
     label.anchor.set(0.5);
     label.position.set(width / 2, -14);
     preview.addChild(label);
+    preview.scale.set(scale);
     return preview;
   }
 
-  private buildRulesHowToPage(): Container {
+  private buildRulesHowToPage(pageCfg: any = this.config.rulesPages?.howTo || {}): Container {
     const page = new Container();
-    const minBet = this.createLegacyBodyText(this.getMinBetLabel(), 0, 910, 920, 28);
-    const maxBet = this.createLegacyBodyText(this.getMaxBetLabel(), 0, 950, 920, 28);
+    const minBet = this.createLegacyBodyText(
+      this.getMinBetLabel(),
+      toNumber(pageCfg.minBet?.x, 0),
+      toNumber(pageCfg.minBet?.bottomY, 910),
+      toNumber(pageCfg.minBet?.width, 920),
+      toNumber(pageCfg.minBet?.fontSize, 28),
+      'left',
+      toNumber(pageCfg.minBet?.height, 40)
+    );
+    const maxBet = this.createLegacyBodyText(
+      this.getMaxBetLabel(),
+      toNumber(pageCfg.maxBet?.x, 0),
+      toNumber(pageCfg.maxBet?.bottomY, 950),
+      toNumber(pageCfg.maxBet?.width, 920),
+      toNumber(pageCfg.maxBet?.fontSize, 28),
+      'left',
+      toNumber(pageCfg.maxBet?.height, 40)
+    );
     page.addChild(minBet);
     page.addChild(maxBet);
 
@@ -872,18 +1165,46 @@ export default class HelpMenu extends Container {
       }
     }
 
-    const interfaceText = this.createLegacyBodyText(getLocalized(this.game, 'rulesInterface', ''), 220, 720, 1265, 26);
-    const autoplayText = this.createLegacyBodyText(getLocalized(this.game, 'rulesAutoplay', ''), 220, 420, 1265, 26);
+    const interfaceText = this.createLocalizedLegacyText(pageCfg.interfaceText, {
+      x: 220,
+      bottomY: 720,
+      width: 1265,
+      height: 220,
+      fontSize: 26,
+      key: 'rulesInterface'
+    });
+    const autoplayText = this.createLocalizedLegacyText(pageCfg.autoplayText, {
+      x: 220,
+      bottomY: 420,
+      width: 1265,
+      height: 180,
+      fontSize: 26,
+      key: 'rulesAutoplay'
+    });
     page.addChild(interfaceText);
     page.addChild(autoplayText);
 
     return page;
   }
 
-  private buildRulesBetSettingsPage(): Container {
+  private buildRulesBetSettingsPage(pageCfg: any = this.config.rulesPages?.betSettings || {}): Container {
     const page = new Container();
-    const betMenuText = this.createLegacyBodyText(getLocalized(this.game, 'rulesBetMenu', ''), 220, 760, 1265, 26);
-    const settingsText = this.createLegacyBodyText(getLocalized(this.game, 'rulesSettings', ''), 220, 480, 1265, 26);
+    const betMenuText = this.createLocalizedLegacyText(pageCfg.betMenuText, {
+      x: 220,
+      bottomY: 760,
+      width: 1265,
+      height: 220,
+      fontSize: 26,
+      key: 'rulesBetMenu'
+    });
+    const settingsText = this.createLocalizedLegacyText(pageCfg.settingsText, {
+      x: 220,
+      bottomY: 480,
+      width: 1265,
+      height: 220,
+      fontSize: 26,
+      key: 'rulesSettings'
+    });
     page.addChild(betMenuText);
     page.addChild(settingsText);
 
@@ -909,33 +1230,68 @@ export default class HelpMenu extends Container {
     return page;
   }
 
-  private buildRulesLinesPage(): Container {
+  private buildRulesLinesPage(pageCfg: any = this.config.rulesPages?.lines || {}): Container {
     const page = new Container();
-    const lines = this.createLegacyBodyText(getLocalized(this.game, 'rulesLines', ''), 220, 700, 1265, 26);
-    const unfinished = this.createLegacyBodyText(getLocalized(this.game, 'rulesUnfinished', ''), 220, 420, 1265, 26);
+    const lines = this.createLocalizedLegacyText(pageCfg.linesText, {
+      x: 220,
+      bottomY: 700,
+      width: 1265,
+      height: 250,
+      fontSize: 26,
+      key: 'rulesLines'
+    });
+    const unfinished = this.createLocalizedLegacyText(pageCfg.unfinishedText, {
+      x: 220,
+      bottomY: 420,
+      width: 1265,
+      height: 140,
+      fontSize: 26,
+      key: 'rulesUnfinished'
+    });
     page.addChild(lines);
     page.addChild(unfinished);
     page.addChild(this.rulesRtpText);
-    this.placeLegacy(this.rulesRtpText, 220, 330);
+    this.placeLegacy(this.rulesRtpText, toNumber(pageCfg.gamePercent?.x, 220), toNumber(pageCfg.gamePercent?.bottomY, 330));
     return page;
   }
 
-  private buildRulesExtraPage(): Container {
+  private buildRulesExtraPage(pageCfg: any = this.config.rulesPages?.extra || {}): Container {
     const page = new Container();
-    const maxWin = this.createLegacyBodyText(getLocalized(this.game, 'rulesMaxWin', ''), 220, 790, 1580, 26);
-    const buyBonus = this.createLegacyBodyText(getLocalized(this.game, 'rulesBuyBonus', ''), 220, 590, 1580, 26);
+    const maxWin = this.createLocalizedLegacyText(pageCfg.maxWinText, {
+      x: 220,
+      bottomY: 790,
+      width: 1580,
+      height: 140,
+      fontSize: 26,
+      key: 'rulesMaxWin'
+    });
+    const buyBonus = this.createLocalizedLegacyText(pageCfg.buyBonusText, {
+      x: 220,
+      bottomY: 590,
+      width: 1580,
+      height: 190,
+      fontSize: 26,
+      key: 'rulesBuyBonus'
+    });
     page.addChild(maxWin);
     page.addChild(buyBonus);
     page.addChild(this.rulesBuyFreeRtpText);
     page.addChild(this.rulesBuyHoldRtpText);
-    this.placeLegacy(this.rulesBuyFreeRtpText, 220, 360);
-    this.placeLegacy(this.rulesBuyHoldRtpText, 220, 315);
+    this.placeLegacy(this.rulesBuyFreeRtpText, toNumber(pageCfg.buyFreeRtp?.x, 220), toNumber(pageCfg.buyFreeRtp?.bottomY, 360));
+    this.placeLegacy(this.rulesBuyHoldRtpText, toNumber(pageCfg.buyHoldRtp?.x, 220), toNumber(pageCfg.buyHoldRtp?.bottomY, 315));
     return page;
   }
 
-  private buildRulesAddFreeGamesPage(): Container {
+  private buildRulesAddFreeGamesPage(pageCfg: any = this.config.rulesPages?.addFreeGames || {}): Container {
     const page = new Container();
-    const addFg = this.createLegacyBodyText(getLocalized(this.game, 'rulesAddFg', ''), 220, 750, 1700, 34);
+    const addFg = this.createLocalizedLegacyText(pageCfg.addFreeGamesText, {
+      x: 220,
+      bottomY: 750,
+      width: 1700,
+      height: 180,
+      fontSize: 34,
+      key: 'rulesAddFg'
+    });
     page.addChild(addFg);
     return page;
   }
@@ -1124,17 +1480,36 @@ export default class HelpMenu extends Container {
     return null;
   }
 
-  private createBodyText(text: string, x: number, y: number, maxWidth: number, fontSize = 28): Text {
+  private createBodyText(
+    text: string,
+    x: number,
+    y: number,
+    maxWidth: number,
+    fontSize = 28,
+    maxHeight = 0,
+    align: 'left' | 'center' | 'right' = 'left',
+    autoFit = true
+  ): Text {
     const body = this.createText(text, x, y, {
       fontSize,
       fill: 0xffffff,
       anchorX: 0,
       anchorY: 0,
-      align: 'left',
-      maxWidth
+      align,
+      autoFit: false
     });
     body.style.wordWrap = true;
     body.style.wordWrapWidth = maxWidth;
+    body.style.align = align;
+    body.style.fontSize = fontSize;
+    body.style.lineHeight = Math.max(16, Math.round(fontSize * 1.02));
+    if (autoFit) {
+      fitPixiTextToBounds(body, {
+        maxWidth,
+        maxHeight,
+        minFontSize: Math.max(14, Math.round(fontSize * 0.82))
+      });
+    }
     return body;
   }
 
@@ -1166,12 +1541,43 @@ export default class HelpMenu extends Container {
     bottomY: number,
     maxWidth: number,
     fontSize = 28,
-    align: 'left' | 'center' | 'right' = 'left'
+    align: 'left' | 'center' | 'right' = 'left',
+    maxHeight = 0,
+    autoFit = true
   ): Text {
-    const body = this.createBodyText(text, x, 0, maxWidth, fontSize);
-    body.style.align = align;
+    const body = this.createBodyText(text, x, 0, maxWidth, fontSize, maxHeight, align, autoFit);
     this.placeLegacy(body, x, bottomY);
     return body;
+  }
+
+  private shouldAutoFitLocalizedText(): boolean {
+    return false;
+  }
+
+  private createLocalizedLegacyText(config: LegacyTextLayout | undefined, defaults: LegacyTextLayout): Text {
+    const merged = resolveLayoutForLocale(this.game, config, defaults);
+    const text = getLocalized(this.game, String(merged.key || ''), String(merged.fallback || ''));
+    return this.createLegacyBodyText(
+      text,
+      toNumber(merged.x, 0),
+      toNumber(merged.bottomY, 0),
+      toNumber(merged.width, 0),
+      toNumber(merged.fontSize, 28),
+      (merged.align || 'left') as 'left' | 'center' | 'right',
+      toNumber(merged.height, 0),
+      false
+    );
+  }
+
+  private applyLegacyTextConfig(display: Text, config: LegacyTextLayout | undefined, defaults: LegacyTextLayout): void {
+    const merged = resolveLayoutForLocale(this.game, config, defaults);
+    const fontSize = toNumber(merged.fontSize, Number(display.style.fontSize) || 28);
+    display.style.fontSize = fontSize;
+    display.style.lineHeight = Math.max(16, Math.round(fontSize * 1.02));
+    display.style.align = (merged.align || 'left') as 'left' | 'center' | 'right';
+    display.style.wordWrap = toNumber(merged.width, 0) > 0;
+    display.style.wordWrapWidth = toNumber(merged.width, 0);
+    this.placeLegacy(display, toNumber(merged.x, 0), toNumber(merged.bottomY, 0));
   }
 
   private createSectionTitle(text: string, x: number, y: number): Text {
@@ -1196,6 +1602,8 @@ export default class HelpMenu extends Container {
       anchorY?: number;
       align?: 'left' | 'center' | 'right';
       maxWidth?: number;
+      maxHeight?: number;
+      autoFit?: boolean;
     } = {}
   ): Text {
     const display = new Text({
@@ -1211,8 +1619,13 @@ export default class HelpMenu extends Container {
     });
     display.anchor.set(toNumber(options.anchorX, 0), toNumber(options.anchorY, 0));
     display.position.set(x, y);
-    if (toNumber(options.maxWidth, 0) > 0) {
-      fitPixiTextToBounds(display, { maxWidth: toNumber(options.maxWidth, 0), minFontSize: 14 });
+    const autoFit = options.autoFit !== false;
+    if (autoFit && (toNumber(options.maxWidth, 0) > 0 || toNumber(options.maxHeight, 0) > 0)) {
+      fitPixiTextToBounds(display, {
+        maxWidth: toNumber(options.maxWidth, 0),
+        maxHeight: toNumber(options.maxHeight, 0),
+        minFontSize: 14
+      });
     }
     return display;
   }
