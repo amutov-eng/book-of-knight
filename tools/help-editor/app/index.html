@@ -571,6 +571,13 @@
                 manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'howTo'],
                 translationKeys: ['rulesTitle', 'rulesMINbet', 'rulesMAXbet', 'rulesInterface', 'rulesAutoplay'],
                 defaultLayout: {
+                    items: [
+                        { id: 'settingsButton', frame: 'button_settings_001.png', x: 210, bottomY: 750, scale: 0.4 },
+                        { id: 'betButton', frame: 'button_bet_001.png', x: 210, bottomY: 685, scale: 0.4 },
+                        { id: 'startButton', frame: 'button_start_001.png', x: 210, bottomY: 620, scale: 0.2 },
+                        { id: 'autoplayButton', frame: 'button_autoplay_001.png', x: 210, bottomY: 555, scale: 0.4 },
+                        { id: 'stopAutoplayButton', frame: 'button_autoX_001.png', x: 200, bottomY: 320, scale: 0.4 }
+                    ],
                     minBet: { x: 0, bottomY: 910, width: 920, height: 40, fontSize: 28 },
                     maxBet: { x: 0, bottomY: 950, width: 920, height: 40, fontSize: 28 },
                     interfaceText: { x: 220, bottomY: 720, width: 1265, height: 220, fontSize: 26, key: 'rulesInterface' },
@@ -584,6 +591,12 @@
                 manifestPath: ['ui', 'hud', 'helpMenu', 'rulesPages', 'betSettings'],
                 translationKeys: ['rulesBetMenu', 'rulesSettings'],
                 defaultLayout: {
+                    items: [
+                        { id: 'minusButton', frame: 'minus_001.png', x: 190, bottomY: 760, scale: 0.8 },
+                        { id: 'plusButton', frame: 'plus_001.png', x: 270, bottomY: 760, scale: 0.8 },
+                        { id: 'maxBetButton', frame: 'button_maxbet_001.png', x: 260, bottomY: 680, scale: 0.5 },
+                        { id: 'betValueButton', frame: 'button_digit_001.png', x: 260, bottomY: 615, scale: 0.5 }
+                    ],
                     betMenuText: { x: 220, bottomY: 760, width: 1265, height: 220, fontSize: 26, key: 'rulesBetMenu' },
                     settingsText: { x: 220, bottomY: 480, width: 1265, height: 220, fontSize: 26, key: 'rulesSettings' }
                 }

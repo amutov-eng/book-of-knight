@@ -1147,20 +1147,22 @@ export default class HelpMenu extends Container {
     page.addChild(minBet);
     page.addChild(maxBet);
 
-    const iconFrames = [
-      ['button_settings_001.png', 210, 750, 0.4],
-      ['button_bet_001.png', 210, 685, 0.4],
-      ['button_start_001.png', 210, 620, 0.2],
-      ['button_autoplay_001.png', 210, 555, 0.4],
-      ['button_autoX_001.png', 200, 320, 0.4]
-    ];
+    const iconItems = Array.isArray(pageCfg.items) && pageCfg.items.length > 0
+      ? pageCfg.items
+      : [
+        { id: 'settingsButton', frame: 'button_settings_001.png', x: 210, bottomY: 750, scale: 0.4 },
+        { id: 'betButton', frame: 'button_bet_001.png', x: 210, bottomY: 685, scale: 0.4 },
+        { id: 'startButton', frame: 'button_start_001.png', x: 210, bottomY: 620, scale: 0.2 },
+        { id: 'autoplayButton', frame: 'button_autoplay_001.png', x: 210, bottomY: 555, scale: 0.4 },
+        { id: 'stopAutoplayButton', frame: 'button_autoX_001.png', x: 200, bottomY: 320, scale: 0.4 }
+      ];
 
-    for (let i = 0; i < iconFrames.length; i += 1) {
-      const [frame, x, y, scale] = iconFrames[i] as [string, number, number, number];
-      const sprite = this.createSprite(frame, 0, 0);
+    for (let i = 0; i < iconItems.length; i += 1) {
+      const item = iconItems[i];
+      const sprite = this.createSprite(String(item.frame || ''), 0, 0);
       if (sprite) {
-        sprite.scale.set(scale);
-        this.placeLegacy(sprite, x, y);
+        sprite.scale.set(toNumber(item.scale, 1));
+        this.placeLegacy(sprite, toNumber(item.x, 0), toNumber(item.bottomY, toNumber(item.y, 0)));
         page.addChild(sprite);
       }
     }
@@ -1208,23 +1210,55 @@ export default class HelpMenu extends Container {
     page.addChild(betMenuText);
     page.addChild(settingsText);
 
-    const minus = this.createSprite('minus_001.png', 0, 0);
-    const plus = this.createSprite('plus_001.png', 0, 0);
+    const defaultItems = [
+      { id: 'minusButton', frame: 'minus_001.png', x: 190, bottomY: 760, scale: 0.8 },
+      { id: 'plusButton', frame: 'plus_001.png', x: 270, bottomY: 760, scale: 0.8 },
+      { id: 'maxBetButton', frame: 'button_maxbet_001.png', x: 260, bottomY: 680, scale: 0.5 },
+      { id: 'betValueButton', frame: 'button_digit_001.png', x: 260, bottomY: 615, scale: 0.5 }
+    ];
+    const itemMap = new Map<string, any>();
+    const pageItems = Array.isArray(pageCfg.items) && pageCfg.items.length > 0 ? pageCfg.items : defaultItems;
+    for (let i = 0; i < pageItems.length; i += 1) {
+      const item = pageItems[i];
+      if (item && item.id) itemMap.set(String(item.id), item);
+    }
+
+    const minusCfg = itemMap.get('minusButton') || defaultItems[0];
+    const plusCfg = itemMap.get('plusButton') || defaultItems[1];
+    const maxButtonCfg = itemMap.get('maxBetButton') || defaultItems[2];
+    const betValueCfg = itemMap.get('betValueButton') || defaultItems[3];
+
+    const minus = this.createSprite(String(minusCfg.frame || 'minus_001.png'), 0, 0);
+    const plus = this.createSprite(String(plusCfg.frame || 'plus_001.png'), 0, 0);
     if (minus) {
-      minus.scale.set(0.8);
-      this.placeLegacy(minus, 190, 760);
+      minus.scale.set(toNumber(minusCfg.scale, 0.8));
+      this.placeLegacy(minus, toNumber(minusCfg.x, 190), toNumber(minusCfg.bottomY, 760));
       page.addChild(minus);
     }
     if (plus) {
-      plus.scale.set(0.8);
-      this.placeLegacy(plus, 270, 760);
+      plus.scale.set(toNumber(plusCfg.scale, 0.8));
+      this.placeLegacy(plus, toNumber(plusCfg.x, 270), toNumber(plusCfg.bottomY, 760));
       page.addChild(plus);
     }
 
-    const maxButton = this.createStaticButton('button_maxbet_001.png', 260, 680, getLocalized(this.game, 'menuBetMaxBet', 'MAX BET'), 0.5, true);
+    const maxButton = this.createStaticButton(
+      String(maxButtonCfg.frame || 'button_maxbet_001.png'),
+      toNumber(maxButtonCfg.x, 260),
+      toNumber(maxButtonCfg.bottomY, 680),
+      getLocalized(this.game, 'menuBetMaxBet', 'MAX BET'),
+      toNumber(maxButtonCfg.scale, 0.5),
+      true
+    );
     if (maxButton) page.addChild(maxButton);
 
-    const betButton = this.createStaticButton('button_digit_001.png', 260, 615, formatMoney(this.game?.meters?.getTotalBet?.() || 0, this.game), 0.5, true);
+    const betButton = this.createStaticButton(
+      String(betValueCfg.frame || 'button_digit_001.png'),
+      toNumber(betValueCfg.x, 260),
+      toNumber(betValueCfg.bottomY, 615),
+      formatMoney(this.game?.meters?.getTotalBet?.() || 0, this.game),
+      toNumber(betValueCfg.scale, 0.5),
+      true
+    );
     if (betButton) page.addChild(betButton);
 
     return page;
