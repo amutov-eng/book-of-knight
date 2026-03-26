@@ -1,0 +1,312 @@
+
+1920_free_games_v1.png
+size: 2036,1910
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+fire_00
+  rotate: false
+  xy: 1583, 1408
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_01
+  rotate: false
+  xy: 1583, 1408
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_02
+  rotate: false
+  xy: 1583, 906
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_03
+  rotate: false
+  xy: 1583, 906
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_04
+  rotate: true
+  xy: 2, 617
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_05
+  rotate: true
+  xy: 2, 617
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_06
+  rotate: true
+  xy: 504, 489
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_07
+  rotate: true
+  xy: 504, 489
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_08
+  rotate: true
+  xy: 1006, 489
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_09
+  rotate: true
+  xy: 1006, 489
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_10
+  rotate: true
+  xy: 1508, 454
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_11
+  rotate: false
+  xy: 2, 115
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_12
+  rotate: true
+  xy: 454, 37
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_13
+  rotate: true
+  xy: 956, 37
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_14
+  rotate: true
+  xy: 1458, 2
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_15
+  rotate: true
+  xy: 1458, 2
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+free_all
+  rotate: true
+  xy: 1235, 1153
+  size: 755, 346
+  orig: 755, 346
+  offset: 0, 0
+  index: -1
+games_all
+  rotate: true
+  xy: 893, 941
+  size: 967, 340
+  orig: 967, 340
+  offset: 0, 0
+  index: -1
+light_all
+  rotate: false
+  xy: 2, 1069
+  size: 890, 840
+  orig: 1028, 943
+  offset: 63, 52
+  index: -1
+
+1920_free_games_v12.png
+size: 1909,2047
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+12
+  rotate: true
+  xy: 1566, 1660
+  size: 385, 324
+  orig: 385, 324
+  offset: 0, 0
+  index: -1
+12inner
+  rotate: false
+  xy: 1072, 45
+  size: 317, 257
+  orig: 317, 257
+  offset: 0, 0
+  index: -1
+fire_16
+  rotate: false
+  xy: 2, 1545
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+fire_17
+  rotate: false
+  xy: 2, 1545
+  size: 450, 500
+  orig: 450, 500
+  offset: 0, 0
+  index: -1
+free_inner
+  rotate: true
+  xy: 1016, 1393
+  size: 652, 246
+  orig: 652, 246
+  offset: 0, 0
+  index: -1
+games_inner
+  rotate: true
+  xy: 454, 1180
+  size: 865, 247
+  orig: 865, 247
+  offset: 0, 0
+  index: -1
+poof_03
+  rotate: true
+  xy: 1264, 1512
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_04
+  rotate: false
+  xy: 1264, 1210
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_05
+  rotate: false
+  xy: 703, 1091
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_06
+  rotate: true
+  xy: 2, 1010
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_07
+  rotate: false
+  xy: 1238, 908
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_08
+  rotate: false
+  xy: 304, 789
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_09
+  rotate: false
+  xy: 839, 606
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_10
+  rotate: false
+  xy: 1374, 606
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_11
+  rotate: false
+  xy: 2, 487
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_12
+  rotate: false
+  xy: 537, 304
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_13
+  rotate: false
+  xy: 1072, 304
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_14
+  rotate: true
+  xy: 1607, 71
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_15
+  rotate: false
+  xy: 2, 2
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_16
+  rotate: false
+  xy: 537, 2
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+torch_left
+  rotate: false
+  xy: 703, 1443
+  size: 311, 602
+  orig: 311, 602
+  offset: 0, 0
+  index: -1
+
+1920_free_games_v13.png
+size: 537,606
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+poof_17
+  rotate: false
+  xy: 2, 304
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1
+poof_18
+  rotate: false
+  xy: 2, 2
+  size: 533, 300
+  orig: 533, 300
+  offset: 0, 0
+  index: -1

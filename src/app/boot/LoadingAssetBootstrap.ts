@@ -83,6 +83,9 @@ export default class LoadingAssetBootstrap {
   ): Promise<Record<string, AssetResource>> {
     const resources = await this.assetManager.loadAll(assetPaths, onProgress);
     await this.preloadSymbolSpineAssets(manifest);
+    if (this.game.gameplaySpineOverlay && typeof this.game.gameplaySpineOverlay.preload === 'function') {
+      await this.game.gameplaySpineOverlay.preload();
+    }
     return resources;
   }
 

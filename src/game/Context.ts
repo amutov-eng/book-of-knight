@@ -1,4 +1,5 @@
 import { createGameOutcome } from './GameOutcome';
+import { ensureFreeGamesState } from './FreeGamesController';
 
 interface ServerErrorState {
   visible: boolean;
@@ -119,5 +120,7 @@ export default class Context {
       MAJOR_JACKPOT_VALUE: 100,
       MINOR_JACKPOT_VALUE: 20
     };
+
+    ensureFreeGamesState(this as unknown as Record<string, any>);
   }
 }

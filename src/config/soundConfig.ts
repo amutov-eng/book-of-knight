@@ -8,7 +8,10 @@ export const SOUND_IDS = {
   BEEP_SUN: 'beepSun',
   LOW_WIN: 'lowWin',
   HIGH_WIN: 'highWin',
-  SCATTER: 'scatter'
+  SCATTER: 'scatter',
+  FREE_GAMES: 'freeGames',
+  CONGRATS: 'congrats',
+  OPEN_BOOK: 'openBook'
 } as const;
 
 export type SoundId = (typeof SOUND_IDS)[keyof typeof SOUND_IDS];
@@ -29,5 +32,8 @@ export const SOUND_DEFINITIONS: ReadonlyArray<SoundDefinition> = Object.freeze([
   { id: SOUND_IDS.BEEP_SUN, path: 'assets/sounds/beep_sun.mp3', volume: 1 },
   { id: SOUND_IDS.LOW_WIN, path: 'assets/sounds/lowWin.mp3', volume: 1 },
   { id: SOUND_IDS.HIGH_WIN, path: 'assets/sounds/highWin.mp3', volume: 1 },
-  { id: SOUND_IDS.SCATTER, path: 'assets/sounds/scatter.mp3', volume: 1 }
+  { id: SOUND_IDS.SCATTER, path: 'assets/sounds/scatter.mp3', volume: 1 },
+  { id: SOUND_IDS.FREE_GAMES, path: 'assets/sounds/free_games.mp3', volume: 1 },
+  { id: SOUND_IDS.CONGRATS, path: 'assets/sounds/congrats.mp3', volume: 1 },
+  { id: SOUND_IDS.OPEN_BOOK, path: 'assets/sounds/open_book.mp3', volume: 1 }
 ]);

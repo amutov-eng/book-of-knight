@@ -10,13 +10,19 @@ import type { GameOutcomeShape } from '../../game/GameOutcome';
 const STATE_TO_LIFECYCLE = new Map<string, string>([
   [GameplayState.IDLE.title, LifecycleState.IDLE],
   [GameplayState.START_SPIN.title, LifecycleState.SPIN],
+  ['FREE_GAMES_START_SPIN', LifecycleState.SPIN],
   [GameplayState.REELS_SPINNING.title, LifecycleState.SPIN],
   [GameplayState.REELS_STOPPING.title, LifecycleState.RESOLVE],
   [GameplayState.REELS_STOPPED.title, LifecycleState.RESOLVE],
   [GameplayState.SHOW_WINS.title, LifecycleState.WIN_PRESENTATION],
+  ['SHOW_SCATTER_WINS', LifecycleState.WIN_PRESENTATION],
+  ['FREE_GAMES', LifecycleState.WIN_PRESENTATION],
+  ['FREE_BOOK', LifecycleState.WIN_PRESENTATION],
   [GameplayState.SHOW_ALL_WINNING_LINES.title, LifecycleState.WIN_PRESENTATION],
   [GameplayState.SHOW_LAST_WINS.title, LifecycleState.WIN_PRESENTATION],
   [GameplayState.SPIN_END.title, LifecycleState.RETURN],
+  ['FREE_GAMES_END', LifecycleState.RETURN],
+  ['FREE_GAMES_TAKE_WINS', LifecycleState.RETURN],
   [GameplayState.TAKE_WINS.title, LifecycleState.RETURN],
   [GameplayState.WIN_TO_CREDIT.title, LifecycleState.RETURN]
 ]);

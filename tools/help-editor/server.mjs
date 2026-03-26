@@ -12,6 +12,7 @@ const MANIFEST_PATH = path.join(PROJECT_ROOT, 'assets/desktop/assets-manifest.de
 const TRANSLATIONS_PATH = path.join(PROJECT_ROOT, 'assets/common/localization/translations.json');
 const ATLAS_FILES = [
     'assets/desktop/symbols/symbols-0.json',
+    'assets/desktop/symbols/freegames.json',
     'assets/desktop/ui/interface-0.json',
     'assets/desktop/ui/menu_buttons-0.json'
 ];

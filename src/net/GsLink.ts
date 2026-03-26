@@ -10,6 +10,7 @@ import { getDefaultNumberPattern } from '../utils/numberFormat';
 import Pool from '../core/utils/Pool';
 import { debug, error as logError } from '../core/utils/logger';
 import type BaseGame from '../core/BaseGame';
+import { ensureFreeGamesState, markFreeGamesIntroSource } from '../game/FreeGamesController';
 
 const DEFAULT_GAME_ID = 'book-of-knight-alea';
 const DEFAULT_WS_PORT = '8081';
@@ -626,14 +627,17 @@ export default class GsLink {
     debug(`GsLink::onSpin raw ${JSON.stringify(outcome)}`);
 
     const serverOutcome = normalizeServerOutcome(outcome);
+    ensureFreeGamesState(this.game.context);
     this.releaseActiveWins();
 
     const mappedOutcome = createGameOutcome();
     mappedOutcome.matrix = serverOutcome.matrix;
     mappedOutcome.hasFreeGames = serverOutcome.hasFreeGames;
 
+    const previousMode = Number(this.game.context.gameMode);
     const finalBalance = toInt(serverOutcome.balance, this.game.meters.credit);
     const stagedBalance = Math.max(0, finalBalance - toInt(serverOutcome.win, 0));
+    this.game.context.prevGameMode = previousMode;
     this.game.context.finalCreditMeter = finalBalance;
     this.game.meters.credit = stagedBalance;
     this.game.meters.win = serverOutcome.win;
@@ -700,6 +704,15 @@ export default class GsLink {
       buyHoldAndWinMult: serverOutcome.buyHoldAndWinMult,
       pattern: this.getNumberPattern()
     };
+    this.game.context.gameMode = serverOutcome.mode;
+    this.game.context.freeGamesCounter = serverOutcome.freeGamesCnt;
+    this.game.context.freeGamesWon = serverOutcome.allFreeGamesCnt || serverOutcome.freeGamesCnt;
+    if (serverOutcome.hasFreeGames) {
+      markFreeGamesIntroSource(this.game.context, previousMode);
+      if (previousMode !== this.game.context.FREE_GAMES) {
+        this.game.context.freeGamesStartCredit = this.game.context.finalCreditMeter;
+      }
+    }
     this.game.context.buyFreeGamesMult = serverOutcome.buyFreeGamesMult;
     this.game.context.buyHoldAndWinMult = serverOutcome.buyHoldAndWinMult;
     if (!this.game.context.buyFeatureConfigured) {

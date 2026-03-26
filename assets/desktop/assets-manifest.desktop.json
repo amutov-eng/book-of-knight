@@ -68,7 +68,8 @@
   "symbols": {
     "atlases": [
       "assets/symbols/symbols-0.json",
-      "assets/symbols/symbols-1.json"
+      "assets/symbols/symbols-1.json",
+      "assets/symbols/freegames.json"
     ],
     "frames": [
       {
@@ -901,7 +902,166 @@
             "fallback": "RULES"
           }
         },
-        "settingsPage": {},
+        "settingsPage": {
+          "items": [
+            {
+              "id": "soundOnToggle",
+              "frame": "sound_bg",
+              "x": 357,
+              "bottomY": 812,
+              "scale": 1
+            },
+            {
+              "id": "gameSoundsToggle",
+              "frame": "soundfx_bg",
+              "x": 357,
+              "bottomY": 658,
+              "scale": 1
+            },
+            {
+              "id": "musicToggle",
+              "frame": "music_bg",
+              "x": 357,
+              "bottomY": 499,
+              "scale": 1
+            },
+            {
+              "id": "volumeBg",
+              "frame": "volume_bg.png",
+              "x": 357,
+              "bottomY": 345,
+              "scale": 1
+            },
+            {
+              "id": "volumeMinus",
+              "frame": "minus_001.png",
+              "x": 597,
+              "bottomY": 340,
+              "scale": 1
+            },
+            {
+              "id": "volumePlus",
+              "frame": "plus_001.png",
+              "x": 812,
+              "bottomY": 340,
+              "scale": 1
+            },
+            {
+              "id": "lobbyButton",
+              "frame": "button_menu_home_001.png",
+              "x": 1063,
+              "bottomY": 812,
+              "scale": 1
+            },
+            {
+              "id": "skipIntroToggle",
+              "frame": "skipscreen_bg",
+              "x": 1063,
+              "bottomY": 658,
+              "scale": 1
+            },
+            {
+              "id": "turboToggle",
+              "frame": "turbo_bg",
+              "x": 1063,
+              "bottomY": 499,
+              "scale": 1
+            },
+            {
+              "id": "skipScreenToggle",
+              "frame": "skipscreen_bg",
+              "x": 1063,
+              "bottomY": 340,
+              "scale": 1
+            }
+          ],
+          "columns": {
+            "leftX": 357,
+            "rightX": 1063
+          },
+          "rows": {
+            "sound": 812,
+            "soundFx": 658,
+            "music": 499,
+            "volume": 345,
+            "lobby": 812,
+            "skipIntro": 658,
+            "turbo": 499,
+            "skipScreen": 340
+          },
+          "soundOnText": {
+            "x": 437,
+            "bottomY": 865,
+            "width": 260,
+            "height": 50,
+            "fontSize": 36,
+            "key": "settingsSoundOn"
+          },
+          "gameSoundsText": {
+            "x": 437,
+            "bottomY": 711,
+            "width": 300,
+            "height": 50,
+            "fontSize": 36,
+            "key": "settingsGameSounds"
+          },
+          "musicText": {
+            "x": 437,
+            "bottomY": 552,
+            "width": 240,
+            "height": 50,
+            "fontSize": 36,
+            "key": "settingsMusic"
+          },
+          "volumeTitle": {
+            "x": 437,
+            "bottomY": 382,
+            "width": 260,
+            "height": 50,
+            "fontSize": 34,
+            "key": "settingsVolume"
+          },
+          "lobbyText": {
+            "x": 1143,
+            "bottomY": 865,
+            "width": 250,
+            "height": 50,
+            "fontSize": 38,
+            "key": "settingsLobby"
+          },
+          "skipIntroText": {
+            "x": 1143,
+            "bottomY": 711,
+            "width": 280,
+            "height": 50,
+            "fontSize": 36,
+            "key": "settingsSkipIntro"
+          },
+          "turboText": {
+            "x": 1143,
+            "bottomY": 552,
+            "width": 280,
+            "height": 50,
+            "fontSize": 36,
+            "key": "settingsTurboSpin"
+          },
+          "turboInfoText": {
+            "x": 1143,
+            "bottomY": 468,
+            "width": 320,
+            "height": 70,
+            "fontSize": 24,
+            "key": "settingsTurboSpinTxt"
+          },
+          "skipScreenText": {
+            "x": 1143,
+            "bottomY": 393,
+            "width": 280,
+            "height": 50,
+            "fontSize": 36,
+            "key": "settingsSkipScreen"
+          }
+        },
         "paytablePages": {
           "holdAndWin": {
             "items": [
@@ -956,75 +1116,66 @@
               },
               {
                 "id": "10",
-                "frame": "10_blur_01.png",
+                "frame": "golden_10_blur_01.png",
                 "x": 900,
                 "bottomY": 665,
-                "scale": 0.3,
-                "tint": 16702551
+                "scale": 0.3
               },
               {
                 "id": "J",
-                "frame": "J_blur_01.png",
+                "frame": "golden_J_blur_01.png",
                 "x": 997,
                 "bottomY": 665,
-                "scale": 0.3,
-                "tint": 16702551
+                "scale": 0.3
               },
               {
                 "id": "Q",
-                "frame": "Q_blur_01.png",
+                "frame": "golden_Q_blur_01.png",
                 "x": 1094,
                 "bottomY": 665,
-                "scale": 0.3,
-                "tint": 16702551
+                "scale": 0.3
               },
               {
                 "id": "K",
-                "frame": "K_blur_01.png",
+                "frame": "golden_K_blur_01.png",
                 "x": 1191,
                 "bottomY": 665,
-                "scale": 0.3,
-                "tint": 16702551
+                "scale": 0.3
               },
               {
                 "id": "A",
-                "frame": "A_blur_01.png",
+                "frame": "golden_A_blur_01.png",
                 "x": 1288,
                 "bottomY": 665,
-                "scale": 0.3,
-                "tint": 16702551
+                "scale": 0.3
               },
               {
                 "id": "torch",
-                "frame": "torch_blur_01.png",
+                "frame": "golden_torch_blur_01.png",
                 "x": 948,
                 "bottomY": 573,
-                "scale": 0.3,
-                "tint": 16702551
+                "scale": 0.3
               },
               {
                 "id": "axe",
-                "frame": "axe_blur_01.png",
+                "frame": "golden_axe_blur_01.png",
                 "x": 1045,
                 "bottomY": 573,
-                "scale": 0.3,
-                "tint": 16702551
+                "scale": 0.3
               },
               {
                 "id": "chalice",
-                "frame": "chalice_blur_01.png",
+                "frame": "golden_chalice_blur_01.png",
                 "x": 1142,
                 "bottomY": 573,
-                "scale": 0.3,
-                "tint": 16702551
+                "scale": 0.3
               },
               {
                 "id": "knight",
-                "frame": "knight_blur_01.png",
+                "frame": "golden_knight_blur_01.png",
                 "x": 1239,
                 "bottomY": 573,
-                "scale": 0.3,
-                "tint": 16702551
+                "scale": 0.3
               }
             ],
             "texts": [
@@ -1314,7 +1465,233 @@
             "previewLineBet": 1,
             "previewTotalBet": 1
           },
-          "gold": {},
+          "gold": {
+            "symbols": [
+              {
+                "frame": "golden_knight_blur_01.png",
+                "x": 145,
+                "bottomY": 671,
+                "paysX": 335,
+                "paysY": 743,
+                "includeFourRows": true,
+                "pays": [
+                  {
+                    "count": 2,
+                    "mult": 5
+                  },
+                  {
+                    "count": 3,
+                    "mult": 100
+                  },
+                  {
+                    "count": 4,
+                    "mult": 1000
+                  },
+                  {
+                    "count": 5,
+                    "mult": 5000
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.45,
+                "paysFontSize": 32
+              },
+              {
+                "frame": "golden_chalice_blur_01.png",
+                "x": 585,
+                "bottomY": 688,
+                "paysX": 755,
+                "paysY": 743,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 30
+                  },
+                  {
+                    "count": 4,
+                    "mult": 400
+                  },
+                  {
+                    "count": 5,
+                    "mult": 2000
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.45,
+                "paysFontSize": 32
+              },
+              {
+                "frame": "golden_axe_blur_01.png",
+                "x": 990,
+                "bottomY": 688,
+                "paysX": 1150,
+                "paysY": 743,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 20
+                  },
+                  {
+                    "count": 4,
+                    "mult": 100
+                  },
+                  {
+                    "count": 5,
+                    "mult": 750
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.45,
+                "paysFontSize": 32
+              },
+              {
+                "frame": "golden_torch_blur_01.png",
+                "x": 1410,
+                "bottomY": 688,
+                "paysX": 1570,
+                "paysY": 743,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 20
+                  },
+                  {
+                    "count": 4,
+                    "mult": 100
+                  },
+                  {
+                    "count": 5,
+                    "mult": 750
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.45,
+                "paysFontSize": 32
+              },
+              {
+                "frame": "golden_A_blur_01.png",
+                "x": 110,
+                "bottomY": 488,
+                "paysX": 260,
+                "paysY": 558,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 5
+                  },
+                  {
+                    "count": 4,
+                    "mult": 30
+                  },
+                  {
+                    "count": 5,
+                    "mult": 150
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.45,
+                "paysFontSize": 32
+              },
+              {
+                "frame": "golden_K_blur_01.png",
+                "x": 450,
+                "bottomY": 488,
+                "paysX": 600,
+                "paysY": 558,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 5
+                  },
+                  {
+                    "count": 4,
+                    "mult": 30
+                  },
+                  {
+                    "count": 5,
+                    "mult": 150
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.45,
+                "paysFontSize": 32
+              },
+              {
+                "frame": "golden_Q_blur_01.png",
+                "x": 790,
+                "bottomY": 488,
+                "paysX": 940,
+                "paysY": 558,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 5
+                  },
+                  {
+                    "count": 4,
+                    "mult": 20
+                  },
+                  {
+                    "count": 5,
+                    "mult": 100
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.45,
+                "paysFontSize": 32
+              },
+              {
+                "frame": "golden_J_blur_01.png",
+                "x": 1130,
+                "bottomY": 488,
+                "paysX": 1280,
+                "paysY": 558,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 5
+                  },
+                  {
+                    "count": 4,
+                    "mult": 20
+                  },
+                  {
+                    "count": 5,
+                    "mult": 100
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.45,
+                "paysFontSize": 32
+              },
+              {
+                "frame": "golden_10_blur_01.png",
+                "x": 1470,
+                "bottomY": 488,
+                "paysX": 1620,
+                "paysY": 558,
+                "pays": [
+                  {
+                    "count": 3,
+                    "mult": 5
+                  },
+                  {
+                    "count": 4,
+                    "mult": 20
+                  },
+                  {
+                    "count": 5,
+                    "mult": 100
+                  }
+                ],
+                "multiplierSource": "lineBet",
+                "scale": 0.45,
+                "paysFontSize": 32
+              }
+            ],
+            "previewLineBet": 1,
+            "previewTotalBet": 1
+          },
           "paylines": {
             "text1": {
               "x": 310,
@@ -1410,36 +1787,6 @@
         },
         "rulesPages": {
           "howTo": {
-            "minBet": {
-              "x": 0,
-              "bottomY": 910,
-              "width": 920,
-              "height": 40,
-              "fontSize": 28
-            },
-            "maxBet": {
-              "x": 0,
-              "bottomY": 950,
-              "width": 920,
-              "height": 40,
-              "fontSize": 28
-            },
-            "interfaceText": {
-              "x": 220,
-              "bottomY": 720,
-              "width": 1265,
-              "height": 220,
-              "fontSize": 26,
-              "key": "rulesInterface"
-            },
-            "autoplayText": {
-              "x": 220,
-              "bottomY": 420,
-              "width": 1265,
-              "height": 180,
-              "fontSize": 26,
-              "key": "rulesAutoplay"
-            },
             "items": [
               {
                 "id": "settingsButton",
@@ -1476,7 +1823,37 @@
                 "bottomY": 320,
                 "scale": 0.4
               }
-            ]
+            ],
+            "minBet": {
+              "x": 0,
+              "bottomY": 910,
+              "width": 920,
+              "height": 40,
+              "fontSize": 28
+            },
+            "maxBet": {
+              "x": 0,
+              "bottomY": 950,
+              "width": 920,
+              "height": 40,
+              "fontSize": 28
+            },
+            "interfaceText": {
+              "x": 220,
+              "bottomY": 720,
+              "width": 1265,
+              "height": 220,
+              "fontSize": 26,
+              "key": "rulesInterface"
+            },
+            "autoplayText": {
+              "x": 220,
+              "bottomY": 420,
+              "width": 1265,
+              "height": 180,
+              "fontSize": 26,
+              "key": "rulesAutoplay"
+            }
           },
           "betSettings": {
             "items": [
@@ -1598,7 +1975,23 @@
           "paytable": [],
           "rules": []
         },
-        "editorTranslationKeys": {}
+        "editorTranslationKeys": {},
+        "editorPageOrder": {
+          "paytable": [
+            "paytable-hold",
+            "paytable-free",
+            "paytable-primary",
+            "paytable-gold",
+            "paytable-lines"
+          ],
+          "rules": [
+            "rules-howto",
+            "rules-bet",
+            "rules-lines",
+            "rules-extra",
+            "rules-fg"
+          ]
+        }
       },
       "bootSoundPrompt": {
         "background": {

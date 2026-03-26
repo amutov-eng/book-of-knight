@@ -396,6 +396,8 @@
                     <button class="primary" id="reload-btn">Reload</button>
                     <button class="primary" id="add-page-btn">Add Page</button>
                     <button class="primary" id="copy-page-btn">Copy Page</button>
+                    <button class="primary" id="move-up-page-btn">Move Up</button>
+                    <button class="primary" id="move-down-page-btn">Move Down</button>
                     <button class="primary" id="delete-page-btn">Delete Page</button>
                     <button class="primary" id="save-btn">Save All</button>
                     <span id="status" class="status"></span>
@@ -480,15 +482,15 @@
                 defaultLayout: {
                     items: [
                         { id: 'book', frame: 'book_blur_01.png', x: 346, bottomY: 590, scale: 0.7 },
-                        { id: '10', frame: '10_blur_01.png', x: 900, bottomY: 665, scale: 0.3, tint: 16702551 },
-                        { id: 'J', frame: 'J_blur_01.png', x: 997, bottomY: 665, scale: 0.3, tint: 16702551 },
-                        { id: 'Q', frame: 'Q_blur_01.png', x: 1094, bottomY: 665, scale: 0.3, tint: 16702551 },
-                        { id: 'K', frame: 'K_blur_01.png', x: 1191, bottomY: 665, scale: 0.3, tint: 16702551 },
-                        { id: 'A', frame: 'A_blur_01.png', x: 1288, bottomY: 665, scale: 0.3, tint: 16702551 },
-                        { id: 'torch', frame: 'torch_blur_01.png', x: 948, bottomY: 573, scale: 0.3, tint: 16702551 },
-                        { id: 'axe', frame: 'axe_blur_01.png', x: 1045, bottomY: 573, scale: 0.3, tint: 16702551 },
-                        { id: 'chalice', frame: 'chalice_blur_01.png', x: 1142, bottomY: 573, scale: 0.3, tint: 16702551 },
-                        { id: 'knight', frame: 'knight_blur_01.png', x: 1239, bottomY: 573, scale: 0.3, tint: 16702551 }
+                        { id: '10', frame: 'golden_10_blur_01.png', x: 900, bottomY: 665, scale: 0.3 },
+                        { id: 'J', frame: 'golden_J_blur_01.png', x: 997, bottomY: 665, scale: 0.3 },
+                        { id: 'Q', frame: 'golden_Q_blur_01.png', x: 1094, bottomY: 665, scale: 0.3 },
+                        { id: 'K', frame: 'golden_K_blur_01.png', x: 1191, bottomY: 665, scale: 0.3 },
+                        { id: 'A', frame: 'golden_A_blur_01.png', x: 1288, bottomY: 665, scale: 0.3 },
+                        { id: 'torch', frame: 'golden_torch_blur_01.png', x: 948, bottomY: 573, scale: 0.3 },
+                        { id: 'axe', frame: 'golden_axe_blur_01.png', x: 1045, bottomY: 573, scale: 0.3 },
+                        { id: 'chalice', frame: 'golden_chalice_blur_01.png', x: 1142, bottomY: 573, scale: 0.3 },
+                        { id: 'knight', frame: 'golden_knight_blur_01.png', x: 1239, bottomY: 573, scale: 0.3 }
                     ],
                     titles: {
                         wild: { x: 391, bottomY: 870, fontSize: 34, key: 'splashSecTitleWild', fallback: 'SCATTER / WILD' },
@@ -539,7 +541,28 @@
                     ]
                 }
             },
-            { id: 'paytable-gold', title: 'Paytable: Gold Paytable', group: 'paytable', manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'gold'], translationKeys: ['paytableTitle'], defaultLayout: {} },
+            {
+                id: 'paytable-gold',
+                title: 'Paytable: Gold Paytable',
+                group: 'paytable',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'paytablePages', 'gold'],
+                translationKeys: ['paytableTitle'],
+                defaultLayout: {
+                    symbols: [
+                        { frame: 'golden_knight_blur_01.png', x: 145, bottomY: 671, paysX: 335, paysY: 743, includeFourRows: true, paysFontSize: 32, multiplierSource: 'lineBet', scale: 0.45, pays: [{ count: 2, mult: 5 }, { count: 3, mult: 100 }, { count: 4, mult: 1000 }, { count: 5, mult: 5000 }] },
+                        { frame: 'golden_chalice_blur_01.png', x: 585, bottomY: 688, paysX: 755, paysY: 743, paysFontSize: 32, multiplierSource: 'lineBet', scale: 0.45, pays: [{ count: 3, mult: 30 }, { count: 4, mult: 400 }, { count: 5, mult: 2000 }] },
+                        { frame: 'golden_axe_blur_01.png', x: 990, bottomY: 688, paysX: 1150, paysY: 743, paysFontSize: 32, multiplierSource: 'lineBet', scale: 0.45, pays: [{ count: 3, mult: 20 }, { count: 4, mult: 100 }, { count: 5, mult: 750 }] },
+                        { frame: 'golden_torch_blur_01.png', x: 1410, bottomY: 688, paysX: 1570, paysY: 743, paysFontSize: 32, multiplierSource: 'lineBet', scale: 0.45, pays: [{ count: 3, mult: 20 }, { count: 4, mult: 100 }, { count: 5, mult: 750 }] },
+                        { frame: 'golden_A_blur_01.png', x: 110, bottomY: 488, paysX: 260, paysY: 558, paysFontSize: 32, multiplierSource: 'lineBet', scale: 0.45, pays: [{ count: 3, mult: 5 }, { count: 4, mult: 30 }, { count: 5, mult: 150 }] },
+                        { frame: 'golden_K_blur_01.png', x: 450, bottomY: 488, paysX: 600, paysY: 558, paysFontSize: 32, multiplierSource: 'lineBet', scale: 0.45, pays: [{ count: 3, mult: 5 }, { count: 4, mult: 30 }, { count: 5, mult: 150 }] },
+                        { frame: 'golden_Q_blur_01.png', x: 790, bottomY: 488, paysX: 940, paysY: 558, paysFontSize: 32, multiplierSource: 'lineBet', scale: 0.45, pays: [{ count: 3, mult: 5 }, { count: 4, mult: 20 }, { count: 5, mult: 100 }] },
+                        { frame: 'golden_J_blur_01.png', x: 1130, bottomY: 488, paysX: 1280, paysY: 558, paysFontSize: 32, multiplierSource: 'lineBet', scale: 0.45, pays: [{ count: 3, mult: 5 }, { count: 4, mult: 20 }, { count: 5, mult: 100 }] },
+                        { frame: 'golden_10_blur_01.png', x: 1470, bottomY: 488, paysX: 1620, paysY: 558, paysFontSize: 32, multiplierSource: 'lineBet', scale: 0.45, pays: [{ count: 3, mult: 5 }, { count: 4, mult: 20 }, { count: 5, mult: 100 }] }
+                    ],
+                    previewLineBet: 1,
+                    previewTotalBet: 1
+                }
+            },
             {
                 id: 'paytable-lines',
                 title: 'Paytable: Paylines',
@@ -563,7 +586,38 @@
                     ]
                 }
             },
-            { id: 'settings', title: 'Help: Settings Page', group: 'shell', manifestPath: ['ui', 'hud', 'helpMenu', 'settingsPage'], translationKeys: ['settingsTitle', 'settingsSoundOn', 'settingsGameSounds', 'settingsMusic', 'settingsVolume', 'settingsLobby', 'settingsSkipIntro', 'settingsTurboSpin', 'settingsTurboSpinTxt', 'settingsSkipScreen'], defaultLayout: {} },
+            {
+                id: 'settings',
+                title: 'Help: Settings Page',
+                group: 'shell',
+                manifestPath: ['ui', 'hud', 'helpMenu', 'settingsPage'],
+                translationKeys: ['settingsTitle', 'settingsSoundOn', 'settingsGameSounds', 'settingsMusic', 'settingsVolume', 'settingsLobby', 'settingsSkipIntro', 'settingsTurboSpin', 'settingsTurboSpinTxt', 'settingsSkipScreen'],
+                defaultLayout: {
+                    columns: { leftX: 357, rightX: 1063 },
+                    rows: { sound: 812, soundFx: 658, music: 499, volume: 345, lobby: 812, skipIntro: 658, turbo: 499, skipScreen: 340 },
+                    items: [
+                        { id: 'soundOnToggle', frame: 'sound_bg', x: 357, bottomY: 812, scale: 1 },
+                        { id: 'gameSoundsToggle', frame: 'soundfx_bg', x: 357, bottomY: 658, scale: 1 },
+                        { id: 'musicToggle', frame: 'music_bg', x: 357, bottomY: 499, scale: 1 },
+                        { id: 'volumeBg', frame: 'volume_bg.png', x: 357, bottomY: 345, scale: 1 },
+                        { id: 'volumeMinus', frame: 'minus_001.png', x: 597, bottomY: 340, scale: 1 },
+                        { id: 'volumePlus', frame: 'plus_001.png', x: 812, bottomY: 340, scale: 1 },
+                        { id: 'lobbyButton', frame: 'button_menu_home_001.png', x: 1063, bottomY: 812, scale: 1 },
+                        { id: 'skipIntroToggle', frame: 'skipscreen_bg', x: 1063, bottomY: 658, scale: 1 },
+                        { id: 'turboToggle', frame: 'turbo_bg', x: 1063, bottomY: 499, scale: 1 },
+                        { id: 'skipScreenToggle', frame: 'skipscreen_bg', x: 1063, bottomY: 340, scale: 1 }
+                    ],
+                    soundOnText: { x: 437, bottomY: 865, width: 260, height: 50, fontSize: 36, key: 'settingsSoundOn' },
+                    gameSoundsText: { x: 437, bottomY: 711, width: 300, height: 50, fontSize: 36, key: 'settingsGameSounds' },
+                    musicText: { x: 437, bottomY: 552, width: 240, height: 50, fontSize: 36, key: 'settingsMusic' },
+                    volumeTitle: { x: 437, bottomY: 382, width: 260, height: 50, fontSize: 34, key: 'settingsVolume' },
+                    lobbyText: { x: 1143, bottomY: 865, width: 250, height: 50, fontSize: 38, key: 'settingsLobby' },
+                    skipIntroText: { x: 1143, bottomY: 711, width: 280, height: 50, fontSize: 36, key: 'settingsSkipIntro' },
+                    turboText: { x: 1143, bottomY: 552, width: 280, height: 50, fontSize: 36, key: 'settingsTurboSpin' },
+                    turboInfoText: { x: 1143, bottomY: 468, width: 320, height: 70, fontSize: 24, key: 'settingsTurboSpinTxt' },
+                    skipScreenText: { x: 1143, bottomY: 393, width: 280, height: 50, fontSize: 36, key: 'settingsSkipScreen' }
+                }
+            },
             {
                 id: 'rules-howto',
                 title: 'Rules: How To Play',
@@ -699,6 +753,20 @@
             return page;
         }
 
+        function getGoldPaytableConfig() {
+            const page = getByPath(state.manifest, ['ui', 'hud', 'helpMenu', 'paytablePages', 'gold']) || {};
+            if (!Array.isArray(page.symbols)) page.symbols = [];
+            if (page.symbols.length === 0) {
+                page.symbols = deepClone(getPageDef('paytable-gold').defaultLayout.symbols || []);
+            }
+            page.symbols.forEach((symbol) => {
+                if (!symbol.multiplierSource) symbol.multiplierSource = 'lineBet';
+            });
+            if (!Number.isFinite(Number(page.previewLineBet))) page.previewLineBet = 1;
+            if (!Number.isFinite(Number(page.previewTotalBet))) page.previewTotalBet = 1;
+            return page;
+        }
+
         function updatePrimaryPaytableSetting(field, rawValue) {
             const page = getPrimaryPaytableConfig();
             const value = Number(rawValue);
@@ -782,6 +850,105 @@
         function updatePrimaryPaytablePayouts(index, rawValue, target = 'symbol') {
             const page = getPrimaryPaytableConfig();
             const owner = target === 'scatter' ? page.scatter : page.symbols[index];
+            if (!owner) return;
+            const rows = String(rawValue || '')
+                .split('\n')
+                .map((row) => row.trim())
+                .filter(Boolean)
+                .map((row) => {
+                    const [count, mult] = row.split(':').map((part) => Number(part.trim()));
+                    return Number.isFinite(count) && Number.isFinite(mult) ? { count, mult } : null;
+                })
+                .filter(Boolean);
+            owner.pays = rows;
+            setDirty(true);
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+        }
+
+        function updateGoldPaytableSetting(field, rawValue) {
+            const page = getGoldPaytableConfig();
+            const value = Number(rawValue);
+            page[field] = Number.isFinite(value) ? value : 0;
+            setDirty(true);
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+        }
+
+        function addGoldPaytableSymbol(copyFromIndex = -1) {
+            const page = getGoldPaytableConfig();
+            const source = copyFromIndex >= 0 && page.symbols[copyFromIndex]
+                ? deepClone(page.symbols[copyFromIndex])
+                : {
+                    frame: 'A_blur_01.png',
+                    x: 110,
+                    bottomY: 488,
+                    scale: 0.45,
+                    paysX: 260,
+                    paysY: 558,
+                    paysFontSize: 32,
+                    multiplierSource: 'lineBet',
+                    descriptionX: 0,
+                    descriptionBottomY: 0,
+                    descriptionWidth: 300,
+                    descriptionHeight: 120,
+                    descriptionFontSize: 24,
+                    descriptionAlign: 'left',
+                    includeFourRows: false,
+                    pays: [
+                        { count: 3, mult: 5 },
+                        { count: 4, mult: 20 },
+                        { count: 5, mult: 100 }
+                    ]
+                };
+            page.symbols.push(source);
+            setDirty(true);
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+        }
+
+        function deleteGoldPaytableSymbol(index) {
+            const page = getGoldPaytableConfig();
+            if (!page.symbols[index]) return;
+            page.symbols.splice(index, 1);
+            setDirty(true);
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+        }
+
+        function updateGoldPaytableSymbol(index, field, rawValue) {
+            const page = getGoldPaytableConfig();
+            const symbol = page.symbols[index];
+            if (!symbol) return;
+            if (field === 'frame' || field === 'descriptionKey' || field === 'descriptionFallback' || field === 'multiplierSource' || field === 'descriptionAlign') {
+                if (field.startsWith('description') && field !== 'descriptionKey' && field !== 'descriptionFallback') {
+                    const locale = previewLocale();
+                    if (!symbol.locales || typeof symbol.locales !== 'object') symbol.locales = {};
+                    if (!symbol.locales[locale] || typeof symbol.locales[locale] !== 'object') symbol.locales[locale] = {};
+                    symbol.locales[locale][field] = rawValue;
+                } else {
+                    symbol[field] = rawValue;
+                }
+            } else if (field === 'includeFourRows') {
+                symbol.includeFourRows = !!rawValue;
+            } else if (field.startsWith('description')) {
+                const locale = previewLocale();
+                if (!symbol.locales || typeof symbol.locales !== 'object') symbol.locales = {};
+                if (!symbol.locales[locale] || typeof symbol.locales[locale] !== 'object') symbol.locales[locale] = {};
+                const value = Number(rawValue);
+                symbol.locales[locale][field] = Number.isFinite(value) ? value : 0;
+            } else {
+                const value = Number(rawValue);
+                symbol[field] = Number.isFinite(value) ? value : 0;
+            }
+            setDirty(true);
+            renderLayoutEditor();
+            renderTextLayoutInspector();
+        }
+
+        function updateGoldPaytablePayouts(index, rawValue) {
+            const page = getGoldPaytableConfig();
+            const owner = page.symbols[index];
             if (!owner) return;
             const rows = String(rawValue || '')
                 .split('\n')
@@ -1002,6 +1169,57 @@
             });
         }
 
+        function renderGoldPaytablePayoutPreview() {
+            if (state.currentPageId !== 'paytable-gold') return;
+            const page = getGoldPaytableConfig();
+            const language = previewLocale();
+            page.symbols.forEach((symbol) => {
+                addPixiSprite(symbol.frame || '', symbol, {
+                    x: Number(symbol.x) || 0,
+                    bottomY: Number(symbol.bottomY) || 0,
+                    scale: Number(symbol.scale) || 0.45
+                });
+                const localizedSymbol = resolveEditorLocaleLayout(symbol, language);
+                const symbolDescriptionText = getLocaleMap(language)?.[symbol.descriptionKey] || symbol.descriptionFallback || '';
+                if (symbolDescriptionText) {
+                    addPixiText(symbolDescriptionText, {}, {
+                        x: Number(localizedSymbol.descriptionX) || 0,
+                        bottomY: Number(localizedSymbol.descriptionBottomY) || 0,
+                        maxWidth: Number(localizedSymbol.descriptionWidth) || 300,
+                        maxHeight: Number(localizedSymbol.descriptionHeight) || 120,
+                        fontSize: Number(localizedSymbol.descriptionFontSize) || 24,
+                        align: localizedSymbol.descriptionAlign || 'left',
+                        autoFit: false
+                    });
+                }
+            });
+            const drawRows = (rows, x, y, fontSize = 32, includeFourRows = false, source = 'lineBet') => {
+                if (!Array.isArray(rows)) return;
+                const stake = source === 'totalBet' ? Number(page.previewTotalBet) || 1 : Number(page.previewLineBet) || 1;
+                rows.forEach((row, index) => {
+                    if (!includeFourRows && Number(row.count) < 3) return;
+                    const rowY = Number(y) + index * (fontSize + 10);
+                    addPixiText(String(row.count), {}, {
+                        x: Number(x) || 0,
+                        bottomY: rowY,
+                        fontSize,
+                        fill: 0xffc72f,
+                        autoFit: false
+                    });
+                    addPixiText(String((Number(row.mult) * stake).toFixed(2)), {}, {
+                        x: (Number(x) || 0) + 32,
+                        bottomY: rowY,
+                        fontSize,
+                        fill: 0xffffff,
+                        autoFit: false
+                    });
+                });
+            };
+            page.symbols.forEach((symbol) => {
+                drawRows(symbol.pays, symbol.paysX, symbol.paysY, Number(symbol.paysFontSize) || 32, !!symbol.includeFourRows, symbol.multiplierSource || 'lineBet');
+            });
+        }
+
         function getEditorPageStore() {
             const helpMenu = state.manifest?.ui?.hud?.helpMenu;
             if (!helpMenu) return { paytable: [], rules: [] };
@@ -1011,6 +1229,17 @@
             if (!Array.isArray(helpMenu.editorPageDefs.paytable)) helpMenu.editorPageDefs.paytable = [];
             if (!Array.isArray(helpMenu.editorPageDefs.rules)) helpMenu.editorPageDefs.rules = [];
             return helpMenu.editorPageDefs;
+        }
+
+        function getEditorPageOrderStore() {
+            const helpMenu = state.manifest?.ui?.hud?.helpMenu;
+            if (!helpMenu) return { paytable: [], rules: [] };
+            if (!helpMenu.editorPageOrder || typeof helpMenu.editorPageOrder !== 'object') {
+                helpMenu.editorPageOrder = { paytable: [], rules: [] };
+            }
+            if (!Array.isArray(helpMenu.editorPageOrder.paytable)) helpMenu.editorPageOrder.paytable = [];
+            if (!Array.isArray(helpMenu.editorPageOrder.rules)) helpMenu.editorPageOrder.rules = [];
+            return helpMenu.editorPageOrder;
         }
 
         function getTranslationKeyStore() {
@@ -1024,10 +1253,22 @@
 
         function getPageDefs() {
             const store = getEditorPageStore();
+            const all = [...BASE_PAGE_DEFS, ...store.paytable, ...store.rules];
+            const orderStore = getEditorPageOrderStore();
+            const orderGroup = (group) => {
+                const pages = all.filter((page) => page.group === group);
+                const ids = pages.map((page) => page.id);
+                const order = orderStore[group].filter((id) => ids.includes(id));
+                ids.forEach((id) => {
+                    if (!order.includes(id)) order.push(id);
+                });
+                orderStore[group] = order;
+                return pages.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+            };
             return [
-                ...BASE_PAGE_DEFS,
-                ...store.paytable,
-                ...store.rules
+                ...all.filter((page) => page.group === 'shell'),
+                ...orderGroup('paytable'),
+                ...orderGroup('rules')
             ];
         }
 
@@ -1181,6 +1422,27 @@
             renderTextLayoutInspector();
             renderTranslations();
             setStatus(`Deleted page "${current.title}".`, 'good');
+        }
+
+        function moveCurrentPage(delta) {
+            const current = getPageDef(state.currentPageId);
+            if (current.group !== 'paytable' && current.group !== 'rules') {
+                setStatus('Only Paytable and Rules pages can be reordered.', 'bad');
+                return;
+            }
+            const orderStore = getEditorPageOrderStore();
+            const order = [...orderStore[current.group]];
+            const index = order.indexOf(current.id);
+            if (index < 0) return;
+            const nextIndex = index + delta;
+            if (nextIndex < 0 || nextIndex >= order.length) return;
+            const tmp = order[index];
+            order[index] = order[nextIndex];
+            order[nextIndex] = tmp;
+            orderStore[current.group] = order;
+            setDirty(true);
+            renderSidebar();
+            setStatus(`Moved "${current.title}".`, 'good');
         }
 
         function getPageDef(id) {
@@ -1815,8 +2077,9 @@
             titleBox.style.height = `${Math.max(32, Number(localizedTitle.fontSize) || 58) / 1080 * 100}%`;
 
             const isPrimaryPaytable = state.currentPageId === 'paytable-primary';
+            const isGoldPaytable = state.currentPageId === 'paytable-gold';
 
-            if (!isPrimaryPaytable && images.length > 0) {
+            if (!isPrimaryPaytable && !isGoldPaytable && images.length > 0) {
                 const imageTitle = document.createElement('div');
                 imageTitle.className = 'group-title';
                 imageTitle.textContent = 'Images';
@@ -1824,7 +2087,7 @@
             }
 
             images.forEach((item, index) => {
-                if (isPrimaryPaytable) return;
+                if (isPrimaryPaytable || isGoldPaytable) return;
                 const itemPath = `image:${item.path.join('.')}`;
                 const button = document.createElement('button');
                 button.className = `page-button${itemPath === state.selectedNodeId ? ' active' : ''}`;
@@ -1869,8 +2132,9 @@
 
             renderPaylinesPreview(pageNode);
             renderPrimaryPaytablePayoutPreview();
+            renderGoldPaytablePayoutPreview();
 
-            if (!isPrimaryPaytable && boxes.length > 0) {
+            if (!isPrimaryPaytable && !isGoldPaytable && boxes.length > 0) {
                 const textTitle = document.createElement('div');
                 textTitle.className = 'group-title';
                 textTitle.textContent = 'Texts';
@@ -1878,7 +2142,7 @@
             }
 
             boxes.forEach((item, index) => {
-                if (isPrimaryPaytable) return;
+                if (isPrimaryPaytable || isGoldPaytable) return;
                 const itemPath = `text:${item.path.join('.')}`;
                 const button = document.createElement('button');
                 button.className = `page-button${itemPath === state.selectedNodeId ? ' active' : ''}`;
@@ -1925,7 +2189,7 @@
             const node = selected.node;
             const previewLanguage = previewLocale();
             const localizedNode = resolveEditorLocaleLayout(node, previewLanguage);
-            if (!isPrimaryPaytable && selected.type === 'shellText') {
+            if (!isPrimaryPaytable && !isGoldPaytable && selected.type === 'shellText') {
                 form.innerHTML = `
                     <div class="field-note">Editing layout for locale <code>${previewLanguage}</code>.</div>
                     <div class="inspector-grid">
@@ -1937,7 +2201,7 @@
                     </div>
                     <div class="field-note">This edits locale-specific title layout at <code>ui.hud.helpMenu.title.locales.${previewLanguage}</code>.</div>
                 `;
-            } else if (!isPrimaryPaytable && selected.type === 'image') {
+            } else if (!isPrimaryPaytable && !isGoldPaytable && selected.type === 'image') {
                 const atlas = state.atlasIndex[node.frame] || {};
                 const effectiveWidth = Number(node.width) || Math.round((atlas.w || 0) * (Number(node.scale) || 1));
                 const effectiveHeight = Number(node.height) || Math.round((atlas.h || 0) * (Number(node.scale) || 1));
@@ -1956,7 +2220,7 @@
                     </div>
                     <div class="field-note">Original frame size: ${atlas.sourceW || atlas.w || 0} x ${atlas.sourceH || atlas.h || 0}. Image changes update the manifest immediately. You can swap the asset by editing <code>frame</code>.</div>
                 `;
-            } else if (!isPrimaryPaytable) {
+            } else if (!isPrimaryPaytable && !isGoldPaytable) {
                 form.innerHTML = `
                     <div class="field-note">Editing layout for locale <code>${previewLanguage}</code>.</div>
                     <div class="inspector-grid">
@@ -2006,19 +2270,21 @@
                 `;
             }
 
-            if (isPrimaryPaytable) {
-                const page = getPrimaryPaytableConfig();
+            if (isPrimaryPaytable || isGoldPaytable) {
+                const page = isPrimaryPaytable ? getPrimaryPaytableConfig() : getGoldPaytableConfig();
                 const previewLanguage = previewLocale();
-                const localizedScatter = resolveEditorLocaleLayout(page.scatter || {}, previewLanguage);
+                const localizedScatter = isPrimaryPaytable ? resolveEditorLocaleLayout(page.scatter || {}, previewLanguage) : {};
                 const primaryTitle = document.createElement('div');
                 primaryTitle.className = 'group-title';
-                primaryTitle.textContent = 'Main Paytable';
+                primaryTitle.textContent = isPrimaryPaytable ? 'Main Paytable' : 'Gold Paytable';
                 list.appendChild(primaryTitle);
 
-                const scatterButton = document.createElement('button');
-                scatterButton.className = 'page-button';
-                scatterButton.textContent = `Scatter: ${page.scatter.frame || 'book_blur_01.png'}`;
-                list.appendChild(scatterButton);
+                if (isPrimaryPaytable) {
+                    const scatterButton = document.createElement('button');
+                    scatterButton.className = 'page-button';
+                    scatterButton.textContent = `Scatter: ${page.scatter.frame || 'book_blur_01.png'}`;
+                    list.appendChild(scatterButton);
+                }
 
                 page.symbols.forEach((symbol, index) => {
                     const button = document.createElement('button');
@@ -2079,6 +2345,7 @@
                 `; }).join('');
 
                 form.innerHTML += `
+                    ${isPrimaryPaytable ? `
                     <div class="translation-key" style="margin-top:14px;">
                         <h3>Scatter</h3>
                         <div class="field-note">Editing description layout for locale <code>${previewLanguage}</code>.</div>
@@ -2128,6 +2395,20 @@
                             <button type="button" id="pt-add-symbol-btn">Add Symbol</button>
                         </div>
                     </div>
+                    ` : `
+                    <div class="translation-key" style="margin-top:14px;">
+                        <h3>Gold Symbols</h3>
+                        <div class="field-note">Editing description layout for locale <code>${previewLanguage}</code>.</div>
+                        <div class="inspector-grid">
+                            <label>Preview Line Bet<input type="number" step="0.01" data-gpt-setting="previewLineBet" value="${Number(page.previewLineBet) || 1}"></label>
+                            <label>Preview Total Bet<input type="number" step="0.01" data-gpt-setting="previewTotalBet" value="${Number(page.previewTotalBet) || 1}"></label>
+                            <div></div>
+                        </div>
+                        <div class="toolbar" style="padding-top:10px;">
+                            <button type="button" id="gpt-add-symbol-btn">Add Symbol</button>
+                        </div>
+                    </div>
+                    `}
                     ${symbolCards}
                 `;
             }
@@ -2200,6 +2481,27 @@
                 });
                 form.querySelector('[data-pt-scatter-payouts]')?.addEventListener('change', (event) => updatePrimaryPaytablePayouts(-1, event.target.value, 'scatter'));
                 form.querySelector('[data-pt-scatter-payouts]')?.addEventListener('blur', (event) => updatePrimaryPaytablePayouts(-1, event.target.value, 'scatter'));
+            }
+
+            if (state.currentPageId === 'paytable-gold') {
+                form.querySelector('#gpt-add-symbol-btn')?.addEventListener('click', () => addGoldPaytableSymbol());
+                form.querySelectorAll('[data-pt-copy]').forEach((button) => button.addEventListener('click', (event) => addGoldPaytableSymbol(Number(event.currentTarget.dataset.ptCopy))));
+                form.querySelectorAll('[data-pt-delete]').forEach((button) => button.addEventListener('click', (event) => deleteGoldPaytableSymbol(Number(event.currentTarget.dataset.ptDelete))));
+                form.querySelectorAll('[data-gpt-setting]').forEach((input) => {
+                    const apply = () => updateGoldPaytableSetting(input.dataset.gptSetting, input.value);
+                    input.addEventListener('change', apply);
+                    input.addEventListener('blur', apply);
+                });
+                form.querySelectorAll('[data-pt-index][data-pt-field]').forEach((input) => {
+                    const apply = () => updateGoldPaytableSymbol(Number(input.dataset.ptIndex), input.dataset.ptField, input.type === 'checkbox' ? input.checked : input.value);
+                    input.addEventListener('change', apply);
+                    input.addEventListener('blur', apply);
+                });
+                form.querySelectorAll('[data-pt-payouts]').forEach((textarea) => {
+                    const apply = () => updateGoldPaytablePayouts(Number(textarea.dataset.ptPayouts), textarea.value);
+                    textarea.addEventListener('change', apply);
+                    textarea.addEventListener('blur', apply);
+                });
             }
 
             if (state.currentPageId === 'paytable-lines') {
@@ -2298,6 +2600,8 @@
             document.getElementById('reload-btn').onclick = () => loadAll().catch((error) => setStatus(error.message, 'bad'));
             document.getElementById('add-page-btn').onclick = () => addPageFromTemplate();
             document.getElementById('copy-page-btn').onclick = () => copyCurrentPage();
+            document.getElementById('move-up-page-btn').onclick = () => moveCurrentPage(-1);
+            document.getElementById('move-down-page-btn').onclick = () => moveCurrentPage(1);
             document.getElementById('delete-page-btn').onclick = () => deleteCurrentPage();
             document.getElementById('save-btn').onclick = () => saveAll();
             document.getElementById('add-translation-key-btn').onclick = () => addTranslationKey();

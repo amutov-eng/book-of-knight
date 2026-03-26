@@ -23,11 +23,11 @@ export default class MainScreen extends BaseScreen {
     }
 
     show() {
-        this.game.backgroundLayer = new BackgroundLayer();
+        this.game.backgroundLayer = new BackgroundLayer(this.game);
         this.game.backgroundLayer.setByState(this.game.controller.state.title);
         this.game.screen.stage.addChild(this.game.backgroundLayer);
         this.game.reels.show();
-        this.game.reelsFrameLayer = new ReelsFrameLayer();
+        this.game.reelsFrameLayer = new ReelsFrameLayer(this.game);
         this.game.reelsFrameLayer.setByState(this.game.controller.state.title);
         this.game.screen.stage.addChild(this.game.reelsFrameLayer);
         this.game.menu.show();

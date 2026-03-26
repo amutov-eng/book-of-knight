@@ -3,9 +3,10 @@ import { getReelTextureKey } from '../config/assetsConfig';
 import { getAssetsManifest, getTextureCache } from '../core/RuntimeContext';
 
 export default class ReelsFrameLayer extends PIXI.Container {
-    constructor() {
+    constructor(game) {
         super();
 
+        this.game = game;
         this.baseSprite = new PIXI.Sprite(PIXI.Texture.EMPTY);
         this.baseSprite.visible = true;
 
@@ -21,7 +22,9 @@ export default class ReelsFrameLayer extends PIXI.Container {
 
     applyBaseTexture() {
         const textureCache = getTextureCache();
-        const textureKey = this.getTextureKey('base');
+        const context = this.game && this.game.context ? this.game.context : null;
+        const mode = context && Number(context.gameMode) === Number(context.FREE_GAMES) ? 'fg' : 'base';
+        const textureKey = this.getTextureKey(mode);
         const texture = textureKey ? textureCache[textureKey] : null;
         if (!texture) return;
 

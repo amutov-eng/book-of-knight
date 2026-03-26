@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { createGameOutcome } from '../../../game/GameOutcome';
+import { isInFreeGames } from '../../../game/FreeGamesController';
 
 function getLocalized(game, key, fallback) {
     if (game && game.localization && typeof game.localization.t === 'function') {
@@ -33,13 +34,14 @@ export default class SpinSystem {
         this.game.context.outcome = createGameOutcome();
 
         const totalBet = this.game.meters.getTotalBet();
+        const freeGamesSpin = isInFreeGames(this.game.context);
         const hasBuyBonus = !!this.game.context.hasBuyBonus;
         const buyType = hasBuyBonus ? Number(this.game.context.buyBonusType) : -1;
         const buyMult = hasBuyBonus
             ? (buyType === 0 ? Number(this.game.context.buyFreeGamesMult || 0) : Number(this.game.context.buyHoldAndWinMult || 0))
             : 1;
 
-        const requiredCredits = hasBuyBonus ? (totalBet * buyMult) : totalBet;
+        const requiredCredits = freeGamesSpin ? 0 : (hasBuyBonus ? (totalBet * buyMult) : totalBet);
         if (!Number.isFinite(requiredCredits) || requiredCredits <= 0) {
             this.game.menu.setStatus('BUY BONUS IS NOT AVAILABLE');
             this.game.context.hasBuyBonus = false;
@@ -71,7 +73,11 @@ export default class SpinSystem {
         this.game.menu.disableControls();
         this.game.menu.setWin(0);
         this.game.menu.setWinStatus('');
-        this.game.menu.setStatus(getLocalized(this.game, 'goodLuck', 'GOOD LUCK !'));
+        this.game.menu.setStatus(
+            freeGamesSpin
+                ? getLocalized(this.game, 'freeGameLeft', 'FREE GAMES')
+                : getLocalized(this.game, 'goodLuck', 'GOOD LUCK !')
+        );
 
         return true;
     }

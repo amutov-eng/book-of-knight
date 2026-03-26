@@ -386,7 +386,7 @@ export default class HelpMenu extends Container {
       { id: 'paytable-lines', titleKey: 'paylinesTitle', titleFallback: 'PAYLINES', container: this.buildPaylinesPage(this.config.paytablePages?.paylines || {}) }
     ];
     const custom = Array.isArray(this.config.editorPageDefs?.paytable) ? this.config.editorPageDefs.paytable as EditorPageDef[] : [];
-    return [...base, ...this.buildCustomPages(custom, 'paytable')];
+    return this.orderConfiguredPages([...base, ...this.buildCustomPages(custom, 'paytable')], 'paytable');
   }
 
   private buildConfiguredRulesPages(): PageEntry[] {
@@ -398,7 +398,16 @@ export default class HelpMenu extends Container {
       { id: 'rules-fg', titleKey: 'rulesTitle', titleFallback: 'RULES', container: this.buildRulesAddFreeGamesPage(this.config.rulesPages?.addFreeGames || {}) }
     ];
     const custom = Array.isArray(this.config.editorPageDefs?.rules) ? this.config.editorPageDefs.rules as EditorPageDef[] : [];
-    return [...base, ...this.buildCustomPages(custom, 'rules')];
+    return this.orderConfiguredPages([...base, ...this.buildCustomPages(custom, 'rules')], 'rules');
+  }
+
+  private orderConfiguredPages(entries: PageEntry[], group: 'paytable' | 'rules'): PageEntry[] {
+    const order = Array.isArray(this.config.editorPageOrder?.[group]) ? this.config.editorPageOrder[group] as string[] : [];
+    if (order.length === 0) return entries;
+    const ranked = order.filter((id) => entries.some((entry) => entry.id === id));
+    const missing = entries.map((entry) => entry.id).filter((id) => !ranked.includes(id));
+    const finalOrder = [...ranked, ...missing];
+    return [...entries].sort((a, b) => finalOrder.indexOf(a.id) - finalOrder.indexOf(b.id));
   }
 
   private buildCustomPages(defs: EditorPageDef[], group: 'paytable' | 'rules'): PageEntry[] {
@@ -949,23 +958,72 @@ export default class HelpMenu extends Container {
 
   private buildGoldPaytablePage(pageCfg: any = this.config.paytablePages?.gold || {}): Container {
     const page = new Container();
-    const items = Array.isArray(pageCfg.items) && pageCfg.items.length > 0 ? pageCfg.items : [
-      { symbol: PAYTABLE_GOLD_PAGE[0], x: 145, y: 671, paysX: 335, paysY: 743, four: true },
-      { symbol: PAYTABLE_GOLD_PAGE[1], x: 585, y: 688, paysX: 755, paysY: 743 },
-      { symbol: PAYTABLE_GOLD_PAGE[2], x: 990, y: 688, paysX: 1150, paysY: 743 },
-      { symbol: PAYTABLE_GOLD_PAGE[3], x: 1410, y: 688, paysX: 1570, paysY: 743 },
-      { symbol: PAYTABLE_GOLD_PAGE[4], x: 110, y: 488, paysX: 260, paysY: 558 },
-      { symbol: PAYTABLE_GOLD_PAGE[5], x: 450, y: 488, paysX: 600, paysY: 558 },
-      { symbol: PAYTABLE_GOLD_PAGE[6], x: 790, y: 488, paysX: 940, paysY: 558 },
-      { symbol: PAYTABLE_GOLD_PAGE[7], x: 1130, y: 488, paysX: 1280, paysY: 558 },
-      { symbol: PAYTABLE_GOLD_PAGE[8], x: 1470, y: 488, paysX: 1620, paysY: 558 }
-    ];
+    const items = Array.isArray(pageCfg.symbols) && pageCfg.symbols.length > 0
+      ? pageCfg.symbols
+      : Array.isArray(pageCfg.items) && pageCfg.items.length > 0
+        ? pageCfg.items
+        : [
+            { symbol: PAYTABLE_GOLD_PAGE[0], x: 145, y: 671, paysX: 335, paysY: 743, four: true, scale: 0.45, multiplierSource: 'lineBet' },
+            { symbol: PAYTABLE_GOLD_PAGE[1], x: 585, y: 688, paysX: 755, paysY: 743, scale: 0.45, multiplierSource: 'lineBet' },
+            { symbol: PAYTABLE_GOLD_PAGE[2], x: 990, y: 688, paysX: 1150, paysY: 743, scale: 0.45, multiplierSource: 'lineBet' },
+            { symbol: PAYTABLE_GOLD_PAGE[3], x: 1410, y: 688, paysX: 1570, paysY: 743, scale: 0.45, multiplierSource: 'lineBet' },
+            { symbol: PAYTABLE_GOLD_PAGE[4], x: 110, y: 488, paysX: 260, paysY: 558, scale: 0.45, multiplierSource: 'lineBet' },
+            { symbol: PAYTABLE_GOLD_PAGE[5], x: 450, y: 488, paysX: 600, paysY: 558, scale: 0.45, multiplierSource: 'lineBet' },
+            { symbol: PAYTABLE_GOLD_PAGE[6], x: 790, y: 488, paysX: 940, paysY: 558, scale: 0.45, multiplierSource: 'lineBet' },
+            { symbol: PAYTABLE_GOLD_PAGE[7], x: 1130, y: 488, paysX: 1280, paysY: 558, scale: 0.45, multiplierSource: 'lineBet' },
+            { symbol: PAYTABLE_GOLD_PAGE[8], x: 1470, y: 488, paysX: 1620, paysY: 558, scale: 0.45, multiplierSource: 'lineBet' }
+          ];
 
     for (let i = 0; i < items.length; i += 1) {
       const item = items[i];
-      const symbol = (item as any).symbol || this.resolvePaySymbolByFrame(String((item as any).frame || ''));
+      const localizedItem = resolveLayoutForLocale(this.game, item as any, {});
+      const symbol = Array.isArray((item as any).pays) && String((item as any).frame || '').length > 0
+        ? {
+            frame: String((item as any).frame || ''),
+            descriptionKey: typeof (item as any).descriptionKey === 'string' ? String((item as any).descriptionKey) : undefined,
+            descriptionFallback: typeof (item as any).descriptionFallback === 'string' ? String((item as any).descriptionFallback) : undefined,
+            pays: (item as any).pays
+          } as PaySymbol
+        : (item as any).symbol || this.resolvePaySymbolByFrame(String((item as any).frame || ''));
       if (!symbol) continue;
-      this.addPaytableSymbolBlock(page, symbol, toNumber((item as any).x, 0), toNumber((item as any).y ?? (item as any).bottomY, 0), true, toNumber((item as any).paysX, 0), toNumber((item as any).paysY, 0), !!((item as any).four ?? (item as any).includeFourRows), true);
+      this.addPaytableSymbolBlock(
+        page,
+        symbol,
+        toNumber((item as any).x, 0),
+        toNumber((item as any).y ?? (item as any).bottomY, 0),
+        false,
+        toNumber((item as any).paysX, 0),
+        toNumber((item as any).paysY, 0),
+        !!((item as any).four ?? (item as any).includeFourRows),
+        true,
+        String((item as any).multiplierSource || 'lineBet') === 'totalBet' ? 'totalBet' : 'lineBet',
+        toNumber((item as any).scale, 0.45),
+        toNumber((item as any).paysFontSize, 32)
+      );
+      const itemDescriptionCfg = {
+        ...(((item as any).description && typeof (item as any).description === 'object') ? (item as any).description : {}),
+        x: toNumber((localizedItem as any).descriptionX, toNumber(((item as any).description || {}).x, 0)),
+        bottomY: toNumber((localizedItem as any).descriptionBottomY, toNumber(((item as any).description || {}).bottomY, 0)),
+        width: toNumber((localizedItem as any).descriptionWidth, toNumber(((item as any).description || {}).width, 300)),
+        height: toNumber((localizedItem as any).descriptionHeight, toNumber(((item as any).description || {}).height, 120)),
+        fontSize: toNumber((localizedItem as any).descriptionFontSize, toNumber(((item as any).description || {}).fontSize, 24)),
+        align: String((localizedItem as any).descriptionAlign || ((item as any).description || {}).align || 'left')
+      };
+      if (
+        String((item as any).descriptionKey || symbol.descriptionKey || '').length > 0 ||
+        String((item as any).descriptionFallback || symbol.descriptionFallback || '').length > 0
+      ) {
+        page.addChild(this.createLocalizedLegacyText(itemDescriptionCfg, {
+          x: toNumber(itemDescriptionCfg.x, 0),
+          bottomY: toNumber(itemDescriptionCfg.bottomY, 0),
+          width: toNumber(itemDescriptionCfg.width, 300),
+          height: toNumber(itemDescriptionCfg.height, 120),
+          fontSize: toNumber(itemDescriptionCfg.fontSize, 24),
+          key: String((item as any).descriptionKey || symbol.descriptionKey || ''),
+          fallback: String((item as any).descriptionFallback || symbol.descriptionFallback || ''),
+          align: itemDescriptionCfg.align as 'left' | 'center' | 'right'
+        }));
+      }
     }
 
     return page;

@@ -10,6 +10,7 @@ import GsLink from '../net/GsLink';
 import SoundSystem from '../game/systems/SoundSystem';
 import SymbolSpineOverlay from '../game/systems/SymbolSpineOverlay';
 import SettingsStore from '../engine/settings/SettingsStore';
+import GameplaySpineOverlay from '../game/systems/GameplaySpineOverlay';
 import type { AppRuntimeServices, GameRuntime } from './types';
 
 /**
@@ -28,6 +29,7 @@ export function wireGameModules(baseGame: BaseGame, services: AppRuntimeServices
   game.meters = new Meters();
   game.soundSystem = new SoundSystem();
   game.symbolSpineOverlay = new SymbolSpineOverlay(game);
+  game.gameplaySpineOverlay = new GameplaySpineOverlay(game);
   game.settings = new SettingsStore({
     audioEnabled: true,
     gameSoundsEnabled: true,

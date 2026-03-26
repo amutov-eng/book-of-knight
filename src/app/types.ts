@@ -16,6 +16,7 @@ import type EventBus from '../core/events/EventBus';
 import type SoundSystem from '../game/systems/SoundSystem';
 import type SymbolSpineOverlay from '../game/systems/SymbolSpineOverlay';
 import type SettingsStore from '../engine/settings/SettingsStore';
+import type GameplaySpineOverlay from '../game/systems/GameplaySpineOverlay';
 
 /**
  * Minimal screen contract consumed by the app ticker and renderer.
@@ -42,6 +43,7 @@ export type GameRuntime = BaseGame & {
   timers: Timers;
   soundSystem: SoundSystem;
   symbolSpineOverlay: SymbolSpineOverlay;
+  gameplaySpineOverlay: GameplaySpineOverlay;
   settings: SettingsStore;
   screen?: RuntimeScreen;
   renderer?: Renderer;

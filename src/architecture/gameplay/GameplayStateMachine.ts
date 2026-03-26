@@ -1,5 +1,6 @@
 import { GAME_RULES } from '../../config/gameRules';
 import { getGameplayConfig } from '../../config/gameplayConfig';
+import { collectScatterWins, ensureFreeGamesState, isInFreeGames, shouldEnterFreeBook } from '../../game/FreeGamesController';
 
 /**
  * Fallback spin timeout used when the manifest does not provide an override.
@@ -73,6 +74,8 @@ type ControllerLike = {
   reelsStopped(): boolean;
   beginWinToCredit(): boolean;
   stepWinToCredit(): boolean;
+  winPresentationSystem: any;
+  winPresentationOrchestrator: any;
 };
 
 type GameplayStateNode = {
@@ -112,6 +115,10 @@ function outcomeWins(controller: ControllerLike): any[] {
   return controller.game.context.outcome.wins;
 }
 
+function scatterWins(controller: ControllerLike): any[] {
+  return collectScatterWins(controller.game.context.outcome);
+}
+
 function toState(controller: ControllerLike, nextState: GameplayStateNode): void {
   controller.setNextState(nextState);
 }
@@ -125,6 +132,7 @@ export const GameplayState = {} as Record<string, GameplayStateNode>;
 
 GameplayState.IDLE = createState('IDLE', {
   entry: (controller) => {
+    ensureFreeGamesState(controller.game.context);
     if (controller.game.context.autoplay) {
       if (controller.game.context.autoplayCounter > 0) {
         controller.event = GameplayEvent.START;
@@ -137,8 +145,11 @@ GameplayState.IDLE = createState('IDLE', {
       controller.game.menu.enableControls();
     }
 
-    controller.game.context.freeGamesCounter = 0;
-    controller.game.context.freeGamesWon = 0;
+    if (!isInFreeGames(controller.game.context)) {
+      controller.game.context.freeGamesCounter = 0;
+      controller.game.context.freeGamesWon = 0;
+      controller.game.reels.setStripMode('normal');
+    }
     controller.game.menu.setWinStatus('');
     if (controller.game.menu && typeof controller.game.menu.refreshIdleStatus === 'function') {
       controller.game.menu.refreshIdleStatus();
@@ -403,7 +414,192 @@ GameplayState.SPIN_END = createState('SPIN_END', {
     }
 
     controller.game.reels.unhighlightAll();
+    if (controller.game.context.outcome.hasFreeGames) {
+      return toState(controller, GameplayState.SHOW_SCATTER_WINS);
+    }
+    if (isInFreeGames(controller.game.context)) {
+      if ((Number(controller.game.context.freeGamesCounter) || 0) > 0) {
+        return toState(controller, GameplayState.FREE_GAMES_START_SPIN);
+      }
+      return toState(controller, GameplayState.FREE_GAMES_END);
+    }
     toState(controller, GameplayState.SHOW_LAST_WINS);
+  }
+});
+
+GameplayState.SHOW_SCATTER_WINS = createState('SHOW_SCATTER_WINS', {
+  entry: (controller) => {
+    controller.game.reels.resetLineLayer();
+    controller.resetWinPresentationDelay();
+    controller.lineCounter = 0;
+    controller.game.menu.setStatus('');
+    controller.game.menu.setWinStatus('');
+  },
+  process: (controller) => {
+    const wins = scatterWins(controller);
+    if (wins.length === 0) {
+      return toState(controller, GameplayState.FREE_GAMES);
+    }
+
+    if (controller.lineCounter > 0 && !controller.isWinPresentationReady()) {
+      return;
+    }
+
+    if (controller.lineCounter >= wins.length) {
+      controller.game.menu.setWin(controller.game.meters.win);
+      return toState(controller, GameplayState.FREE_GAMES);
+    }
+
+    const win = wins[controller.lineCounter];
+    controller.game.reels.unhighlightAll();
+    const animationMs = controller.game.reels.highlightWin(win, false, true) || 0;
+    controller.game.menu.setWinStatus(controller.winPresentationSystem.winningLineToText(win));
+    const delayFrames = controller.winPresentationSystem.resolveHighlightDelayFrames(win, animationMs);
+    controller.winPresentationOrchestrator.startDelay(delayFrames);
+    controller.lineCounter += 1;
+  },
+  leave: (controller) => {
+    controller.game.menu.setWin(controller.game.meters.win);
+  }
+});
+
+GameplayState.FREE_GAMES = createState('FREE_GAMES', {
+  entry: (controller) => {
+    controller.game.reels.setStripMode('free');
+    controller.game.menu.disableControls();
+    controller.game.menu.setStatus('');
+    controller.game.menu.setWinStatus('');
+    void controller.game.gameplaySpineOverlay?.play('freeGamesIntro');
+  },
+  process: (controller) => {
+    if (!controller.game.gameplaySpineOverlay?.isComplete()) {
+      return;
+    }
+
+    controller.game.menu.setWinStatus('PRESS ANYWHERE');
+    if (controller.event === GameplayEvent.START) {
+      clearEvent(controller);
+      return toState(
+        controller,
+        shouldEnterFreeBook(controller.game.context) ? GameplayState.FREE_BOOK : GameplayState.FREE_GAMES_START_SPIN
+      );
+    }
+  },
+  leave: (controller) => {
+    controller.game.gameplaySpineOverlay?.hide();
+    controller.game.menu.setWinStatus('');
+  }
+});
+
+GameplayState.FREE_BOOK = createState('FREE_BOOK', {
+  entry: (controller) => {
+    controller.game.menu.disableControls();
+    controller.game.menu.setStatus('');
+    controller.game.menu.setWinStatus('');
+    controller.game.context.pendingFreeGamesIntroSource = controller.game.context.FREE_GAMES;
+    void controller.game.gameplaySpineOverlay?.play('freeGamesBook');
+  },
+  process: (controller) => {
+    if (!controller.game.gameplaySpineOverlay?.isComplete()) {
+      return;
+    }
+
+    controller.game.menu.setWinStatus('PRESS ANYWHERE');
+    if (controller.event === GameplayEvent.START) {
+      clearEvent(controller);
+      return toState(controller, GameplayState.FREE_GAMES_START_SPIN);
+    }
+  },
+  leave: (controller) => {
+    controller.game.gameplaySpineOverlay?.hide();
+    controller.game.menu.setWinStatus('');
+  }
+});
+
+GameplayState.FREE_GAMES_START_SPIN = createState('FREE_GAMES_START_SPIN', {
+  entry: (controller) => {
+    controller.game.reels.setStripMode('free');
+    controller.game.menu.disableControls();
+    const remaining = Math.max(0, (Number(controller.game.context.freeGamesCounter) || 0) - 1);
+    controller.game.menu.setStatus('');
+    controller.game.menu.setWinStatus(`${remaining} FREE GAMES LEFT`);
+    if (controller.startSpin()) {
+      toState(controller, GameplayState.REELS_SPINNING);
+      return;
+    }
+    toState(controller, GameplayState.FREE_GAMES_END);
+  },
+  leave: (controller) => {
+    clearEvent(controller);
+  }
+});
+
+GameplayState.FREE_GAMES_END = createState('FREE_GAMES_END', {
+  entry: (controller) => {
+    controller.game.reels.setStripMode('normal');
+    controller.game.context.gameMode = controller.game.context.MAIN_GAME;
+    controller.game.menu.disableControls();
+    controller.game.menu.setStatus('');
+    controller.game.menu.setWinStatus('');
+    if ((Number(controller.game.meters.fgwin) || 0) <= 0) {
+      toState(controller, GameplayState.IDLE);
+      return;
+    }
+    void controller.game.gameplaySpineOverlay?.play('freeGamesCongrats');
+  },
+  process: (controller) => {
+    if (!controller.game.gameplaySpineOverlay?.isComplete()) {
+      return;
+    }
+
+    controller.game.menu.setWinStatus('PRESS ANYWHERE');
+    if (controller.event === GameplayEvent.START) {
+      clearEvent(controller);
+      return toState(controller, GameplayState.FREE_GAMES_TAKE_WINS);
+    }
+  },
+  leave: (controller) => {
+    controller.game.gameplaySpineOverlay?.hide();
+    controller.game.menu.setWinStatus('');
+  }
+});
+
+GameplayState.FREE_GAMES_TAKE_WINS = createState('FREE_GAMES_TAKE_WINS', {
+  entry: (controller) => {
+    controller.game.menu.disableControls();
+    controller.game.menu.setStatus('');
+    controller.game.menu.setWinStatus('');
+    controller.game.context.onscreenWinMeter = 0;
+    controller.game.context.onscreenCreditMeter = Math.max(0, Number(controller.game.context.freeGamesStartCredit) || 0);
+    controller.game.menu.setWin(Math.max(0, Number(controller.game.meters.fgwin) || 0));
+    controller.game.menu.setCredit(controller.game.context.onscreenCreditMeter);
+    if ((Number(controller.game.meters.fgwin) || 0) > 0) {
+      controller.game.soundSystem?.play('coinup' as any, true);
+    }
+  },
+  process: (controller) => {
+    const targetCredit = Math.max(
+      Number(controller.game.context.finalCreditMeter) || 0,
+      Number(controller.game.context.onscreenCreditMeter) || 0
+    );
+    const totalFgWin = Math.max(0, Number(controller.game.meters.fgwin) || 0);
+
+    if (controller.game.context.onscreenCreditMeter < targetCredit) {
+      const remaining = targetCredit - controller.game.context.onscreenCreditMeter;
+      const delta = Math.max(1, Math.ceil(remaining / 24));
+      controller.game.context.onscreenCreditMeter = Math.min(targetCredit, controller.game.context.onscreenCreditMeter + delta);
+      controller.game.context.onscreenWinMeter = Math.min(totalFgWin, controller.game.context.onscreenWinMeter + delta);
+      controller.game.menu.setCredit(controller.game.context.onscreenCreditMeter);
+      controller.game.menu.setWin(Math.max(0, totalFgWin - controller.game.context.onscreenWinMeter));
+      return;
+    }
+
+    controller.game.soundSystem?.stop('coinup' as any);
+    controller.game.soundSystem?.play('coinend' as any);
+    controller.game.meters.credit = targetCredit;
+    controller.game.menu.setCredit(targetCredit);
+    controller.game.menu.setWin(0);
+    toState(controller, GameplayState.IDLE);
   }
 });
 

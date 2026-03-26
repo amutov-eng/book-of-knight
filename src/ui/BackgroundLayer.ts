@@ -6,9 +6,10 @@ import { getRuntimeVariant, isMobileVariant } from '../config/runtimeConfig';
 import { getAssetsManifest, getIsLandscape, getTextureCache } from '../core/RuntimeContext';
 
 export default class BackgroundLayer extends PIXI.Container {
-    constructor() {
+    constructor(game) {
         super();
 
+        this.game = game;
         this.variant = getRuntimeVariant();
 
         /** @type {PixiSprite} */
@@ -26,7 +27,9 @@ export default class BackgroundLayer extends PIXI.Container {
     }
 
     getTextureKey() {
-        return getBackgroundTextureKey(getAssetsManifest(), this.variant, 'base', getIsLandscape());
+        const context = this.game && this.game.context ? this.game.context : null;
+        const mode = context && Number(context.gameMode) === Number(context.FREE_GAMES) ? 'fg' : 'base';
+        return getBackgroundTextureKey(getAssetsManifest(), this.variant, mode, getIsLandscape());
     }
 
     applyBaseTexture() {

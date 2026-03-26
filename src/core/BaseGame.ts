@@ -18,6 +18,7 @@ import type Timers from './time/Timers';
 import type SoundSystem from '../game/systems/SoundSystem';
 import type SymbolSpineOverlay from '../game/systems/SymbolSpineOverlay';
 import type SettingsStore from '../engine/settings/SettingsStore';
+import type GameplaySpineOverlay from '../game/systems/GameplaySpineOverlay';
 
 export default class BaseGame {
   stage: Container;
@@ -43,6 +44,7 @@ export default class BaseGame {
   timers: Timers | null;
   soundSystem: SoundSystem | null;
   symbolSpineOverlay: SymbolSpineOverlay | null;
+  gameplaySpineOverlay: GameplaySpineOverlay | null;
   settings: SettingsStore | null;
 
   constructor() {
@@ -69,6 +71,7 @@ export default class BaseGame {
     this.timers = null;
     this.soundSystem = null;
     this.symbolSpineOverlay = null;
+    this.gameplaySpineOverlay = null;
     this.settings = null;
   }
 
