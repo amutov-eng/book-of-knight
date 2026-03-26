@@ -71,7 +71,7 @@ export default class IntroSequenceCoordinator {
 
     this.bootSoundPrompt = new BootSoundPrompt(this.game);
     stage.addChild(this.bootSoundPrompt);
-    this.bootSoundPrompt.visible = true;
+    this.bootSoundPrompt.visible = false;
     this.bootSoundPrompt.interactiveChildren = false;
 
     if (this.game.renderer) {

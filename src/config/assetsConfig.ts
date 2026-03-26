@@ -203,6 +203,32 @@ function normalizeSymbolSpineConfig(value) {
     return Object.keys(result).length > 0 ? result : null;
 }
 
+function normalizeGameplaySpineClipConfig(value) {
+    if (!value || typeof value !== 'object') {
+        return null;
+    }
+
+    if (typeof value.jsonPath !== 'string' || value.jsonPath.length === 0) {
+        return null;
+    }
+
+    if (typeof value.atlasPath !== 'string' || value.atlasPath.length === 0) {
+        return null;
+    }
+
+    return {
+        jsonPath: value.jsonPath,
+        atlasPath: value.atlasPath,
+        animationName: typeof value.animationName === 'string' && value.animationName.length > 0 ? value.animationName : 'animation',
+        loopAnimationName: typeof value.loopAnimationName === 'string' && value.loopAnimationName.length > 0 ? value.loopAnimationName : '',
+        soundId: typeof value.soundId === 'string' && value.soundId.length > 0 ? value.soundId : '',
+        x: Number.isFinite(value.x) ? Number(value.x) : 960,
+        y: Number.isFinite(value.y) ? Number(value.y) : 540,
+        scale: Number.isFinite(value.scale) ? Number(value.scale) : 1,
+        pivot: value.pivot === 'top-center' ? 'top-center' : 'center'
+    };
+}
+
 const DEFAULT_SYMBOL_WIN_PROFILES = {
     normal: {
         scale: [100, 94.4, 88.8, 83.2, 77.6, 72, 82.8, 93.5, 104, 115, 110, 105, 100, 95, 90, 91.4, 92.9, 94, 95.7, 97, 98.6, 100, 100, 100, 100],
@@ -524,6 +550,14 @@ export function getUiHudConfig(manifest) {
             winStatus: { x: 960, y: 990, fontSize: 34, align: 'center', anchorX: 0.5 },
             win: { x: 960, y: 953, fontSize: 36, align: 'center', anchorX: 0.5 }
         },
+        freeGamesTitle: {
+            panelX: -7,
+            panelY: 362,
+            twoDigitLeftX: 27,
+            twoDigitRightX: 111,
+            digitY: 512,
+            singleDigitX: 64
+        },
         topBar: {
             logo: { frame: 'logo.png', x: 20, y: 6 },
             jackpots: [
@@ -832,6 +866,7 @@ export function getUiHudConfig(manifest) {
         backgrounds: mergeBranch(fallback.backgrounds, hud.backgrounds),
         buttons: mergeBranch(fallback.buttons, hud.buttons),
         texts: mergeBranch(fallback.texts, hud.texts),
+        freeGamesTitle: mergeBranch(fallback.freeGamesTitle, hud.freeGamesTitle),
         topBar: mergeBranch(fallback.topBar, hud.topBar),
         betMenu: mergeBranch(fallback.betMenu, hud.betMenu),
         autoPlayMenu: mergeBranch(fallback.autoPlayMenu, hud.autoPlayMenu),
@@ -840,6 +875,24 @@ export function getUiHudConfig(manifest) {
         bootSoundPrompt: mergeBranch(fallback.bootSoundPrompt, hud.bootSoundPrompt),
         helpMenu: mergeBranch(fallback.helpMenu, hud.helpMenu)
     };
+}
+
+export function getGameplaySpineConfig(manifest) {
+    if (!manifest || !manifest.gameplaySpine || typeof manifest.gameplaySpine !== 'object') {
+        return {};
+    }
+
+    const result = {};
+    const keys = ['freeGamesIntro', 'freeGamesBook', 'freeGamesCongrats'];
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const clip = normalizeGameplaySpineClipConfig(manifest.gameplaySpine[key]);
+        if (clip) {
+            result[key] = clip;
+        }
+    }
+
+    return result;
 }
 
 export function getIntroConfig(manifest) {

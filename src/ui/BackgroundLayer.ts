@@ -12,10 +12,17 @@ export default class BackgroundLayer extends PIXI.Container {
         this.game = game;
         this.variant = getRuntimeVariant();
 
-        /** @type {PixiSprite} */
         this.baseSprite = new PIXI.Sprite(PIXI.Texture.EMPTY);
+        this.overlaySprite = new PIXI.Sprite(PIXI.Texture.EMPTY);
+        this.currentMode = 'base';
+        this.targetMode = 'base';
+        this.freeGamesActive = false;
+        this.transitionProgress = 1;
+        this.transitionFrames = 36;
+        this.overlaySprite.alpha = 0;
 
         this.addChild(this.baseSprite);
+        this.addChild(this.overlaySprite);
 
         if (isMobileVariant(this.variant)) {
             const onResize = () => this.applyBaseTexture();
@@ -27,23 +34,49 @@ export default class BackgroundLayer extends PIXI.Container {
     }
 
     getTextureKey() {
-        const context = this.game && this.game.context ? this.game.context : null;
-        const mode = context && Number(context.gameMode) === Number(context.FREE_GAMES) ? 'fg' : 'base';
+        const mode = this.freeGamesActive ? 'fg' : 'base';
         return getBackgroundTextureKey(getAssetsManifest(), this.variant, mode, getIsLandscape());
     }
 
     applyBaseTexture() {
         const textureCache = /** @type {Record<string, PixiTexture>} */ (getTextureCache());
-        const baseKey = this.getTextureKey();
-        const baseTexture = baseKey ? textureCache[baseKey] : null;
-        if (baseTexture) {
-            this.baseSprite.texture = baseTexture;
-        }
+        const normalKey = getBackgroundTextureKey(getAssetsManifest(), this.variant, 'base', getIsLandscape());
+        const overlayKey = this.getTextureKey();
+        const baseTexture = normalKey ? textureCache[normalKey] : null;
+        const overlayTexture = overlayKey ? textureCache[overlayKey] : null;
+        if (baseTexture) this.baseSprite.texture = baseTexture;
+        if (overlayTexture) this.overlaySprite.texture = overlayTexture;
     }
 
     setByState(_stateTitle) {
+        const nextMode = (() => {
+            if (this.freeGamesActive) {
+                return 'fg';
+            }
+            const context = this.game && this.game.context ? this.game.context : null;
+            return context && Number(context.gameMode) === Number(context.FREE_GAMES) ? 'fg' : 'base';
+        })();
+        this.targetMode = nextMode;
         this.applyBaseTexture();
+        if (this.currentMode !== this.targetMode) {
+            this.transitionProgress = 0;
+        } else {
+            this.overlaySprite.alpha = this.targetMode === 'base' ? 0 : 1;
+        }
     }
 
-    act() {}
+    act(delta = 1) {
+        if (this.transitionProgress >= 1) return;
+        this.transitionProgress = Math.min(1, this.transitionProgress + (Number(delta) || 1) / this.transitionFrames);
+        const showingOverlay = this.targetMode !== 'base';
+        this.overlaySprite.alpha = showingOverlay ? this.transitionProgress : 1 - this.transitionProgress;
+        if (this.transitionProgress >= 1) {
+            this.currentMode = this.targetMode;
+        }
+    }
+
+    setFreeGamesAnim(active) {
+        this.freeGamesActive = !!active;
+        this.setByState('');
+    }
 }

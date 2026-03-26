@@ -7,6 +7,7 @@ import LoadingAssetBootstrap from '../../app/boot/LoadingAssetBootstrap';
 import IntroSequenceCoordinator from '../../app/boot/IntroSequenceCoordinator';
 import { BOOT_INTRO_CONFIG, GAMEPLAY_INTRO_CONFIG } from '../../config/introConfig';
 import { restorePixiGlobals } from '../../core/globals';
+import ServerErrorModal from '../ServerErrorModal';
 /** @typedef {import('../../core/BaseGame').default} BaseGame */
 
 /**
@@ -26,6 +27,7 @@ export default class LoadingScreen extends BaseScreen {
         this.assetsManifest = null;
         this.assetBootstrap = new LoadingAssetBootstrap(this.game, this.variant);
         this.introFlow = new IntroSequenceCoordinator(this.game);
+        this.serverErrorModal = null;
         this.loadWithAssets();
     }
 
@@ -48,6 +50,7 @@ export default class LoadingScreen extends BaseScreen {
      */
     async loadWithAssets() {
         const manifestPlanPromise = this.assetBootstrap.loadManifestPlan();
+        this.startServerConnection();
 
         await this.introFlow.startBootIntro(this.resolveBootIntroConfig());
 
@@ -69,22 +72,68 @@ export default class LoadingScreen extends BaseScreen {
 
         restorePixiGlobals();
         await this.waitForNextFrame();
-        await this.introFlow.presentBootSoundPrompt(this.stage);
 
         const [resources] = await Promise.all([resourcesPromise, soundsPromise]);
-        this.setup({ resources });
+        if (!this.applySetupResources({ resources })) {
+            return;
+        }
+
+        const connected = await this.waitForServerConnection();
+        if (!connected) {
+            return;
+        }
+
+        await this.introFlow.presentBootSoundPrompt(this.stage);
+        this.finishSetup();
         await this.introFlow.playGameplayIntro(this.resolveGameplayIntroConfig());
     }
 
     /**
      * Applies the loaded manifest resources and hands control over to `MainScreen`.
      */
-    setup(loader) {
+    applySetupResources(loader) {
         const resources = loader.resources || {};
-        if (!this.assetBootstrap.applyLoadedResources(this.assetsManifest, resources)) return;
+        return this.assetBootstrap.applyLoadedResources(this.assetsManifest, resources);
+    }
+
+    finishSetup() {
+        this.game.setScreen(new MainScreen(this.game));
+    }
+
+    startServerConnection() {
+        if (!this.game.gsLink) {
+            this.showServerError('Missing server connection');
+            return;
+        }
 
         this.game.gsLink.connect();
-        this.game.setScreen(new MainScreen(this.game));
+    }
+
+    async waitForServerConnection() {
+        if (!this.game.gsLink) {
+            this.showServerError('Missing server connection');
+            return false;
+        }
+
+        const result = await this.game.gsLink.waitForConnectionResult(12000);
+        if (!result.ok) {
+            this.showServerError(result.message);
+            return false;
+        }
+
+        return true;
+    }
+
+    showServerError(message) {
+        if (!this.serverErrorModal) {
+            this.serverErrorModal = new ServerErrorModal(() => window.location.reload());
+            this.stage.addChild(this.serverErrorModal);
+        }
+
+        const screenWidth = (this.game.renderer && this.game.renderer.width) ? this.game.renderer.width : 1920;
+        const screenHeight = (this.game.renderer && this.game.renderer.height) ? this.game.renderer.height : 1080;
+        this.serverErrorModal.resize(screenWidth, screenHeight);
+        this.serverErrorModal.show(message);
     }
 
     async hide() {

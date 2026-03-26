@@ -1,6 +1,7 @@
 import { GAME_RULES } from '../../config/gameRules';
 import { getGameplayConfig } from '../../config/gameplayConfig';
 import { collectScatterWins, ensureFreeGamesState, isInFreeGames, shouldEnterFreeBook } from '../../game/FreeGamesController';
+import { getLocalizedText } from '../../ui/uiTextFormat';
 
 /**
  * Fallback spin timeout used when the manifest does not provide an override.
@@ -119,8 +120,62 @@ function scatterWins(controller: ControllerLike): any[] {
   return collectScatterWins(controller.game.context.outcome);
 }
 
+function presentedWins(controller: ControllerLike): any[] {
+  const wins = outcomeWins(controller);
+  if (!controller.game.context.outcome.hasFreeGames) {
+    return wins;
+  }
+  return wins.filter((win) => Number(win?.type) !== 1);
+}
+
+function presentedWinIndexes(controller: ControllerLike): number[] {
+  const wins = outcomeWins(controller);
+  const indexes: number[] = [];
+  for (let i = 0; i < wins.length; i += 1) {
+    // Legacy Book-style triggers present line wins first and keep scatter/book
+    // wins for the dedicated scatter presentation that follows immediately after.
+    if (controller.game.context.outcome.hasFreeGames && Number(wins[i]?.type) === 1) {
+      continue;
+    }
+    indexes.push(i);
+  }
+  return indexes;
+}
+
+function processPresentedWin(controller: ControllerLike, presentedIndex: number): void {
+  const indexes = presentedWinIndexes(controller);
+  const actualIndex = indexes[presentedIndex];
+  if (!Number.isFinite(actualIndex)) {
+    return;
+  }
+  const delayFrames = controller.winPresentationSystem.processWinAt(actualIndex);
+  controller.winPresentationOrchestrator.startDelay(delayFrames);
+}
+
 function toState(controller: ControllerLike, nextState: GameplayStateNode): void {
   controller.setNextState(nextState);
+}
+
+function getPressAnywhereText(controller: ControllerLike): string {
+  return getLocalizedText(controller.game, 'pressAnywhere', 'PRESS ANYWHERE TO CONTINUE');
+}
+
+function getFreeGamesText(controller: ControllerLike): string {
+  return getLocalizedText(controller.game, 'freeGameTxt', 'FREE GAMES');
+}
+
+function getFreeGamesLeftText(controller: ControllerLike): string {
+  return getLocalizedText(controller.game, 'freeGameLeft', 'FREE GAMES LEFT');
+}
+
+function getYouWonFreeGamesText(controller: ControllerLike, count: number): string {
+  const youWon = getLocalizedText(controller.game, 'youWon', 'YOU WON');
+  return `${youWon} ${Math.max(0, count)} ${getFreeGamesText(controller)}!`;
+}
+
+function applyBlinkingPrompt(controller: ControllerLike, text: string): void {
+  const blinkPhase = controller.timerCounter % 50;
+  controller.game.menu.setWinStatus(blinkPhase < 25 ? text : '');
 }
 
 /**
@@ -263,8 +318,11 @@ GameplayState.SHOW_WINS = createState('SHOW_WINS', {
     controller.game.menu.setWin(0);
     controller.game.menu.setStatus('');
     controller.game.menu.setWinStatus('');
-    controller.processWin();
-    controller.lineCounter++;
+    const wins = presentedWinIndexes(controller);
+    if (wins.length > 0) {
+      processPresentedWin(controller, controller.lineCounter);
+      controller.lineCounter++;
+    }
   },
   process: (controller) => {
     if (controller.event === GameplayEvent.START) {
@@ -285,10 +343,15 @@ GameplayState.SHOW_WINS = createState('SHOW_WINS', {
     }
 
     controller.timerCounter = 0;
-    if (controller.lineCounter < outcomeWins(controller).length) {
-      controller.processWin();
+    const wins = presentedWinIndexes(controller);
+    if (controller.lineCounter < wins.length) {
+      processPresentedWin(controller, controller.lineCounter);
       controller.lineCounter++;
       return;
+    }
+
+    if (controller.game.context.outcome.hasFreeGames) {
+      return toState(controller, GameplayState.SPIN_END);
     }
 
     toState(controller, GameplayState.WIN_TO_CREDIT);
@@ -386,6 +449,16 @@ GameplayState.TAKE_WINS = createState('TAKE_WINS', {
 
 GameplayState.WIN_TO_CREDIT = createState('WIN_TO_CREDIT', {
   entry: (controller) => {
+    if (isInFreeGames(controller.game.context) || controller.game.context.outcome.hasFreeGames) {
+      controller.game.menu.setWin(
+        controller.game.context.outcome.hasFreeGames
+          ? Math.max(0, Number(controller.game.meters.win) || 0)
+          : Math.max(0, Number(controller.game.meters.fgwin) || 0)
+      );
+      toState(controller, GameplayState.SPIN_END);
+      return;
+    }
+
     if (!controller.beginWinToCredit()) {
       toState(controller, GameplayState.SPIN_END);
     }
@@ -406,7 +479,12 @@ GameplayState.WIN_TO_CREDIT = createState('WIN_TO_CREDIT', {
 
 GameplayState.SPIN_END = createState('SPIN_END', {
   entry: (controller) => {
-    controller.game.menu.updateMeters();
+    if (isInFreeGames(controller.game.context)) {
+      controller.game.menu.setCredit(controller.game.meters.credit);
+      controller.game.menu.setWin(Math.max(0, Number(controller.game.meters.fgwin) || 0));
+    } else {
+      controller.game.menu.updateMeters();
+    }
   },
   process: (controller) => {
     if (controller.timerCounter <= spinEndTimeout()) {
@@ -465,27 +543,45 @@ GameplayState.SHOW_SCATTER_WINS = createState('SHOW_SCATTER_WINS', {
 
 GameplayState.FREE_GAMES = createState('FREE_GAMES', {
   entry: (controller) => {
-    controller.game.reels.setStripMode('free');
+    // Transitional legacy behavior:
+    // delay the FG background/frame/title switch until the old spine overlay is
+    // already mounted, otherwise the screen flashes for one frame before intro.
+    controller.game.context.freeGamesVisualPrepared = false;
     controller.game.menu.disableControls();
     controller.game.menu.setStatus('');
-    controller.game.menu.setWinStatus('');
+    controller.game.menu.setWinStatus(getYouWonFreeGamesText(controller, Number(controller.game.context.freeGamesWon) || Number(controller.game.context.freeGamesCounter) || 0));
     void controller.game.gameplaySpineOverlay?.play('freeGamesIntro');
   },
   process: (controller) => {
+    if (!controller.game.context.freeGamesVisualPrepared && controller.game.gameplaySpineOverlay?.isReady()) {
+      // This block is tied to the current legacy spine intro choreography.
+      // When the next games move to the new spine pipeline, this prepare step
+      // should disappear and the visuals can switch in one presentation system.
+      controller.game.reels.setStripMode('free');
+      controller.game.reels.setFreeGames(true);
+      controller.game.backgroundLayer?.setFreeGamesAnim?.(true);
+      controller.game.menu.setFreeGamesTitleLabelFirst?.(Number(controller.game.context.freeGamesCounter) || 0);
+      controller.game.menu.showFreeGamesTitle?.(true);
+      controller.game.context.freeGamesVisualPrepared = true;
+    }
+
     if (!controller.game.gameplaySpineOverlay?.isComplete()) {
       return;
     }
 
-    controller.game.menu.setWinStatus('PRESS ANYWHERE');
+    applyBlinkingPrompt(controller, getPressAnywhereText(controller));
     if (controller.event === GameplayEvent.START) {
       clearEvent(controller);
+      const shouldShowBook = shouldEnterFreeBook(controller.game.context)
+        && !!controller.game.gameplaySpineOverlay?.hasClip?.('freeGamesBook');
       return toState(
         controller,
-        shouldEnterFreeBook(controller.game.context) ? GameplayState.FREE_BOOK : GameplayState.FREE_GAMES_START_SPIN
+        shouldShowBook ? GameplayState.FREE_BOOK : GameplayState.FREE_GAMES_START_SPIN
       );
     }
   },
   leave: (controller) => {
+    controller.game.context.freeGamesVisualPrepared = false;
     controller.game.gameplaySpineOverlay?.hide();
     controller.game.menu.setWinStatus('');
   }
@@ -504,7 +600,7 @@ GameplayState.FREE_BOOK = createState('FREE_BOOK', {
       return;
     }
 
-    controller.game.menu.setWinStatus('PRESS ANYWHERE');
+    applyBlinkingPrompt(controller, getPressAnywhereText(controller));
     if (controller.event === GameplayEvent.START) {
       clearEvent(controller);
       return toState(controller, GameplayState.FREE_GAMES_START_SPIN);
@@ -519,10 +615,15 @@ GameplayState.FREE_BOOK = createState('FREE_BOOK', {
 GameplayState.FREE_GAMES_START_SPIN = createState('FREE_GAMES_START_SPIN', {
   entry: (controller) => {
     controller.game.reels.setStripMode('free');
+    controller.game.reels.setFreeGames(true);
+    controller.game.backgroundLayer?.setFreeGamesAnim?.(true);
     controller.game.menu.disableControls();
     const remaining = Math.max(0, (Number(controller.game.context.freeGamesCounter) || 0) - 1);
+    controller.game.menu.setFreeGamesTitleLabelFirst?.(remaining);
+    controller.game.menu.showFreeGamesTitle?.(true);
     controller.game.menu.setStatus('');
-    controller.game.menu.setWinStatus(`${remaining} FREE GAMES LEFT`);
+    controller.game.menu.setWinStatus(`${remaining} ${getFreeGamesLeftText(controller)}`);
+    controller.game.menu.setWin(Math.max(0, Number(controller.game.meters.fgwin) || 0));
     if (controller.startSpin()) {
       toState(controller, GameplayState.REELS_SPINNING);
       return;
@@ -536,12 +637,15 @@ GameplayState.FREE_GAMES_START_SPIN = createState('FREE_GAMES_START_SPIN', {
 
 GameplayState.FREE_GAMES_END = createState('FREE_GAMES_END', {
   entry: (controller) => {
-    controller.game.reels.setStripMode('normal');
-    controller.game.context.gameMode = controller.game.context.MAIN_GAME;
     controller.game.menu.disableControls();
     controller.game.menu.setStatus('');
     controller.game.menu.setWinStatus('');
     if ((Number(controller.game.meters.fgwin) || 0) <= 0) {
+      controller.game.menu.showFreeGamesTitle?.(false);
+      controller.game.reels.setFreeGames(false);
+      controller.game.backgroundLayer?.setFreeGamesAnim?.(false);
+      controller.game.reels.setStripMode('normal');
+      controller.game.context.gameMode = controller.game.context.MAIN_GAME;
       toState(controller, GameplayState.IDLE);
       return;
     }
@@ -552,7 +656,7 @@ GameplayState.FREE_GAMES_END = createState('FREE_GAMES_END', {
       return;
     }
 
-    controller.game.menu.setWinStatus('PRESS ANYWHERE');
+    applyBlinkingPrompt(controller, getPressAnywhereText(controller));
     if (controller.event === GameplayEvent.START) {
       clearEvent(controller);
       return toState(controller, GameplayState.FREE_GAMES_TAKE_WINS);
@@ -597,6 +701,11 @@ GameplayState.FREE_GAMES_TAKE_WINS = createState('FREE_GAMES_TAKE_WINS', {
     controller.game.soundSystem?.stop('coinup' as any);
     controller.game.soundSystem?.play('coinend' as any);
     controller.game.meters.credit = targetCredit;
+    controller.game.menu.showFreeGamesTitle?.(false);
+    controller.game.reels.setFreeGames(false);
+    controller.game.backgroundLayer?.setFreeGamesAnim?.(false);
+    controller.game.reels.setStripMode('normal');
+    controller.game.context.gameMode = controller.game.context.MAIN_GAME;
     controller.game.menu.setCredit(targetCredit);
     controller.game.menu.setWin(0);
     toState(controller, GameplayState.IDLE);

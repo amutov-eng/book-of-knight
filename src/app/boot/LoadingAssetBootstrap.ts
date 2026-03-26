@@ -119,7 +119,10 @@ export default class LoadingAssetBootstrap {
       SOUND_IDS.BEEP_SUN,
       SOUND_IDS.LOW_WIN,
       SOUND_IDS.HIGH_WIN,
-      SOUND_IDS.SCATTER
+      SOUND_IDS.SCATTER,
+      SOUND_IDS.FREE_GAMES,
+      SOUND_IDS.OPEN_BOOK,
+      SOUND_IDS.CONGRATS
     ]);
   }
 

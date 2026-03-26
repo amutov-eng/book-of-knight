@@ -11,6 +11,8 @@ export function ensureFreeGamesState(context: Record<string, any> | null | undef
   if (!Number.isFinite(context.freeGamesCounter)) context.freeGamesCounter = 0;
   if (!Number.isFinite(context.freeGamesWon)) context.freeGamesWon = 0;
   if (!Number.isFinite(context.freeGamesStartCredit)) context.freeGamesStartCredit = 0;
+  if (typeof context.freeGamesTitleVisible !== 'boolean') context.freeGamesTitleVisible = false;
+  if (typeof context.freeGamesVisualPrepared !== 'boolean') context.freeGamesVisualPrepared = false;
   if (!Number.isFinite(context.pendingFreeGamesIntroSource)) {
     context.pendingFreeGamesIntroSource = context.MAIN_GAME;
   }

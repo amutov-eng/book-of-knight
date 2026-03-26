@@ -85,8 +85,8 @@
             "runtime": "3.8",
             "loop": false,
             "scale": 1,
-            "offsetX": 0,
-            "offsetY": 0
+            "offsetX": -8,
+            "offsetY": 566
           }
         }
       },
@@ -335,6 +335,14 @@
           "align": "center",
           "anchorX": 0.5
         }
+      },
+      "freeGamesTitle": {
+        "panelX": -7,
+        "panelY": 362,
+        "twoDigitLeftX": 27,
+        "twoDigitRightX": 107,
+        "digitY": 535,
+        "singleDigitX": 64
       },
       "topBar": {
         "logo": {
@@ -2079,6 +2087,29 @@
         "minAlpha": 0.15,
         "maxAlpha": 1
       }
+    }
+  },
+  "gameplaySpine": {
+    "freeGamesIntro": {
+      "jsonPath": "assets/spine/animations/1920_free_games_v1.json",
+      "atlasPath": "assets/spine/animations/1920_free_games_v1.atlas",
+      "animationName": "animation_start",
+      "loopAnimationName": "animation_loop",
+      "soundId": "free_games",
+      "x": 960,
+      "y": -120,
+      "scale": 1,
+      "pivot": "top-center"
+    },
+    "freeGamesCongrats": {
+      "jsonPath": "assets/spine/animations/1920_congrats_v1.json",
+      "atlasPath": "assets/spine/animations/1920_congrats_v1.atlas",
+      "animationName": "animation",
+      "soundId": "congrats",
+      "x": 960,
+      "y": 540,
+      "scale": 1,
+      "pivot": "center"
     }
   }
 }

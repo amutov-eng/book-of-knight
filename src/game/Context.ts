@@ -31,6 +31,8 @@ export default class Context {
 
   turboSpinIsEnabled: boolean;
 
+  skipIntro: boolean;
+
   skipScreen: boolean;
 
   onscreenWinMeter: number;
@@ -57,6 +59,12 @@ export default class Context {
 
   hasAddFreeSpins: boolean;
 
+  bonusCashActive: boolean;
+
+  bonusCashSpins: number;
+
+  bonusCashWin: number;
+
   hasReloadButton: boolean;
 
   hasHomeButton: boolean;
@@ -65,11 +73,11 @@ export default class Context {
 
   hasLobbyButton: boolean;
 
-  gamePercent: number;
+  gamePercent: string;
 
-  gamePercentBuyFree: number;
+  gamePercentBuyFree: string;
 
-  gamePercentBuyHold: number;
+  gamePercentBuyHold: string;
 
   serverError: ServerErrorState;
 
@@ -85,6 +93,7 @@ export default class Context {
     this.autoplayLostUnlimited = true;
     this.turboGame = false;
     this.turboSpinIsEnabled = true;
+    this.skipIntro = false;
     this.skipScreen = false;
     this.onscreenWinMeter = 0;
     this.onscreenCreditMeter = 0;
@@ -100,15 +109,18 @@ export default class Context {
     this.addFreeSpinsCnt = 0;
     this.showAddFreeSpins = false;
     this.hasAddFreeSpins = false;
+    this.bonusCashActive = false;
+    this.bonusCashSpins = 0;
+    this.bonusCashWin = 0;
 
     this.hasReloadButton = false;
     this.hasHomeButton = false;
     this.hasHistoryButton = false;
     this.hasLobbyButton = false;
 
-    this.gamePercent = 0;
-    this.gamePercentBuyFree = 0;
-    this.gamePercentBuyHold = 0;
+    this.gamePercent = '';
+    this.gamePercentBuyFree = '';
+    this.gamePercentBuyHold = '';
 
     this.serverError = {
       visible: false,

@@ -251,12 +251,14 @@ export default class HudButtonLayer extends PIXI.Container {
         const connected = !!(this.game && this.game.gsLink && this.game.gsLink.isFullyConnected && this.game.gsLink.isFullyConnected());
         const serverSpinResultReady = !!(this.game && this.game.gsLink && this.game.gsLink.spinEnded);
         const autoplayActive = !!(this.game && this.game.context && this.game.context.autoplay);
+        const freeGamesTitleVisible = !!(this.game && this.game.context && this.game.context.freeGamesTitleVisible);
         const nextStateKey = [
             title,
             connected ? 1 : 0,
             serverSpinResultReady ? 1 : 0,
             controlsDisabled ? 1 : 0,
             autoplayActive ? 1 : 0,
+            freeGamesTitleVisible ? 1 : 0,
             modalState.autoMenuOpen ? 1 : 0,
             modalState.buyMenuOpen ? 1 : 0,
             modalState.buyConfirmOpen ? 1 : 0,
@@ -285,7 +287,7 @@ export default class HudButtonLayer extends PIXI.Container {
         if (this.betButton && this.betButton.setEnabled) this.betButton.setEnabled(betEnabled && !modalState.autoMenuOpen && !modalState.buyMenuOpen && !modalState.buyConfirmOpen && !autoplayActive);
         if (this.paytableButton && this.paytableButton.setEnabled) this.paytableButton.setEnabled(sideEnabled && !modalState.autoMenuOpen && !modalState.buyMenuOpen && !modalState.buyConfirmOpen && !autoplayActive);
         if (this.buyBonusButton) {
-            const canShowBuyBonus = !!GAME_RULES.BUY_BONUS_BUTTON_ENABLED && !!(this.game && this.game.context && this.game.context.hasBuyFeature);
+            const canShowBuyBonus = !!GAME_RULES.BUY_BONUS_BUTTON_ENABLED && !!(this.game && this.game.context && this.game.context.hasBuyFeature) && !freeGamesTitleVisible;
             this.buyBonusButton.visible = canShowBuyBonus;
             if (this.buyBonusButton.setEnabled) {
                 this.buyBonusButton.setEnabled(canShowBuyBonus && sideEnabled && !modalState.autoMenuOpen && !modalState.buyMenuOpen && !modalState.buyConfirmOpen && !autoplayActive);

@@ -54,6 +54,11 @@ export default class Reels extends Container {
   private isBuilt = false;
   public lineRenderer: LineRender | null = null;
   private reelsBackground: Sprite | null = null;
+  private reelsBackgroundOverlay: Sprite | null = null;
+  private reelBackgroundMode: 'base' | 'fg' | 'haw' = 'base';
+  private reelBackgroundTargetMode: 'base' | 'fg' | 'haw' = 'base';
+  private reelBackgroundTransition = 1;
+  private freeGamesVisualActive = false;
 
   constructor(game: BaseGame) {
     super();
@@ -183,6 +188,7 @@ export default class Reels extends Container {
     const normalized = mode === 'free' || mode === 'holdAndWin' ? mode : 'normal';
     this.stripMode = normalized;
     this.updateLayoutFromManifest();
+    this.updateReelBackgroundMode();
     if (this.reelControllers.length === 0) return;
 
     for (let i = 0; i < this.reelControllers.length; i++) {
@@ -198,15 +204,34 @@ export default class Reels extends Container {
     const bgTexture = bgKey ? textureCache[bgKey] : null;
     if (!bgTexture) return;
 
-    if (this.reelsBackground) {
+    if (!this.reelsBackground) {
+      this.reelsBackground = new Sprite(bgTexture);
+      this.reelsBackground.position.set(this.BG_POSITION_X, this.BG_POSITION_Y);
+      this.addChild(this.reelsBackground);
+    } else {
       this.reelsBackground.texture = bgTexture;
       this.reelsBackground.position.set(this.BG_POSITION_X, this.BG_POSITION_Y);
-      return;
     }
 
-    this.reelsBackground = new Sprite(bgTexture);
-    this.reelsBackground.position.set(this.BG_POSITION_X, this.BG_POSITION_Y);
-    this.addChild(this.reelsBackground);
+    if (!this.reelsBackgroundOverlay) {
+      this.reelsBackgroundOverlay = new Sprite(bgTexture);
+      this.reelsBackgroundOverlay.position.set(this.BG_POSITION_X, this.BG_POSITION_Y);
+      this.reelsBackgroundOverlay.alpha = 0;
+      this.addChild(this.reelsBackgroundOverlay);
+    } else {
+      this.reelsBackgroundOverlay.position.set(this.BG_POSITION_X, this.BG_POSITION_Y);
+    }
+
+    this.updateReelBackgroundMode();
+  }
+
+  setFreeGames(active: boolean): void {
+    this.freeGamesVisualActive = !!active;
+    this.updateReelBackgroundMode();
+    const reelsFrameLayer = this.game && (this.game as any).reelsFrameLayer;
+    if (reelsFrameLayer && typeof reelsFrameLayer.setFreeGamesAnim === 'function') {
+      reelsFrameLayer.setFreeGamesAnim(active);
+    }
   }
 
   private applyLineRendererLayer(): void {
@@ -252,6 +277,7 @@ export default class Reels extends Container {
   }
 
   act(delta: number): void {
+    this.stepReelBackgroundTransition(delta);
     const views = this.reelViews;
     for (let i = 0; i < views.length; i++) {
       views[i].update(delta);
@@ -269,6 +295,45 @@ export default class Reels extends Container {
         target.stop();
       }
     });
+  }
+
+  private updateReelBackgroundMode(): void {
+    const nextMode = this.freeGamesVisualActive || this.stripMode === 'free'
+      ? 'fg'
+      : (this.stripMode === 'holdAndWin' ? 'haw' : 'base');
+    this.reelBackgroundTargetMode = nextMode;
+    this.applyReelBackgroundTextures();
+    if (this.reelBackgroundMode !== this.reelBackgroundTargetMode) {
+      this.reelBackgroundTransition = 0;
+    } else if (this.reelsBackgroundOverlay) {
+      this.reelsBackgroundOverlay.alpha = this.reelBackgroundTargetMode === 'base' ? 0 : 1;
+    }
+  }
+
+  private applyReelBackgroundTextures(): void {
+    if (!this.reelsBackground || !this.reelsBackgroundOverlay) return;
+    const textureCache = getTextureCache() as Record<string, Texture>;
+    const manifest = getAssetsManifest();
+    const baseKey = getReelTextureKey(manifest, 'background', 'base');
+    const overlayKey = getReelTextureKey(manifest, 'background', this.reelBackgroundTargetMode);
+    const baseTexture = baseKey ? textureCache[baseKey] : null;
+    const overlayTexture = overlayKey ? textureCache[overlayKey] : null;
+    if (baseTexture) this.reelsBackground.texture = baseTexture;
+    if (overlayTexture) this.reelsBackgroundOverlay.texture = overlayTexture;
+  }
+
+  private stepReelBackgroundTransition(delta: number): void {
+    if (!this.reelsBackgroundOverlay || this.reelBackgroundTransition >= 1) {
+      return;
+    }
+
+    this.reelBackgroundTransition = Math.min(1, this.reelBackgroundTransition + (Number(delta) || 1) / 36);
+    this.reelsBackgroundOverlay.alpha = this.reelBackgroundTargetMode === 'base'
+      ? 1 - this.reelBackgroundTransition
+      : this.reelBackgroundTransition;
+    if (this.reelBackgroundTransition >= 1) {
+      this.reelBackgroundMode = this.reelBackgroundTargetMode;
+    }
   }
 
   updateStopSymbols(): void {

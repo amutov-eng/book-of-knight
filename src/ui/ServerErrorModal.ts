@@ -21,43 +21,39 @@ export default class ServerErrorModal extends PIXI.Container {
         this.shade.rect(0, 0, width, height).fill({ color: 0x000000, alpha: 0.35 });
         this.addChild(this.shade);
 
-        const panelTexture = this.getTexture('error_message.png');
         const reloadNormal = this.getTexture('b_reload_001.png');
         const reloadPressed = this.getTexture('b_reload_002.png') || reloadNormal;
         const reloadHover = this.getTexture('b_reload_hover.png') || reloadNormal;
 
-        const panelWidth = panelTexture ? panelTexture.width : 392;
-        const panelHeight = panelTexture ? panelTexture.height : 292;
+        const panelWidth = 500;
+        const panelHeight = 320;
         const panelX = (width - panelWidth) / 2;
         const panelY = (height - panelHeight) / 2;
 
-        if (panelTexture) {
-            this.panel = new PIXI.Sprite(panelTexture);
-            this.panel.position.set(panelX, panelY);
-            this.addChild(this.panel);
-        } else {
-            this.panel = new PIXI.Graphics();
-            this.panel.roundRect(panelX, panelY, panelWidth, panelHeight, 28).fill(0x0f0b27).stroke({ width: 4, color: 0x4f3e86 });
-            this.addChild(this.panel);
-        }
+        this.panel = new PIXI.Graphics();
+        this.panel.roundRect(panelX, panelY, panelWidth, panelHeight, 28).fill({ color: 0x09061c, alpha: 0.92 }).stroke({ width: 3, color: 0x4f3e86, alpha: 0.95 });
+        this.addChild(this.panel);
 
         this.messageText = new PIXI.Text({
             text: 'Unable to connect with server.\nCheck your connection and try again',
             style: {
                 fill: 0xffffff,
-                fontSize: 28,
+                fontSize: 26,
                 fontFamily: APP_FONT_FAMILY,
                 fontWeight: APP_FONT_WEIGHT_REGULAR,
-                align: 'center'
+                align: 'center',
+                wordWrap: true,
+                wordWrapWidth: panelWidth - 72,
+                lineHeight: 34
             }
         });
         this.messageText.anchor.set(0.5, 0.5);
-        this.messageText.position.set(width / 2, panelY + panelHeight / 2 - 24);
+        this.messageText.position.set(width / 2, panelY + 120);
         this.addChild(this.messageText);
 
         if (reloadNormal) {
             this.button = new PIXI.Sprite(reloadNormal);
-            this.button.position.set(panelX + Math.round((panelWidth - reloadNormal.width) / 2), panelY + panelHeight - 50 - reloadNormal.height);
+            this.button.position.set(panelX + Math.round((panelWidth - reloadNormal.width) / 2), panelY + panelHeight - 44 - reloadNormal.height);
             this.button.eventMode = 'static';
             this.button.cursor = 'pointer';
             this.button.on('pointerover', () => { this.button.texture = reloadHover; });

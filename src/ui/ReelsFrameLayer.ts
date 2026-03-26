@@ -7,6 +7,7 @@ export default class ReelsFrameLayer extends PIXI.Container {
         super();
 
         this.game = game;
+        this.freeGamesActive = false;
         this.baseSprite = new PIXI.Sprite(PIXI.Texture.EMPTY);
         this.baseSprite.visible = true;
 
@@ -23,7 +24,7 @@ export default class ReelsFrameLayer extends PIXI.Container {
     applyBaseTexture() {
         const textureCache = getTextureCache();
         const context = this.game && this.game.context ? this.game.context : null;
-        const mode = context && Number(context.gameMode) === Number(context.FREE_GAMES) ? 'fg' : 'base';
+        const mode = this.freeGamesActive || (context && Number(context.gameMode) === Number(context.FREE_GAMES)) ? 'fg' : 'base';
         const textureKey = this.getTextureKey(mode);
         const texture = textureKey ? textureCache[textureKey] : null;
         if (!texture) return;
@@ -33,6 +34,11 @@ export default class ReelsFrameLayer extends PIXI.Container {
     }
 
     setByState(_stateTitle) {
+        this.applyBaseTexture();
+    }
+
+    setFreeGamesAnim(active) {
+        this.freeGamesActive = !!active;
         this.applyBaseTexture();
     }
 }

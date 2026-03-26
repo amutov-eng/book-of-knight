@@ -12,8 +12,8 @@ import { debug, error as logError } from '../core/utils/logger';
 import type BaseGame from '../core/BaseGame';
 import { ensureFreeGamesState, markFreeGamesIntroSource } from '../game/FreeGamesController';
 
-const DEFAULT_GAME_ID = 'book-of-knight-alea';
-const DEFAULT_WS_PORT = '8081';
+const DEFAULT_GAME_ID = 'book-of-knight-demo';
+const DEFAULT_WS_PORT = '8703';
 
 type ServerWin = {
   winningLine?: number;
@@ -29,17 +29,28 @@ type ServerWin = {
 
 type LoginParams = {
   addFreeGamesCnt?: number;
+  addFreeSpinsCnt?: number;
   showAddFreeSpins?: number | boolean;
   hasAddFreeGames?: number | boolean;
+  hasAddFreeSpins?: number | boolean;
+  bonusCashActive?: number | boolean;
+  bonusCashSpins?: number;
+  bonusCashWin?: number;
   minDenom?: number;
+  MIN_DENOM?: number;
   minBetPerLine?: number;
+  MIN_BET_PER_LINE?: number;
   minLines?: number;
+  MIN_LINES?: number;
   denom?: number;
   betPerLine?: number;
   linesSelected?: number;
   maxDenom?: number;
+  MAX_DENOM?: number;
   maxBetPerLine?: number;
+  MAX_BET_PER_LINE?: number;
   maxLines?: number;
+  MAX_LINES?: number;
   currency?: string;
   locked?: number | boolean;
   hasTurboSpins?: number | boolean;
@@ -47,10 +58,11 @@ type LoginParams = {
   hasReloadButton?: number | boolean;
   hasHomeButton?: number | boolean;
   hasHistoryButton?: number | boolean;
+  hasHistory?: number | boolean;
   hasLobbyButton?: number | boolean;
-  gamePercent?: number;
-  gamePercentBuyFree?: number;
-  gamePercentBuyHold?: number;
+  gamePercent?: number | string;
+  gamePercentBuyFree?: number | string;
+  gamePercentBuyHold?: number | string;
   buyFreeGamesMult?: number;
   buyHoldAndWinMult?: number;
   GRAND_JACKPOT_VALUE?: number;
@@ -61,6 +73,9 @@ type LoginParams = {
   minorJackpotValue?: number;
   pattern?: string;
   sessionUID?: string;
+  skipIntro?: number | boolean;
+  skipScreen?: number | boolean;
+  turboGame?: number | boolean;
 };
 
 type ServerOutcome = {
@@ -87,6 +102,8 @@ type ServerOutcome = {
 };
 
 type SpinAppliedListener = (outcome: GameOutcomeShape) => void;
+type ConnectionResult = { ok: true } | { ok: false; message: string };
+type ConnectionResultListener = (result: ConnectionResult) => void;
 
 function toInt(value: unknown, fallback = 0): number {
   const parsed = Number.parseInt(String(value), 10);
@@ -224,6 +241,31 @@ function resolveJackpotMultiplierParam(
 
   return fallback;
 }
+
+function readServerText(value: unknown, fallback = ''): string {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : fallback;
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return String(value);
+  }
+
+  return fallback;
+}
+
+function readServerNumber(params: Record<string, unknown>, names: string[], fallback: number): number {
+  for (let i = 0; i < names.length; i += 1) {
+    const value = Number(params[names[i]]);
+    if (Number.isFinite(value)) {
+      return value;
+    }
+  }
+
+  return fallback;
+}
+
 function normalizeWsAddress(rawValue: string): string {
   if (!rawValue || typeof rawValue !== 'string') return '';
   const decoded = decodeURIComponent(rawValue).trim();
@@ -242,6 +284,8 @@ function normalizeWsAddress(rawValue: string): string {
   }
 }
 
+const ALEA_GAME_ID = 'book-of-knight-alea';
+
 function hasActiveServerError(game: any): boolean {
   const serverError = game?.context?.serverError;
   return !!(
@@ -250,6 +294,10 @@ function hasActiveServerError(game: any): boolean {
     typeof serverError.message === 'string' &&
     serverError.message.trim().length > 0
   );
+}
+
+function isDevServerTraceEnabled(): boolean {
+  return !!import.meta.env?.DEV;
 }
 
 export default class GsLink {
@@ -284,6 +332,7 @@ export default class GsLink {
   private activePooledWins: WinLike[];
   private balance = 0;
   private readonly spinAppliedListeners: Set<SpinAppliedListener>;
+  private readonly connectionResultListeners: Set<ConnectionResultListener>;
 
   constructor(game: BaseGame) {
     this.game = game as any;
@@ -323,6 +372,7 @@ export default class GsLink {
     this.numberPatternLocked = false;
     this.pendingLoginTimerId = 0;
     this.spinAppliedListeners = new Set();
+    this.connectionResultListeners = new Set();
     this.winPool = new Pool<WinLike>({
       create: () => Object.assign({}, Win),
       reset: resetPooledWin,
@@ -366,11 +416,15 @@ export default class GsLink {
 
     if (token) {
       this.token = decodeURIComponent(token);
+      this.gameId = ALEA_GAME_ID;
+    } else {
+      this.token = 'demo';
+      this.gameId = DEFAULT_GAME_ID;
     }
 
     if (sessionId) {
       this.sessionId = decodeURIComponent(sessionId);
-      this.gameId = DEFAULT_GAME_ID;
+      this.gameId = ALEA_GAME_ID;
     }
 
     if (lang) {
@@ -435,17 +489,17 @@ export default class GsLink {
 
     const meters = this.game?.meters;
     if (meters) {
-      if (Number.isFinite(params.minDenom)) meters.setMinDenom(toInt(params.minDenom, meters.MIN_DENOM));
-      if (Number.isFinite(params.minBetPerLine)) meters.setMinBetPerLine(toInt(params.minBetPerLine, meters.MIN_BET_PER_LINE));
-      if (Number.isFinite(params.minLines)) meters.setMinLines(toInt(params.minLines, meters.MIN_LINES));
+      meters.setMinDenom(readServerNumber(params, ['minDenom', 'MIN_DENOM'], meters.MIN_DENOM));
+      meters.setMinBetPerLine(readServerNumber(params, ['minBetPerLine', 'MIN_BET_PER_LINE'], meters.MIN_BET_PER_LINE));
+      meters.setMinLines(readServerNumber(params, ['minLines', 'MIN_LINES'], meters.MIN_LINES));
 
-      if (Number.isFinite(params.maxDenom)) meters.setMaxDenom(toInt(params.maxDenom, meters.MAX_DENOM));
-      if (Number.isFinite(params.maxBetPerLine)) meters.setMaxBetPerLine(toInt(params.maxBetPerLine, meters.MAX_BET_PER_LINE));
-      if (Number.isFinite(params.maxLines)) meters.setMaxLines(toInt(params.maxLines, meters.MAX_LINES));
+      meters.setMaxDenom(readServerNumber(params, ['maxDenom', 'MAX_DENOM'], meters.MAX_DENOM));
+      meters.setMaxBetPerLine(readServerNumber(params, ['maxBetPerLine', 'MAX_BET_PER_LINE'], meters.MAX_BET_PER_LINE));
+      meters.setMaxLines(readServerNumber(params, ['maxLines', 'MAX_LINES'], meters.MAX_LINES));
 
-      if (Number.isFinite(params.denom)) meters.setDenom(toInt(params.denom, meters.getDenomination()));
-      if (Number.isFinite(params.betPerLine)) meters.setBetPerLine(toInt(params.betPerLine, meters.getBetPerLine()));
-      if (Number.isFinite(params.linesSelected)) meters.setLines(toInt(params.linesSelected, meters.getLines()));
+      meters.setDenom(readServerNumber(params, ['denom'], meters.getDenomination()));
+      meters.setBetPerLine(readServerNumber(params, ['betPerLine'], meters.getBetPerLine()));
+      meters.setLines(readServerNumber(params, ['linesSelected'], meters.getLines()));
 
       if (typeof params.currency === 'string' && params.currency.trim().length > 0) {
         meters.setCurrency(params.currency.trim());
@@ -455,21 +509,27 @@ export default class GsLink {
 
     const context = this.game?.context;
     if (context) {
-      context.addFreeSpinsCnt = toInt(params.addFreeGamesCnt, 0);
+      context.addFreeSpinsCnt = readServerNumber(params, ['addFreeGamesCnt', 'addFreeSpinsCnt'], 0);
       context.showAddFreeSpins = toBoolFlag(params.showAddFreeSpins, false);
-      context.hasAddFreeSpins = toBoolFlag(params.hasAddFreeGames, false);
+      context.hasAddFreeSpins = toBoolFlag(params.hasAddFreeGames, toBoolFlag(params.hasAddFreeSpins, false));
+      context.bonusCashActive = toBoolFlag(params.bonusCashActive, context.bonusCashActive);
+      context.bonusCashSpins = toInt(params.bonusCashSpins, context.bonusCashSpins || 0);
+      context.bonusCashWin = toInt(params.bonusCashWin, context.bonusCashWin || 0);
 
       context.turboSpinIsEnabled = toBoolFlag(params.hasTurboSpins, context.turboSpinIsEnabled);
+      context.skipIntro = toBoolFlag(params.skipIntro, context.skipIntro);
+      context.skipScreen = toBoolFlag(params.skipScreen, context.skipScreen);
+      context.turboGame = toBoolFlag(params.turboGame, context.turboGame);
       context.hasBuyFeature = toBoolFlag(params.hasBuyFeature, context.hasBuyFeature);
       context.buyFeatureConfigured = true;
       context.hasReloadButton = toBoolFlag(params.hasReloadButton, false);
       context.hasHomeButton = toBoolFlag(params.hasHomeButton, false);
-      context.hasHistoryButton = toBoolFlag(params.hasHistoryButton, false);
+      context.hasHistoryButton = toBoolFlag(params.hasHistoryButton, toBoolFlag(params.hasHistory, false));
       context.hasLobbyButton = toBoolFlag(params.hasLobbyButton, false);
 
-      context.gamePercent = toInt(params.gamePercent, 0);
-      context.gamePercentBuyFree = toInt(params.gamePercentBuyFree, 0);
-      context.gamePercentBuyHold = toInt(params.gamePercentBuyHold, 0);
+      context.gamePercent = readServerText(params.gamePercent, context.gamePercent || '');
+      context.gamePercentBuyFree = readServerText(params.gamePercentBuyFree, context.gamePercentBuyFree || '');
+      context.gamePercentBuyHold = readServerText(params.gamePercentBuyHold, context.gamePercentBuyHold || '');
 
       context.buyFreeGamesMult = toInt(params.buyFreeGamesMult, context.buyFreeGamesMult || 0);
       context.buyHoldAndWinMult = toInt(params.buyHoldAndWinMult, context.buyHoldAndWinMult || 0);
@@ -498,6 +558,9 @@ export default class GsLink {
     this.hasLobby = toBoolFlag(params.hasLobbyButton, this.hasLobby);
     this.updateNumberPatternFromSource(params);
     (this.game as any).locked = toBoolFlag(params.locked, false);
+    if (this.game?.settings?.set) {
+      this.game.settings.set('skipIntro', toBoolFlag(params.skipIntro, this.game.settings.get('skipIntro', false)));
+    }
   }
   setParams(): { betPerLine: number; linesSelected: number; credits: number; denom: number; hasBuyBonus: boolean; buyBonusType: number } {
     this.gameParams.betPerLine = this.game.meters.getBetPerLine();
@@ -529,6 +592,38 @@ export default class GsLink {
     this.connection.addEventListener('error', (event) => this.onError(event));
   }
 
+  waitForConnectionResult(timeoutMs = 10000): Promise<ConnectionResult> {
+    if (this.isFullyConnected()) {
+      return Promise.resolve({ ok: true });
+    }
+
+    const serverErrorMessage = this.game?.context?.serverError?.message;
+    if (this.hasVisibleServerError() && typeof serverErrorMessage === 'string' && serverErrorMessage.trim().length > 0) {
+      return Promise.resolve({ ok: false, message: serverErrorMessage });
+    }
+
+    return new Promise((resolve) => {
+      let settled = false;
+      const finish = (result: ConnectionResult) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeoutId);
+        this.connectionResultListeners.delete(handleResult);
+        resolve(result);
+      };
+
+      const handleResult = (result: ConnectionResult) => {
+        finish(result);
+      };
+
+      const timeoutId = window.setTimeout(() => {
+        finish({ ok: false, message: 'Unable to connect with server.\nCheck your connection and try again' });
+      }, timeoutMs);
+
+      this.connectionResultListeners.add(handleResult);
+    });
+  }
+
   disconnect(): void {
     if (!this.isConnected) {
       debug('game not connected');
@@ -552,25 +647,34 @@ export default class GsLink {
       return false;
     }
 
+    this.traceServer('send', message);
     this.connection.send(JSON.stringify(message));
     return true;
   }
 
   private login(): void {
     if (!this.isConnected) return;
+    this.configureSessionFromQuery();
 
-    this.send({
+    const message: Record<string, unknown> = {
       cmd: 'login',
       token: this.token,
       sessionId: this.sessionId,
       game: this.gameId,
-      userId: this.userId,
       comment: 'Token auth',
-      version: 1,
-      currency: this.currency,
-      site: this.lobbyUrl,
-      lang: this.lang
-    });
+      version: 0,
+      site: this.lobbyUrl
+    };
+
+    if (typeof this.userId === 'string' && this.userId.trim().length > 0) {
+      message.userId = this.userId;
+    }
+
+    if (typeof this.currency === 'string' && this.currency.trim().length > 0) {
+      message.currency = this.currency;
+    }
+
+    this.send(message);
   }
 
   getBalance(): void {
@@ -599,6 +703,7 @@ export default class GsLink {
 
   private onOpen(): void {
     debug('Connection open!');
+    this.traceServer('open', { serverAddress: this.serverAddress });
     this.isConnected = true;
     this.clearServerError();
     if (this.game?.timers?.after) {
@@ -613,10 +718,12 @@ export default class GsLink {
 
   private onClose(): void {
     debug('Connection closed');
+    this.traceServer('close', { serverAddress: this.serverAddress });
     this.clearPendingTimers();
     this.releaseActiveWins();
     this.isConnected = false;
     this.isLoggedIn = false;
+    this.emitConnectionResult({ ok: false, message: 'Unable to connect with server.\nCheck your connection and try again' });
     if (!this.hasVisibleServerError()) {
       this.pushServerError('Unable to connect with server.\nCheck your connection and try again');
     }
@@ -636,7 +743,11 @@ export default class GsLink {
 
     const previousMode = Number(this.game.context.gameMode);
     const finalBalance = toInt(serverOutcome.balance, this.game.meters.credit);
-    const stagedBalance = Math.max(0, finalBalance - toInt(serverOutcome.win, 0));
+    const inFreeGamesMode = previousMode === Number(this.game.context.FREE_GAMES)
+      || Number(serverOutcome.mode) === Number(this.game.context.FREE_GAMES);
+    const stagedBalance = inFreeGamesMode
+      ? Math.max(0, finalBalance - toInt(serverOutcome.fgWin, 0))
+      : Math.max(0, finalBalance - toInt(serverOutcome.win, 0));
     this.game.context.prevGameMode = previousMode;
     this.game.context.finalCreditMeter = finalBalance;
     this.game.meters.credit = stagedBalance;
@@ -738,6 +849,7 @@ export default class GsLink {
   }
 
   private onMessage(event: MessageEvent<string>): void {
+    this.traceServer('message:raw', event.data);
     let response: any;
     try {
       response = JSON.parse(event.data);
@@ -745,6 +857,8 @@ export default class GsLink {
       this.onError(`Invalid server message: ${event.data}`);
       return;
     }
+
+    this.traceServer('message:parsed', response);
 
     if (toInt(response && response.err, 0) > 0) {
       this.isLoggedIn = false;
@@ -758,6 +872,7 @@ export default class GsLink {
         if (response.success === true) {
           this.spinEnded = true;
           this.isLoggedIn = true;
+          this.emitConnectionResult({ ok: true });
           this.captureInitialPatternFromLogin(response);
           if (response.params && typeof response.params === 'object') {
             this.applyLoginParams(response.params);
@@ -800,7 +915,9 @@ export default class GsLink {
 
   onError(error: unknown): void {
     this.errorTxt = typeof error === 'string' ? error : 'GsLink::onError';
+    this.traceServer('error', error);
     this.pushServerError(this.errorTxt);
+    this.emitConnectionResult({ ok: false, message: this.errorTxt });
     logError(this.errorTxt);
   }
 
@@ -901,6 +1018,28 @@ export default class GsLink {
     for (const listener of this.spinAppliedListeners) {
       listener(outcome);
     }
+  }
+
+  private emitConnectionResult(result: ConnectionResult): void {
+    for (const listener of this.connectionResultListeners) {
+      listener(result);
+    }
+
+    if (result.ok || this.connectionResultListeners.size === 0) {
+      this.connectionResultListeners.clear();
+    }
+  }
+
+  private traceServer(stage: string, payload: unknown): void {
+    if (!isDevServerTraceEnabled() || typeof window === 'undefined') return;
+
+    const prefix = `[GsLink:${stage}]`;
+    if (stage === 'error') {
+      console.error(prefix, payload);
+      return;
+    }
+
+    console.log(prefix, payload);
   }
 }
 

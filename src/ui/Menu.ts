@@ -10,6 +10,7 @@ import BuyBonusConfirm from './BuyBonusConfirm';
 import HelpMenu from './HelpMenu';
 import HudTextLayer from './hud/HudTextLayer';
 import HudButtonLayer from './hud/HudButtonLayer';
+import FreeGamesInfoPanel from './FreeGamesInfoPanel';
 
 function toNumber(value, fallback = 0) {
     return Number.isFinite(value) ? value : fallback;
@@ -52,6 +53,7 @@ export default class Menu extends PIXI.Container {
         this.winFieldBg = null;
         this.textLayer = null;
         this.buttonLayer = null;
+        this.freeGamesInfoPanel = null;
         this.betMenu = null;
         this.autoPlayMenu = null;
         this.buyBonusMenu = null;
@@ -144,6 +146,10 @@ export default class Menu extends PIXI.Container {
         });
         this.addChild(this.buttonLayer);
         this.buttonLayer.build();
+
+        this.freeGamesInfoPanel = new FreeGamesInfoPanel(this.game);
+        this.addChild(this.freeGamesInfoPanel);
+        this.freeGamesInfoPanel.build();
     }
 
     onStartPressed() {
@@ -472,6 +478,26 @@ export default class Menu extends PIXI.Container {
     setLines(_lines) {}
     setDenom(_denom) {}
 
+    setFreeGamesTitleLabelFirst(value) {
+        if (!this.freeGamesInfoPanel) return;
+        this.freeGamesInfoPanel.setRemainingCount(value);
+        this.freeGamesInfoPanel.setPanelVisible(true);
+        if (this.game && this.game.context) {
+            this.game.context.freeGamesTitleVisible = true;
+        }
+    }
+
+    showFreeGamesTitle(visible) {
+        if (!this.freeGamesInfoPanel) return;
+        this.freeGamesInfoPanel.setPanelVisible(visible);
+        if (this.game && this.game.context) {
+            this.game.context.freeGamesTitleVisible = !!visible;
+        }
+        if (this.buttonLayer) {
+            this.updateButtonState();
+        }
+    }
+
     setTotalBet(value) {
         if (this.textLayer) {
             this.textLayer.setTotalBet(value);
@@ -549,6 +575,9 @@ export default class Menu extends PIXI.Container {
         this.updateButtonState();
         if (this.buttonLayer) {
             this.buttonLayer.stepTransitions(delta);
+        }
+        if (this.freeGamesInfoPanel && this.freeGamesInfoPanel.act) {
+            this.freeGamesInfoPanel.act(delta);
         }
         this.refreshIdleStatus();
     }
